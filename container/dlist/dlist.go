@@ -1,4 +1,4 @@
-package dklist
+package dlist
 
 import (
 	"bytes"
