@@ -2,12 +2,56 @@ package dconv
 
 import (
 	"donkeygo/encoding/dbinary"
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 )
 
+var StructTagPriority = []string{"c", "p", "json"}
+
+//把对象转换成一个byte
+func Byte(i interface{}) byte {
+	if v, ok := i.(byte); ok {
+		return v
+	}
+	return Uint8(i)
+}
+
+//把对象转化成byte数组
+func Bytes(i interface{}) []byte {
+	if i == nil {
+		return nil
+	}
+	switch value := i.(type) {
+	case string:
+		return []byte(value)
+	case []byte:
+		return value
+	default:
+		return dbinary.Encode(i)
+	}
+}
+
+//rune 类型，代表一个 UTF-8 字符,把其他类型转换成rune
+func Rune(i interface{}) rune {
+	if v, ok := i.(rune); ok {
+		return v
+	}
+	return rune(Int32(i))
+}
+
+// Runes converts <i> to []rune.
+func Runes(i interface{}) []rune {
+	if v, ok := i.([]rune); ok {
+		return v
+	}
+	return []rune(String(i))
+}
+
+//把 i 转换成string类型
 func String(i interface{}) string {
 	if i == nil {
 		return ""
@@ -64,49 +108,48 @@ func String(i interface{}) string {
 	//	}
 	//	return value.String()
 	default:
-		//// Empty checks.
-		//if value == nil {
-		//	return ""
-		//}
-		//if f, ok := value.(apiString); ok {
-		//	// If the variable implements the String() interface,
-		//	// then use that interface to perform the conversion
-		//	return f.String()
-		//}
-		//if f, ok := value.(apiError); ok {
-		//	// If the variable implements the Error() interface,
-		//	// then use that interface to perform the conversion
-		//	return f.Error()
-		//}
-		//// Reflect checks.
-		//var (
-		//	rv   = reflect.ValueOf(value)
-		//	kind = rv.Kind()
-		//)
-		//switch kind {
-		//case reflect.Chan,
-		//	reflect.Map,
-		//	reflect.Slice,
-		//	reflect.Func,
-		//	reflect.Ptr,
-		//	reflect.Interface,
-		//	reflect.UnsafePointer:
-		//	if rv.IsNil() {
-		//		return ""
-		//	}
-		//case reflect.String:
-		//	return rv.String()
-		//}
-		//if kind == reflect.Ptr {
-		//	return String(rv.Elem().Interface())
-		//}
-		//// Finally we use json.Marshal to convert.
-		//if jsonContent, err := json.Marshal(value); err != nil {
-		//	return fmt.Sprint(value)
-		//} else {
-		//	return string(jsonContent)
-		//}
-		return ""
+		// Empty checks.
+		if value == nil {
+			return ""
+		}
+		if f, ok := value.(apiString); ok {
+			// If the variable implements the String() interface,
+			// then use that interface to perform the conversion
+			return f.String()
+		}
+		if f, ok := value.(apiError); ok {
+			// If the variable implements the Error() interface,
+			// then use that interface to perform the conversion
+			return f.Error()
+		}
+		// Reflect checks.
+		var (
+			rv   = reflect.ValueOf(value)
+			kind = rv.Kind()
+		)
+		switch kind {
+		case reflect.Chan,
+			reflect.Map,
+			reflect.Slice,
+			reflect.Func,
+			reflect.Ptr,
+			reflect.Interface,
+			reflect.UnsafePointer:
+			if rv.IsNil() {
+				return ""
+			}
+		case reflect.String:
+			return rv.String()
+		}
+		if kind == reflect.Ptr {
+			return String(rv.Elem().Interface())
+		}
+		// Finally we use json.Marshal to convert.
+		if jsonContent, err := json.Marshal(value); err != nil {
+			return fmt.Sprint(value)
+		} else {
+			return string(jsonContent)
+		}
 	}
 }
 
@@ -118,6 +161,7 @@ var emptyStringMap = map[string]struct{}{
 	"false": {},
 }
 
+//把任何类型转换成bool类型
 func Bool(i interface{}) bool {
 	if i == nil {
 		return false
@@ -159,6 +203,7 @@ func Bool(i interface{}) bool {
 
 }
 
+// Int converts <i> to int.
 func Int(i interface{}) int {
 	if i == nil {
 		return 0
@@ -167,6 +212,38 @@ func Int(i interface{}) int {
 		return v
 	}
 	return int(Int64(i))
+}
+
+// Int8 converts <i> to int8.
+func Int8(i interface{}) int8 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(int8); ok {
+		return v
+	}
+	return int8(Int64(i))
+}
+
+func Int16(i interface{}) int16 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(int16); ok {
+		return v
+	}
+	return int16(Int64(i))
+}
+
+// Int32 converts <i> to int32.
+func Int32(i interface{}) int32 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(int32); ok {
+		return v
+	}
+	return int32(Int64(i))
 }
 
 func Int64(i interface{}) int64 {
@@ -246,6 +323,129 @@ func Int64(i interface{}) int64 {
 	}
 }
 
+// Uint converts <i> to uint.
+func Uint(i interface{}) uint {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(uint); ok {
+		return v
+	}
+	return uint(Uint64(i))
+}
+
+// Uint8 converts <i> to uint8.
+func Uint8(i interface{}) uint8 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(uint8); ok {
+		return v
+	}
+	return uint8(Uint64(i))
+}
+
+// Uint16 converts <i> to uint16.
+func Uint16(i interface{}) uint16 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(uint16); ok {
+		return v
+	}
+	return uint16(Uint64(i))
+}
+
+// Uint32 converts <i> to uint32.
+func Uint32(i interface{}) uint32 {
+	if i == nil {
+		return 0
+	}
+	if v, ok := i.(uint32); ok {
+		return v
+	}
+	return uint32(Uint64(i))
+}
+
+func Uint64(i interface{}) uint64 {
+	if i == nil {
+		return 0
+	}
+	switch value := i.(type) {
+	case int:
+		return uint64(value)
+	case int8:
+		return uint64(value)
+	case int16:
+		return uint64(value)
+	case int32:
+		return uint64(value)
+	case int64:
+		return uint64(value)
+	case uint:
+		return uint64(value)
+	case uint8:
+		return uint64(value)
+	case uint16:
+		return uint64(value)
+	case uint32:
+		return uint64(value)
+	case uint64:
+		return value
+	case float32:
+		return uint64(value)
+	case float64:
+		return uint64(value)
+	case bool:
+		if value {
+			return 1
+		}
+		return 0
+	case []byte:
+		return dbinary.DecodeToUint64(value)
+	default:
+		s := String(i)
+		//16进制转换
+		if len(s) > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X') {
+			if v, e := strconv.ParseUint(s[2:], 16, 64); e == nil {
+				return v
+			}
+		}
+		// 8进制转换
+		if len(s) > 1 && s[0] == '0' {
+			if v, e := strconv.ParseUint(s[1:], 8, 64); e == nil {
+				return v
+			}
+		}
+		// 10进制转换
+		if v, e := strconv.ParseUint(s, 10, 64); e == nil {
+			return v
+		}
+		// Float64
+		return uint64(Float64(value))
+	}
+
+}
+
+//转换成float32
+func Float32(i interface{}) float32 {
+	if i == nil {
+		return 0
+	}
+	switch value := i.(type) {
+	case float32:
+		return value
+	case float64:
+		return float32(value)
+	case []byte:
+		return dbinary.DecodeToFloat32(value)
+	default:
+		v, _ := strconv.ParseFloat(String(i), 64)
+		return float32(v)
+	}
+}
+
+//转换成float64
 func Float64(i interface{}) float64 {
 	if i == nil {
 		return 0
