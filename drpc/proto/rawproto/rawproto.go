@@ -57,6 +57,7 @@ func (that *rawProto) Version() (byte, string) {
 	return that.id, that.name
 }
 
+//打包
 func (that *rawProto) Pack(m proto.Message) error {
 	bb := dbuffer.GetByteBuffer()
 	defer dbuffer.ReleaseByteBuffer(bb)
@@ -157,6 +158,7 @@ func (that *rawProto) writeBody(bb *dbuffer.ByteBuffer, m proto.Message) error {
 	return nil
 }
 
+//解包
 func (that *rawProto) Unpack(m proto.Message) error {
 	bb := dbuffer.GetByteBuffer()
 	defer dbuffer.ReleaseByteBuffer(bb)
@@ -180,6 +182,7 @@ func (that *rawProto) Unpack(m proto.Message) error {
 	return that.readBody(data, m)
 }
 
+//读取消息内容
 func (that *rawProto) readMessage(bb *dbuffer.ByteBuffer, m proto.Message) error {
 	that.rMu.Lock()
 	defer that.rMu.Unlock()
