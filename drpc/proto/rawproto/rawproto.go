@@ -57,7 +57,7 @@ func (that *rawProto) Version() (byte, string) {
 	return that.id, that.name
 }
 
-//打包
+// Pack 打包
 func (that *rawProto) Pack(m proto.Message) error {
 	bb := dbuffer.GetByteBuffer()
 	defer dbuffer.ReleaseByteBuffer(bb)
@@ -158,7 +158,7 @@ func (that *rawProto) writeBody(bb *dbuffer.ByteBuffer, m proto.Message) error {
 	return nil
 }
 
-//解包
+// Unpack 解包
 func (that *rawProto) Unpack(m proto.Message) error {
 	bb := dbuffer.GetByteBuffer()
 	defer dbuffer.ReleaseByteBuffer(bb)

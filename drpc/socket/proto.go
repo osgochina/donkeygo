@@ -11,12 +11,12 @@ type ProtoFunc = proto.ProtoFunc
 //默认传输编码协议
 var defaultProtoFunc = rawproto.RawProtoFunc
 
-//获取默认的传输编码协议
+// DefaultProtoFunc 获取默认的传输编码协议
 func DefaultProtoFunc() ProtoFunc {
 	return defaultProtoFunc
 }
 
-//设置默认的传输编码协议
+// SetDefaultProtoFunc 设置默认的传输编码协议
 func SetDefaultProtoFunc(protoFunc ProtoFunc) {
 	defaultProtoFunc = protoFunc
 }

@@ -17,52 +17,52 @@ type Message = message.Message
 
 type Socket interface {
 
-	//获取socket本地的地址
+	// LocalAddr 获取socket本地的地址
 	LocalAddr() net.Addr
 
-	//获取socket远端的地址
+	// RemoteAddr 获取socket远端的地址
 	RemoteAddr() net.Addr
 
-	//设置超时时间
+	// SetDeadline 设置超时时间
 	SetDeadline(t time.Time) error
 
-	//设置读取数据的超时时间
+	// SetReadDeadline 设置读取数据的超时时间
 	SetReadDeadline(t time.Time) error
 
-	//设置发送数据的超时时间
+	// SetWriteDeadline 设置发送数据的超时时间
 	SetWriteDeadline(t time.Time) error
 
-	//往链接中写入消息
+	// WriteMessage 往链接中写入消息
 	WriteMessage(message Message) error
 
-	//从链接中读取消息头和消息体，并填充到消息对象中
+	// ReadMessage 从链接中读取消息头和消息体，并填充到消息对象中
 	ReadMessage(message Message) error
 
-	//从链接中读取字符
+	// Read 从链接中读取字符
 	Read(b []byte) (n int, err error)
 
-	//写入字符到链接
+	// Write 写入字符到链接
 	Write(b []byte) (n int, err error)
 
-	//关闭链接
+	// Close 关闭链接
 	Close() error
 
-	//链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
+	// Swap 链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
 	Swap(newSwap ...*dmap.Map) *dmap.Map
 
-	//返回链接中自定义数据的长度
+	// SwapLen 返回链接中自定义数据的长度
 	SwapLen() int
 
-	//返回链接的id
+	// ID 返回链接的id
 	ID() string
 
-	//设置链接id
+	// SetID 设置链接id
 	SetID(string)
 
-	//重置net.Conn
+	// Reset 重置net.Conn
 	Reset(netConn net.Conn, protoFunc ...ProtoFunc)
 
-	//返回原始链接
+	// Raw 返回原始链接
 	Raw() net.Conn
 }
 
@@ -80,14 +80,14 @@ type socket struct {
 
 var readerSize = 1024
 
-//获取一个socket
+// GetSocket 获取一个socket
 func GetSocket(c net.Conn, protoFunc ...ProtoFunc) Socket {
 	s := socketPool.Get().(*socket)
 	s.Reset(c, protoFunc...)
 	return s
 }
 
-//对外暴露创建链接的接口
+// NewSocket 对外暴露创建链接的接口
 func NewSocket(c net.Conn, protoFunc ...ProtoFunc) Socket {
 	return newSocket(c, protoFunc)
 }
@@ -103,7 +103,7 @@ func newSocket(c net.Conn, protoFuncList []ProtoFunc) *socket {
 	return s
 }
 
-//获取原始链接
+// Raw 获取原始链接
 func (that *socket) Raw() net.Conn {
 	that.mu.RLock()
 	conn := that.Conn
@@ -111,7 +111,7 @@ func (that *socket) Raw() net.Conn {
 	return conn
 }
 
-//获取链接的原始句柄
+// ControlFD 获取链接的原始句柄
 func (that *socket) ControlFD(f func(fd uintptr)) error {
 	syscallConn, ok := that.Raw().(syscall.Conn)
 	if !ok {
@@ -129,7 +129,7 @@ func (that *socket) Read(b []byte) (int, error) {
 	return that.readerWithBuffer.Read(b)
 }
 
-//读取数据到消息
+// ReadMessage 读取数据到消息
 func (that *socket) ReadMessage(message Message) error {
 	that.mu.RLock()
 	protocol := that.protocol
@@ -137,7 +137,7 @@ func (that *socket) ReadMessage(message Message) error {
 	return protocol.Unpack(message)
 }
 
-//写入消息
+// WriteMessage 写入消息
 func (that *socket) WriteMessage(message Message) error {
 	that.mu.RLock()
 	protocol := that.protocol
@@ -149,7 +149,7 @@ func (that *socket) WriteMessage(message Message) error {
 	return err
 }
 
-//链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
+// Swap 链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
 func (that *socket) Swap(newSwap ...*dmap.Map) *dmap.Map {
 	if len(newSwap) > 0 {
 		that.swap = newSwap[0]
@@ -160,7 +160,7 @@ func (that *socket) Swap(newSwap ...*dmap.Map) *dmap.Map {
 	return swap
 }
 
-//返回链接中自定义数据的长度
+// SwapLen 返回链接中自定义数据的长度
 func (that *socket) SwapLen() int {
 	swap := that.swap
 	if swap == nil {

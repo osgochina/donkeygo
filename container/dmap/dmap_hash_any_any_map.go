@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 )
 
-//并发安全的hash字典表
+// AnyAnyMap 并发安全的hash字典表
 type AnyAnyMap struct {
 	mu   rwmutex.RWMutex
 	data map[interface{}]interface{}
 }
 
-//创建hash表
+// NewAnyAnyMap 创建hash表
 func NewAnyAnyMap(safe ...bool) *AnyAnyMap {
 	return &AnyAnyMap{
 		mu:   rwmutex.Create(safe...),
@@ -21,7 +21,7 @@ func NewAnyAnyMap(safe ...bool) *AnyAnyMap {
 	}
 }
 
-//通过map创建hash表
+// NewAnyAnyMapFrom 通过map创建hash表
 func NewAnyAnyMapFrom(data map[interface{}]interface{}, safe ...bool) *AnyAnyMap {
 	return &AnyAnyMap{
 		mu:   rwmutex.Create(safe...),
@@ -29,7 +29,7 @@ func NewAnyAnyMapFrom(data map[interface{}]interface{}, safe ...bool) *AnyAnyMap
 	}
 }
 
-//迭代hash表
+// Iterator 迭代hash表
 func (that *AnyAnyMap) Iterator(f func(k interface{}, v interface{}) bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -40,7 +40,7 @@ func (that *AnyAnyMap) Iterator(f func(k interface{}, v interface{}) bool) {
 	}
 }
 
-//返回原始结构
+// Map 返回原始结构
 func (that *AnyAnyMap) Map() map[interface{}]interface{} {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -55,7 +55,7 @@ func (that *AnyAnyMap) Map() map[interface{}]interface{} {
 	return data
 }
 
-//copy一份map数据
+// MapCopy copy一份map数据
 func (that *AnyAnyMap) MapCopy() map[interface{}]interface{} {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -66,12 +66,12 @@ func (that *AnyAnyMap) MapCopy() map[interface{}]interface{} {
 	return data
 }
 
-//clone一份数据。并返回新的对象指针
+// Clone clone一份数据。并返回新的对象指针
 func (that *AnyAnyMap) Clone(safe ...bool) *AnyAnyMap {
 	return NewFrom(that.MapCopy(), safe...)
 }
 
-//清除空值
+// FilterEmpty 清除空值
 func (that *AnyAnyMap) FilterEmpty() {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -82,7 +82,7 @@ func (that *AnyAnyMap) FilterEmpty() {
 	}
 }
 
-//清除nil值
+// FilterNil 清除nil值
 func (that *AnyAnyMap) FilterNil() {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -93,7 +93,7 @@ func (that *AnyAnyMap) FilterNil() {
 	}
 }
 
-//设置key value
+// Set 设置key value
 func (that *AnyAnyMap) Set(key interface{}, value interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -103,7 +103,7 @@ func (that *AnyAnyMap) Set(key interface{}, value interface{}) {
 	that.data[key] = value
 }
 
-//批量设置
+// Sets 批量设置
 func (that *AnyAnyMap) Sets(data map[interface{}]interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -116,7 +116,7 @@ func (that *AnyAnyMap) Sets(data map[interface{}]interface{}) {
 	}
 }
 
-//通过key查找value
+// Search 通过key查找value
 func (that *AnyAnyMap) Search(key interface{}) (value interface{}, found bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -126,13 +126,13 @@ func (that *AnyAnyMap) Search(key interface{}) (value interface{}, found bool) {
 	return
 }
 
-//查找key
+// Get 查找key
 func (that *AnyAnyMap) Get(key interface{}) (value interface{}) {
 	v, _ := that.Search(key)
 	return v
 }
 
-//随机获取一个字典key，value
+// Pop 随机获取一个字典key，value
 func (that *AnyAnyMap) Pop() (key, value interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -143,7 +143,7 @@ func (that *AnyAnyMap) Pop() (key, value interface{}) {
 	return
 }
 
-//随机获取指定size的字典值，-1表示获取全部
+// Pops 随机获取指定size的字典值，-1表示获取全部
 func (that *AnyAnyMap) Pops(size int) map[interface{}]interface{} {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -191,7 +191,7 @@ func (that *AnyAnyMap) doSetWithLockCheck(key interface{}, value interface{}) in
 	return value
 }
 
-//查找key对应的值是否存在，如果未找到，则写入
+// GetOrSet 查找key对应的值是否存在，如果未找到，则写入
 func (that *AnyAnyMap) GetOrSet(key interface{}, value interface{}) interface{} {
 	if v, ok := that.Search(key); !ok {
 		return that.doSetWithLockCheck(key, value)
@@ -200,7 +200,7 @@ func (that *AnyAnyMap) GetOrSet(key interface{}, value interface{}) interface{} 
 	}
 }
 
-//获取指定key的值，如果不存在，则通过方法f生成该值，并写入到map，然后返回
+// GetOrSetFunc 获取指定key的值，如果不存在，则通过方法f生成该值，并写入到map，然后返回
 //生成新值的方法未使用到锁，不会造成阻塞
 func (that *AnyAnyMap) GetOrSetFunc(key interface{}, f func() interface{}) interface{} {
 	if v, ok := that.Search(key); !ok {
@@ -210,7 +210,7 @@ func (that *AnyAnyMap) GetOrSetFunc(key interface{}, f func() interface{}) inter
 	}
 }
 
-//与上面GetOrSetFunc方法的区别，在乎生成值的时候是否使用锁，此方法生成值的时候会使用到做，传入的方法不能阻塞，
+// GetOrSetFuncLock 与上面GetOrSetFunc方法的区别，在乎生成值的时候是否使用锁，此方法生成值的时候会使用到做，传入的方法不能阻塞，
 //不然会造成map加锁不可读写
 func (that *AnyAnyMap) GetOrSetFuncLock(key interface{}, f func() interface{}) interface{} {
 	if v, ok := that.Search(key); !ok {
@@ -220,7 +220,7 @@ func (that *AnyAnyMap) GetOrSetFuncLock(key interface{}, f func() interface{}) i
 	}
 }
 
-//如果map中不存在该key，则设置
+// SetIfNotExist 如果map中不存在该key，则设置
 func (that *AnyAnyMap) SetIfNotExist(key interface{}, value interface{}) bool {
 	if !that.Contains(key) {
 		that.doSetWithLockCheck(key, value)
@@ -229,7 +229,7 @@ func (that *AnyAnyMap) SetIfNotExist(key interface{}, value interface{}) bool {
 	return false
 }
 
-//如果map中不存在key，则调用方法f生成，生成的时候未加锁
+// SetIfNotExistFunc 如果map中不存在key，则调用方法f生成，生成的时候未加锁
 func (that *AnyAnyMap) SetIfNotExistFunc(key interface{}, f func() interface{}) bool {
 	if !that.Contains(key) {
 		that.doSetWithLockCheck(key, f())
@@ -238,7 +238,7 @@ func (that *AnyAnyMap) SetIfNotExistFunc(key interface{}, f func() interface{}) 
 	return false
 }
 
-//如果map中不存在key，则调用方法f生成，生成的时候加锁
+// SetIfNotExistFuncLock 如果map中不存在key，则调用方法f生成，生成的时候加锁
 func (that *AnyAnyMap) SetIfNotExistFuncLock(key interface{}, f func() interface{}) bool {
 	if !that.Contains(key) {
 		that.doSetWithLockCheck(key, f)
@@ -247,7 +247,7 @@ func (that *AnyAnyMap) SetIfNotExistFuncLock(key interface{}, f func() interface
 	return false
 }
 
-//判断传入的key是否存在于map中
+// Contains 判断传入的key是否存在于map中
 func (that *AnyAnyMap) Contains(key interface{}) bool {
 	var ok bool
 	that.mu.RLock()
@@ -258,7 +258,7 @@ func (that *AnyAnyMap) Contains(key interface{}) bool {
 	return ok
 }
 
-//移除指定的key，并返回它对应的值
+// Remove 移除指定的key，并返回它对应的值
 func (that *AnyAnyMap) Remove(key interface{}) (value interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -272,7 +272,7 @@ func (that *AnyAnyMap) Remove(key interface{}) (value interface{}) {
 	return
 }
 
-//批量删除key
+// Removes 批量删除key
 func (that *AnyAnyMap) Removes(keys []interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -283,7 +283,7 @@ func (that *AnyAnyMap) Removes(keys []interface{}) {
 	}
 }
 
-//返回map的所有key
+// Keys 返回map的所有key
 func (that *AnyAnyMap) Keys() []interface{} {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -298,7 +298,7 @@ func (that *AnyAnyMap) Keys() []interface{} {
 	return keys
 }
 
-//返回map所有的值
+// Values 返回map所有的值
 func (that *AnyAnyMap) Values() []interface{} {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -313,7 +313,7 @@ func (that *AnyAnyMap) Values() []interface{} {
 	return values
 }
 
-//返回map的长度
+// Size 返回map的长度
 func (that *AnyAnyMap) Size() int {
 	that.mu.RLock()
 	length := len(that.data)
@@ -321,40 +321,40 @@ func (that *AnyAnyMap) Size() int {
 	return length
 }
 
-//判断map是否为空
+// IsEmpty 判断map是否为空
 func (that *AnyAnyMap) IsEmpty() bool {
 	return that.Size() == 0
 }
 
-//清除map
+// Clear 清除map
 func (that *AnyAnyMap) Clear() {
 	that.mu.Lock()
 	that.data = make(map[interface{}]interface{})
 	that.mu.Unlock()
 }
 
-//替换map
+// Replace 替换map
 func (that *AnyAnyMap) Replace(data map[interface{}]interface{}) {
 	that.mu.Lock()
 	that.data = data
 	that.mu.Unlock()
 }
 
-//加锁执行方法操作数据
+// LockFunc 加锁执行方法操作数据
 func (that *AnyAnyMap) LockFunc(f func(m map[interface{}]interface{})) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	f(that.data)
 }
 
-//加读锁执行方法操作数据
+// RLockFunc 加读锁执行方法操作数据
 func (that *AnyAnyMap) RLockFunc(f func(m map[interface{}]interface{})) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	f(that.data)
 }
 
-//翻转key和value
+// Flip 翻转key和value
 func (that *AnyAnyMap) Flip() {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -365,7 +365,7 @@ func (that *AnyAnyMap) Flip() {
 	that.data = n
 }
 
-//合并两个map
+// Merge 合并两个map
 func (that *AnyAnyMap) Merge(other *AnyAnyMap) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -388,12 +388,12 @@ func (that *AnyAnyMap) String() string {
 	return dconv.UnsafeBytesToStr(b)
 }
 
-//json序列化
+// MarshalJSON json序列化
 func (that *AnyAnyMap) MarshalJSON() ([]byte, error) {
 	return json.Marshal(dconv.Map(that.Map()))
 }
 
-//json反序列化
+// UnmarshalJSON json反序列化
 func (that *AnyAnyMap) UnmarshalJSON(b []byte) error {
 	that.mu.Lock()
 	defer that.mu.Unlock()
