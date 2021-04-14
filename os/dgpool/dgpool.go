@@ -17,7 +17,7 @@ type Pool struct {
 //默认创建一个协程池
 var pool = New()
 
-//创建协程池，limit限制最多能同时运行多少个工作协程
+// New 创建协程池，limit限制最多能同时运行多少个工作协程
 func New(limit ...int) *Pool {
 	p := &Pool{
 		limit:  -1,
@@ -31,27 +31,27 @@ func New(limit ...int) *Pool {
 	return p
 }
 
-//往默认协程池中添加jobs
+// Add 往默认协程池中添加jobs
 func Add(f func()) error {
 	return pool.Add(f)
 }
 
-//在默认协程池中执行方法，并且执行完成后，如果出错，则调用recover方法
+// AddWithRecover 在默认协程池中执行方法，并且执行完成后，如果出错，则调用recover方法
 func AddWithRecover(userFunc func(), recoverFunc ...func(err error)) error {
 	return pool.AddWithRecover(userFunc, recoverFunc...)
 }
 
-//默认协程池的大小
+// Size 默认协程池的大小
 func Size() int {
 	return pool.Size()
 }
 
-//默认协程池当前中有多少个任务需要执行
+// Jobs 默认协程池当前中有多少个任务需要执行
 func Jobs() int {
 	return pool.Jobs()
 }
 
-//添加待执行的方法到协程池
+// Add 添加待执行的方法到协程池
 func (that *Pool) Add(f func()) error {
 
 	//如果协程池已关闭，则返回错误
@@ -78,7 +78,7 @@ func (that *Pool) Add(f func()) error {
 	return nil
 }
 
-//添加任务，并在任务执行出错的情况下，回调recoverFunc
+// AddWithRecover 添加任务，并在任务执行出错的情况下，回调recoverFunc
 func (that *Pool) AddWithRecover(useFunc func(), recoverFunc ...func(err error)) error {
 	return that.Add(func() {
 		defer func() {
@@ -109,27 +109,27 @@ func (that *Pool) fork() {
 	}()
 }
 
-//判断协程池是否关闭
+// IsClosed 判断协程池是否关闭
 func (that *Pool) IsClosed() bool {
 	return that.closed.Val()
 }
 
-//关闭协程池
+// Close 关闭协程池
 func (that *Pool) Close() {
 	that.closed.Set(true)
 }
 
-//协程池中的协程数量
+// Size 协程池中的协程数量
 func (that *Pool) Size() int {
 	return that.count.Val()
 }
 
-//协程池中的待执行任务数量
+// Jobs 协程池中的待执行任务数量
 func (that *Pool) Jobs() int {
 	return that.list.Size()
 }
 
-//协程池最大能够启动多少个协程
+// Cap 协程池最大能够启动多少个协程
 func (that *Pool) Cap() int {
 	return that.limit
 }

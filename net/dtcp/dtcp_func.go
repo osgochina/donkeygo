@@ -28,7 +28,7 @@ func NewNetConn(addr string, timeout ...time.Duration) (net.Conn, error) {
 	return net.DialTimeout("tcp", addr, d)
 }
 
-//创建并返回一个tls加密的 net.Conn 链接，addr的格式为："127.0.0.1:80",
+// NewNetConnTLS 创建并返回一个tls加密的 net.Conn 链接，addr的格式为："127.0.0.1:80",
 func NewNetConnTLS(addr string, tslConfig *tls.Config, timeout ...time.Duration) (net.Conn, error) {
 	dialer := &net.Dialer{
 		Timeout: dDefaultConnTimeout,

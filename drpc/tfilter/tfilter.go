@@ -6,15 +6,15 @@ import (
 	"math"
 )
 
-//传输过滤器接口
+// TransferFilter 传输过滤器接口
 type TransferFilter interface {
-	// 过滤器id
+	// ID 过滤器id
 	ID() byte
-	// 过滤器名字
+	// Name 过滤器名字
 	Name() string
-	//过滤器打包方法
+	// OnPack 过滤器打包方法
 	OnPack([]byte) ([]byte, error)
-	// 过滤器解包方法
+	// OnUnpack 过滤器解包方法
 	OnUnpack([]byte) ([]byte, error)
 }
 
@@ -28,7 +28,7 @@ var transferFilterMap = struct {
 
 var ErrTransferFilterTooLong = errors.New("The length of transfer pipe cannot be bigger than 255 ")
 
-//注册过滤器
+// Reg 注册过滤器
 func Reg(tFilter TransferFilter) {
 	id := tFilter.ID()
 	name := tFilter.Name()
@@ -42,7 +42,7 @@ func Reg(tFilter TransferFilter) {
 	transferFilterMap.nameMap[name] = tFilter
 }
 
-//通过id获取过滤器对象
+// Get 通过id获取过滤器对象
 func Get(id byte) (TransferFilter, error) {
 	tFilter, ok := transferFilterMap.idMap[id]
 	if !ok {
@@ -51,7 +51,7 @@ func Get(id byte) (TransferFilter, error) {
 	return tFilter, nil
 }
 
-//通过过滤器名称返回过滤器对象
+// GetByName 通过过滤器名称返回过滤器对象
 func GetByName(name string) (TransferFilter, error) {
 	tFilter, ok := transferFilterMap.nameMap[name]
 	if !ok {
@@ -60,22 +60,22 @@ func GetByName(name string) (TransferFilter, error) {
 	return tFilter, nil
 }
 
-//传输过滤器管道
+// PipeTFilter 传输过滤器管道
 type PipeTFilter struct {
 	filters []TransferFilter
 }
 
-//创建传输过滤器管道
+// NewPipeTFilter 创建传输过滤器管道
 func NewPipeTFilter() *PipeTFilter {
 	return new(PipeTFilter)
 }
 
-//清除传输过滤器管道
+// Reset 清除传输过滤器管道
 func (that *PipeTFilter) Reset() {
 	that.filters = that.filters[:0]
 }
 
-//追加传输过滤器
+// Append 追加传输过滤器
 func (that *PipeTFilter) Append(filterID ...byte) error {
 	for _, id := range filterID {
 		filter, err := Get(id)
@@ -87,7 +87,7 @@ func (that *PipeTFilter) Append(filterID ...byte) error {
 	return that.check()
 }
 
-//从指定传输过滤器管道追加过滤器
+// AppendFrom 从指定传输过滤器管道追加过滤器
 func (that *PipeTFilter) AppendFrom(src *PipeTFilter) {
 	for _, filter := range src.filters {
 		that.filters = append(that.filters, filter)
@@ -102,7 +102,7 @@ func (that *PipeTFilter) check() error {
 	return nil
 }
 
-//当前传输过滤器管道的长度
+// Len 当前传输过滤器管道的长度
 func (that *PipeTFilter) Len() int {
 	if that == nil {
 		return 0
@@ -110,7 +110,7 @@ func (that *PipeTFilter) Len() int {
 	return len(that.filters)
 }
 
-//获取当前传输过滤器管道中的id
+// IDs 获取当前传输过滤器管道中的id
 func (that *PipeTFilter) IDs() []byte {
 	var ids = make([]byte, that.Len())
 	if that.Len() == 0 {
@@ -134,7 +134,7 @@ func (that *PipeTFilter) Names() []string {
 	return names
 }
 
-//迭代
+// Iterator 迭代
 func (that *PipeTFilter) Iterator(callback func(idx int, filter TransferFilter) bool) {
 	for idx, filter := range that.filters {
 		if !callback(idx, filter) {
@@ -143,7 +143,7 @@ func (that *PipeTFilter) Iterator(callback func(idx int, filter TransferFilter) 
 	}
 }
 
-//打包，从最内层到最外层
+// OnPack 打包，从最内层到最外层
 func (that *PipeTFilter) OnPack(data []byte) ([]byte, error) {
 	var err error
 	for i := that.Len() - 1; i >= 0; i-- {
@@ -154,7 +154,7 @@ func (that *PipeTFilter) OnPack(data []byte) ([]byte, error) {
 	return data, err
 }
 
-//解包，从最外层到最内层
+// OnUnpack 解包，从最外层到最内层
 func (that *PipeTFilter) OnUnpack(data []byte) ([]byte, error) {
 	var err error
 	var count = that.Len()

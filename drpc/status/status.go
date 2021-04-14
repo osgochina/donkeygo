@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	// 成功状态
+	// OK 成功状态
 	OK int32 = 0
 
-	// 未知错误
+	// UnknownError 未知错误
 	UnknownError int32 = -1
 )
 
@@ -24,7 +24,7 @@ type Status struct {
 	*stack
 }
 
-//传入错误码，错误消息，错误原因，创建一个状态结构对象
+// New 传入错误码，错误消息，错误原因，创建一个状态结构对象
 func New(code int32, msg string, cause ...interface{}) *Status {
 	s := &Status{
 		code: code,
@@ -36,12 +36,12 @@ func New(code int32, msg string, cause ...interface{}) *Status {
 	return s
 }
 
-//传入错误码，错误消息，错误栈堆，创建一个状态结构对象
+// NewWithStack 传入错误码，错误消息，错误栈堆，创建一个状态结构对象
 func NewWithStack(code int32, msg string, cause ...interface{}) *Status {
 	return New(code, msg, cause...).TagStack(1)
 }
 
-//设置错误码
+// SetCode 设置错误码
 func (that *Status) SetCode(code int32) *Status {
 	if that != nil {
 		that.code = code
@@ -49,7 +49,7 @@ func (that *Status) SetCode(code int32) *Status {
 	return that
 }
 
-//设置错误消息
+// SetMsg 设置错误消息
 func (that *Status) SetMsg(msg string) *Status {
 	if that != nil {
 		that.msg = msg
@@ -57,7 +57,7 @@ func (that *Status) SetMsg(msg string) *Status {
 	return that
 }
 
-//设置错误原因
+// SetCases 设置错误原因
 func (that *Status) SetCases(cause interface{}) *Status {
 	if that != nil {
 		that.cause = toError(cause)
@@ -65,7 +65,7 @@ func (that *Status) SetCases(cause interface{}) *Status {
 	return that
 }
 
-//获取错误码
+// Code 获取错误码
 func (that *Status) Code() int32 {
 	if that == nil {
 		return OK
@@ -73,7 +73,7 @@ func (that *Status) Code() int32 {
 	return that.code
 }
 
-//获取错误消息
+// Msg 获取错误消息
 func (that *Status) Msg() string {
 	if that == nil {
 		return ""
@@ -84,7 +84,7 @@ func (that *Status) Msg() string {
 	return that.msg
 }
 
-//获取错误原因
+// Cause 获取错误原因
 func (that *Status) Cause() error {
 	if that == nil {
 		return nil
@@ -95,22 +95,22 @@ func (that *Status) Cause() error {
 	return that.cause
 }
 
-//清除状态结构
+// Clear 清除状态结构
 func (that *Status) Clear() {
 	*that = Status{}
 }
 
-//判断状态是否成功
+// OK 判断状态是否成功
 func (that *Status) OK() bool {
 	return that.Code() == OK
 }
 
-//是否为未知错误
+// UnknownError 是否为未知错误
 func (that *Status) UnknownError() bool {
 	return that.Code() == UnknownError
 }
 
-//栈堆结构
+// TagStack 栈堆结构
 func (that *Status) TagStack(skip ...int) *Status {
 	depth := 3
 	if len(skip) > 0 {
@@ -120,7 +120,7 @@ func (that *Status) TagStack(skip ...int) *Status {
 	return that
 }
 
-//获取错误的栈堆
+// StackTrace 获取错误的栈堆
 func (that *Status) StackTrace() StackTrace {
 	if that == nil || that.stack == nil {
 		return nil
@@ -137,7 +137,7 @@ func (that *Status) String() string {
 	return string(b)
 }
 
-//格式化输出
+// Format 格式化输出
 func (that *Status) Format(state fmt.State, verb rune) {
 	switch verb {
 	case 'v':
@@ -175,7 +175,7 @@ var (
 	_ json.Unmarshaler = new(Status)
 )
 
-//json编码
+// MarshalJSON json编码
 func (that *Status) MarshalJSON() ([]byte, error) {
 	if that == nil {
 		return null, nil
@@ -197,7 +197,7 @@ func (that *Status) MarshalJSON() ([]byte, error) {
 	return b, nil
 }
 
-//json解码
+// UnmarshalJSON json解码
 func (that *Status) UnmarshalJSON(b []byte) error {
 	if that == nil {
 		return nil
@@ -221,7 +221,7 @@ func (that *Status) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-//copy 一个新的状态对象
+// Copy copy 一个新的状态对象
 func (that *Status) Copy(newCause interface{}, newStackSkip ...int) *Status {
 	if that == nil {
 		return nil

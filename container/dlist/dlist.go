@@ -14,11 +14,11 @@ type (
 		list *list.List
 		mu   rwmutex.RWMutex
 	}
-	//链表中的节点类型
+	// Element 链表中的节点类型
 	Element = list.Element
 )
 
-//创建
+// New 创建
 func New(safe ...bool) *List {
 	return &List{
 		list: list.New(),
@@ -26,7 +26,7 @@ func New(safe ...bool) *List {
 	}
 }
 
-//创建一个链表，并把切片中的对象填充进该链表
+// NewFrom 创建一个链表，并把切片中的对象填充进该链表
 func NewFrom(array []interface{}, safe ...bool) *List {
 	l := list.New()
 	for _, v := range array {
@@ -39,7 +39,7 @@ func NewFrom(array []interface{}, safe ...bool) *List {
 	}
 }
 
-// 往链表的头部插入一个值为v的节点，并返回该节点
+// PushFront 往链表的头部插入一个值为v的节点，并返回该节点
 func (that *List) PushFront(v interface{}) *Element {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -49,7 +49,7 @@ func (that *List) PushFront(v interface{}) *Element {
 	return that.list.PushFront(v)
 }
 
-//往链表的尾部插入一个值为v的节点，并返回该节点
+// PushBack 往链表的尾部插入一个值为v的节点，并返回该节点
 func (that *List) PushBack(v interface{}) *Element {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -59,7 +59,7 @@ func (that *List) PushBack(v interface{}) *Element {
 	return that.list.PushBack(v)
 }
 
-//往链表的头部插入多个值
+// PushFronts 往链表的头部插入多个值
 func (that *List) PushFronts(values []interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -71,7 +71,7 @@ func (that *List) PushFronts(values []interface{}) {
 	}
 }
 
-//往链表的尾部插入多个值
+// PushBacks 往链表的尾部插入多个值
 func (that *List) PushBacks(values []interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -83,7 +83,7 @@ func (that *List) PushBacks(values []interface{}) {
 	}
 }
 
-//获取链表的头节点的值，并且移除该节点
+// PopFront 获取链表的头节点的值，并且移除该节点
 func (that *List) PopFront() interface{} {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -97,7 +97,7 @@ func (that *List) PopFront() interface{} {
 	return nil
 }
 
-//获取链表的尾节点的值，并且移除该节点
+// PopBack 获取链表的尾节点的值，并且移除该节点
 func (that *List) PopBack() interface{} {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -111,7 +111,7 @@ func (that *List) PopBack() interface{} {
 	return nil
 }
 
-//取出链表尾部最多max个节点的值
+// PopBacks 取出链表尾部最多max个节点的值
 func (that *List) PopBacks(max int) (values []interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -132,7 +132,7 @@ func (that *List) PopBacks(max int) (values []interface{}) {
 	return
 }
 
-//取出链表头部最多max个节点的值
+// PopFronts 取出链表头部最多max个节点的值
 func (that *List) PopFronts(max int) (values []interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -153,17 +153,17 @@ func (that *List) PopFronts(max int) (values []interface{}) {
 	return
 }
 
-//从链表尾部开始取，取出全部的值
+// PopBackAll 从链表尾部开始取，取出全部的值
 func (that *List) PopBackAll() []interface{} {
 	return that.PopBacks(-1)
 }
 
-//从链表头部开始取，取出全部的值
+// PopFrontAll 从链表头部开始取，取出全部的值
 func (that *List) PopFrontAll() []interface{} {
 	return that.PopFronts(-1)
 }
 
-//查看链表从头开始的所有值
+// FrontAll 查看链表从头开始的所有值
 func (that *List) FrontAll() (values []interface{}) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -180,7 +180,7 @@ func (that *List) FrontAll() (values []interface{}) {
 	return
 }
 
-//查看链表从尾开始的所有值
+// BackAll 查看链表从尾开始的所有值
 func (that *List) BackAll() (values []interface{}) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -197,7 +197,7 @@ func (that *List) BackAll() (values []interface{}) {
 	return
 }
 
-//查看链表头部的值
+// FrontValue 查看链表头部的值
 func (that *List) FrontValue() (value interface{}) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -210,7 +210,7 @@ func (that *List) FrontValue() (value interface{}) {
 	return
 }
 
-//查看链表尾部的值
+// BackValue 查看链表尾部的值
 func (that *List) BackValue() (value interface{}) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -223,7 +223,7 @@ func (that *List) BackValue() (value interface{}) {
 	return
 }
 
-//获取链表的头部节点
+// Front 获取链表的头部节点
 func (that *List) Front() (e *Element) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -234,7 +234,7 @@ func (that *List) Front() (e *Element) {
 	return
 }
 
-//获取链表的尾部节点
+// Back 获取链表的尾部节点
 func (that *List) Back() (e *Element) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -245,7 +245,7 @@ func (that *List) Back() (e *Element) {
 	return
 }
 
-//获取链表的长度
+// Len 获取链表的长度
 func (that *List) Len() (length int) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -256,24 +256,24 @@ func (that *List) Len() (length int) {
 	return
 }
 
-//获取链表的长度
+// Size 获取链表的长度
 func (that *List) Size() int {
 	return that.Len()
 }
 
-//移除所有节点
+// RemoveAll 移除所有节点
 func (that *List) RemoveAll() {
 	that.mu.Lock()
 	that.list = list.New()
 	that.mu.Unlock()
 }
 
-//清空链表
+// Clear 清空链表
 func (that *List) Clear() {
 	that.RemoveAll()
 }
 
-//把e节点从链表中移动到p节点的前面
+// MoveBefore 把e节点从链表中移动到p节点的前面
 func (that *List) MoveBefore(e, p *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -283,7 +283,7 @@ func (that *List) MoveBefore(e, p *Element) {
 	that.list.MoveBefore(e, p)
 }
 
-//把e节点移动到p节点的后面
+// MoveAfter 把e节点移动到p节点的后面
 func (that *List) MoveAfter(e, p *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -293,7 +293,7 @@ func (that *List) MoveAfter(e, p *Element) {
 	that.list.MoveAfter(e, p)
 }
 
-//把节点e移动到链表的头部
+// MoveToFront 把节点e移动到链表的头部
 func (that *List) MoveToFront(e *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -303,7 +303,7 @@ func (that *List) MoveToFront(e *Element) {
 	that.list.MoveToFront(e)
 }
 
-//把节点e移动到链表的尾部
+// MoveToBack 把节点e移动到链表的尾部
 func (that *List) MoveToBack(e *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -313,7 +313,7 @@ func (that *List) MoveToBack(e *Element) {
 	that.list.MoveToBack(e)
 }
 
-//把链表other链接到链表的尾部
+// PushBackList 把链表other链接到链表的尾部
 func (that *List) PushBackList(other *List) {
 	if that != other {
 		other.mu.RLock()
@@ -327,7 +327,7 @@ func (that *List) PushBackList(other *List) {
 	that.list.PushBackList(other.list)
 }
 
-//把链表other链接到链表的头部
+// PushFrontList 把链表other链接到链表的头部
 func (that *List) PushFrontList(other *List) {
 	if that != other {
 		other.mu.RLock()
@@ -341,7 +341,7 @@ func (that *List) PushFrontList(other *List) {
 	that.list.PushFrontList(other.list)
 }
 
-//插入值v到节点p的后面，并返回该节点
+// InsertAfter 插入值v到节点p的后面，并返回该节点
 func (that *List) InsertAfter(p *Element, v interface{}) (e *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -352,7 +352,7 @@ func (that *List) InsertAfter(p *Element, v interface{}) (e *Element) {
 	return
 }
 
-//插入值v到节点p的前面，并返回该节点
+// InsertBefore 插入值v到节点p的前面，并返回该节点
 func (that *List) InsertBefore(p *Element, v interface{}) (e *Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -363,7 +363,7 @@ func (that *List) InsertBefore(p *Element, v interface{}) (e *Element) {
 	return
 }
 
-//移除节点e，并返回该节点的值
+// Remove 移除节点e，并返回该节点的值
 func (that *List) Remove(e *Element) (value interface{}) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -374,7 +374,7 @@ func (that *List) Remove(e *Element) (value interface{}) {
 	return
 }
 
-//移除指定的一批节点
+// Removes 移除指定的一批节点
 func (that *List) Removes(es []*Element) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -387,7 +387,7 @@ func (that *List) Removes(es []*Element) {
 	return
 }
 
-//加读锁执行函数
+// RLockFunc 加读锁执行函数
 func (that *List) RLockFunc(f func(list *list.List)) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -396,7 +396,7 @@ func (that *List) RLockFunc(f func(list *list.List)) {
 	}
 }
 
-//加读写锁执行函数
+// LockFunc 加读写锁执行函数
 func (that *List) LockFunc(f func(list *list.List)) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -406,12 +406,12 @@ func (that *List) LockFunc(f func(list *list.List)) {
 	f(that.list)
 }
 
-//迭代
+// Iterator 迭代
 func (that *List) Iterator(f func(e *Element) bool) {
 	that.IteratorAsc(f)
 }
 
-//从头开始迭代
+// IteratorAsc 从头开始迭代
 func (that *List) IteratorAsc(f func(e *Element) bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -428,7 +428,7 @@ func (that *List) IteratorAsc(f func(e *Element) bool) {
 	}
 }
 
-//从尾部开始迭代
+// IteratorDesc 从尾部开始迭代
 func (that *List) IteratorDesc(f func(e *Element) bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -445,7 +445,7 @@ func (that *List) IteratorDesc(f func(e *Element) bool) {
 	}
 }
 
-//把链表中的值，按glue分隔符链接起来
+// Join 把链表中的值，按glue分隔符链接起来
 func (that *List) Join(glue string) string {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -472,12 +472,12 @@ func (that *List) String() string {
 	return "[" + that.Join(",") + "]"
 }
 
-//把链表转成json串
+// MarshalJSON 把链表转成json串
 func (that *List) MarshalJSON() ([]byte, error) {
 	return json.Marshal(that.FrontAll())
 }
 
-//把json串反序列化成链表
+// UnmarshalJSON 把json串反序列化成链表
 func (that *List) UnmarshalJSON(b []byte) error {
 	that.mu.Lock()
 	defer that.mu.Unlock()
@@ -492,19 +492,20 @@ func (that *List) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-//func (that *List) UnmarshalValue(value interface{}) (err error) {
-//	that.mu.Lock()
-//	defer that.mu.Unlock()
-//	if that.list == nil {
-//		that.list = list.New()
-//	}
-//	var array []interface{}
-//	switch value.(type) {
-//	case string, []byte:
-//		err = json.Unmarshal(gconv.Bytes(value), &array)
-//	default:
-//		array = gconv.SliceAny(value)
-//	}
-//	that.PushBacks(array)
-//	return err
-//}
+// UnmarshalValue 解码内容
+func (that *List) UnmarshalValue(value interface{}) (err error) {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	if that.list == nil {
+		that.list = list.New()
+	}
+	var array []interface{}
+	switch value.(type) {
+	case string, []byte:
+		err = json.Unmarshal(dconv.Bytes(value), &array)
+	default:
+		array = dconv.SliceAny(value)
+	}
+	that.PushBacks(array)
+	return err
+}

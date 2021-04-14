@@ -12,7 +12,7 @@ import (
 
 var StructTagPriority = []string{"c", "p", "json"}
 
-//把对象转换成一个byte
+// Byte 把对象转换成一个byte
 func Byte(i interface{}) byte {
 	if v, ok := i.(byte); ok {
 		return v
@@ -20,7 +20,7 @@ func Byte(i interface{}) byte {
 	return Uint8(i)
 }
 
-//把对象转化成byte数组
+// Bytes 把对象转化成byte数组
 func Bytes(i interface{}) []byte {
 	if i == nil {
 		return nil
@@ -35,7 +35,7 @@ func Bytes(i interface{}) []byte {
 	}
 }
 
-//rune 类型，代表一个 UTF-8 字符,把其他类型转换成rune
+// Rune rune 类型，代表一个 UTF-8 字符,把其他类型转换成rune
 func Rune(i interface{}) rune {
 	if v, ok := i.(rune); ok {
 		return v
@@ -51,7 +51,7 @@ func Runes(i interface{}) []rune {
 	return []rune(String(i))
 }
 
-//把 i 转换成string类型
+// String 把 i 转换成string类型
 func String(i interface{}) string {
 	if i == nil {
 		return ""
@@ -161,7 +161,7 @@ var emptyStringMap = map[string]struct{}{
 	"false": {},
 }
 
-//把任何类型转换成bool类型
+// Bool 把任何类型转换成bool类型
 func Bool(i interface{}) bool {
 	if i == nil {
 		return false
@@ -427,7 +427,7 @@ func Uint64(i interface{}) uint64 {
 
 }
 
-//转换成float32
+// Float32 转换成float32
 func Float32(i interface{}) float32 {
 	if i == nil {
 		return 0
@@ -445,7 +445,7 @@ func Float32(i interface{}) float32 {
 	}
 }
 
-//转换成float64
+// Float64 转换成float64
 func Float64(i interface{}) float64 {
 	if i == nil {
 		return 0

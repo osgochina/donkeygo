@@ -11,7 +11,7 @@ const md5Length = 16
 
 var errDataCheck = errors.New("check failed")
 
-//注册md5校验过滤器
+// Reg 注册md5校验过滤器
 func Reg(id byte, name string) {
 	tfilter.Reg(&md5Hash{
 		id:   id,

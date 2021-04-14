@@ -8,17 +8,17 @@ import (
 	"strings"
 )
 
-//把value值转换成map
+// Map 把value值转换成map
 func Map(value interface{}, tags ...string) map[string]interface{} {
 	return doMapConvert(value, false, tags...)
 }
 
-//把value值转换成map,并且支持递归转换
+// MapDeep 把value值转换成map,并且支持递归转换
 func MapDeep(value interface{}, tags ...string) map[string]interface{} {
 	return doMapConvert(value, true, tags...)
 }
 
-//转换成key和value都是字符串的map
+// MapStrStr 转换成key和value都是字符串的map
 func MapStrStr(value interface{}, tags ...string) map[string]string {
 	if v, ok := value.(map[string]string); ok {
 		return v
@@ -34,7 +34,7 @@ func MapStrStr(value interface{}, tags ...string) map[string]string {
 	return nil
 }
 
-//递归转换成key和value都是字符串的map
+// MapStrStrDeep 递归转换成key和value都是字符串的map
 func MapStrStrDeep(value interface{}, tags ...string) map[string]string {
 	if r, ok := value.(map[string]string); ok {
 		return r

@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-//使用gzip压缩
+// Gzip 使用gzip压缩
 func Gzip(data []byte, level ...int) ([]byte, error) {
 	var (
 		writer *gzip.Writer
@@ -30,7 +30,7 @@ func Gzip(data []byte, level ...int) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-//解压缩gzip
+// UnGzip 解压缩gzip
 func UnGzip(data []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	reader, err := gzip.NewReader(bytes.NewReader(data))

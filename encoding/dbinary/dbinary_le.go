@@ -54,7 +54,7 @@ func LeEncode(values ...interface{}) []byte {
 	return buf.Bytes()
 }
 
-// 将变量转换为二进制[]byte，并指定固定的[]byte长度返回，长度单位为字节(byte)；
+// LeEncodeByLength 将变量转换为二进制[]byte，并指定固定的[]byte长度返回，长度单位为字节(byte)；
 // 如果转换的二进制长度超过指定长度，那么进行截断处理
 func LeEncodeByLength(length int, values ...interface{}) []byte {
 	b := LeEncode(values...)
@@ -66,7 +66,7 @@ func LeEncodeByLength(length int, values ...interface{}) []byte {
 	return b
 }
 
-// 整形二进制解包，注意第二个及其后参数为字长确定的整形变量的指针地址，以便确定解析的[]byte长度，
+// LeDecode 整形二进制解包，注意第二个及其后参数为字长确定的整形变量的指针地址，以便确定解析的[]byte长度，
 // 例如：int8/16/32/64、uint8/16/32/64、float32/64等等
 func LeDecode(b []byte, values ...interface{}) error {
 	buf := bytes.NewBuffer(b)
@@ -108,7 +108,7 @@ func LeEncodeInt(i int) []byte {
 	}
 }
 
-// 自动识别uint类型长度，转换为[]byte
+// LeEncodeUint 自动识别uint类型长度，转换为[]byte
 func LeEncodeUint(i uint) []byte {
 	if i <= math.MaxUint8 {
 		return EncodeUint8(uint8(i))

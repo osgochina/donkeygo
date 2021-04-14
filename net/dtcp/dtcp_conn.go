@@ -11,7 +11,7 @@ import (
 //读取缓冲区的间隔时间
 const dRecvAllWaitTimeout = time.Millisecond
 
-//tcp链接对象
+// Conn tcp链接对象
 type Conn struct {
 	net.Conn                     //tcp 链接的对象
 	reader         *bufio.Reader // 读数据的缓冲区
@@ -38,7 +38,7 @@ func NewConnTLS(addr string, tlsConfig *tls.Config) (*Conn, error) {
 	}
 }
 
-//通过已有的net.Conn 创建一个tcp链接
+// NewConnByNetConn 通过已有的net.Conn 创建一个tcp链接
 func NewConnByNetConn(conn net.Conn) *Conn {
 	return &Conn{
 		Conn:           conn,
@@ -49,7 +49,7 @@ func NewConnByNetConn(conn net.Conn) *Conn {
 	}
 }
 
-//发送数据到远端，没有任何缓冲，直接调用tcp write写入到系统缓冲区
+// Send 发送数据到远端，没有任何缓冲，直接调用tcp write写入到系统缓冲区
 func (that *Conn) Send(data []byte, retry ...Retry) error {
 	for {
 		if _, err := that.Write(data); err != nil {
@@ -75,7 +75,7 @@ func (that *Conn) Send(data []byte, retry ...Retry) error {
 	}
 }
 
-//读取数据
+// Recv 读取数据
 func (that *Conn) Recv(length int, retry ...Retry) ([]byte, error) {
 	var err error
 	var size int
@@ -152,7 +152,7 @@ func (that *Conn) Recv(length int, retry ...Retry) ([]byte, error) {
 	return buffer[:index], err
 }
 
-//获取以 \n 结尾的一行，但是返回的数据不包含 \n
+// RecvLine 获取以 \n 结尾的一行，但是返回的数据不包含 \n
 func (that *Conn) RecvLine(retry ...Retry) ([]byte, error) {
 	var err error
 	var buffer []byte
@@ -174,7 +174,7 @@ func (that *Conn) RecvLine(retry ...Retry) ([]byte, error) {
 	return data, err
 }
 
-//在指定的时间内读取数据
+// RecvWithTimeout 在指定的时间内读取数据
 func (that *Conn) RecvWithTimeout(length int, timeout time.Duration, retry ...Retry) (data []byte, err error) {
 
 	if err = that.SetRecvDeadline(time.Now().Add(timeout)); err != nil {
@@ -185,7 +185,7 @@ func (that *Conn) RecvWithTimeout(length int, timeout time.Duration, retry ...Re
 	return data, err
 }
 
-//在指定的时间内发送数据
+// SendWithTimeout 在指定的时间内发送数据
 func (that *Conn) SendWithTimeout(data []byte, timeout time.Duration, retry ...Retry) (err error) {
 	if err = that.SetSendDeadline(time.Now().Add(timeout)); err != nil {
 		return err
@@ -195,7 +195,7 @@ func (that *Conn) SendWithTimeout(data []byte, timeout time.Duration, retry ...R
 	return
 }
 
-//发送并且读取
+// SendRecv 发送并且读取
 func (that *Conn) SendRecv(data []byte, length int, retry ...Retry) ([]byte, error) {
 	if err := that.Send(data, retry...); err == nil {
 		return that.Recv(length, retry...)
@@ -204,7 +204,7 @@ func (that *Conn) SendRecv(data []byte, length int, retry ...Retry) ([]byte, err
 	}
 }
 
-//设置超时时间
+// SetDeadline 设置超时时间
 func (that *Conn) SetDeadline(t time.Time) error {
 	err := that.Conn.SetDeadline(t)
 	if err == nil {
@@ -214,7 +214,7 @@ func (that *Conn) SetDeadline(t time.Time) error {
 	return err
 }
 
-//设置读取超时时间
+// SetRecvDeadline 设置读取超时时间
 func (that *Conn) SetRecvDeadline(t time.Time) error {
 	err := that.SetReadDeadline(t)
 	if err == nil {
@@ -223,7 +223,7 @@ func (that *Conn) SetRecvDeadline(t time.Time) error {
 	return err
 }
 
-//设置发送超时时间
+// SetSendDeadline 设置发送超时时间
 func (that *Conn) SetSendDeadline(t time.Time) error {
 	err := that.SetWriteDeadline(t)
 	if err == nil {

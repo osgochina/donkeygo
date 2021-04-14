@@ -2,7 +2,7 @@ package codec
 
 import "fmt"
 
-//消息内容的编解码器
+// Codec 消息内容的编解码器
 type Codec interface {
 	ID() byte
 	Name() string
@@ -26,7 +26,7 @@ const (
 	NilCodecName string = ""
 )
 
-//通过编解码器的id获取编解码器对象
+// Get 通过编解码器的id获取编解码器对象
 func Get(codecID byte) (Codec, error) {
 	codec, ok := codecMap.idMap[codecID]
 	if !ok {
@@ -35,7 +35,7 @@ func Get(codecID byte) (Codec, error) {
 	return codec, nil
 }
 
-//通过编解码器的名字获取编解码器对象
+// GetByName 通过编解码器的名字获取编解码器对象
 func GetByName(codecName string) (Codec, error) {
 	codec, ok := codecMap.nameMap[codecName]
 	if !ok {
@@ -44,7 +44,7 @@ func GetByName(codecName string) (Codec, error) {
 	return codec, nil
 }
 
-//使用指定编解码器编码
+// Marshal 使用指定编解码器编码
 func Marshal(codecID byte, v interface{}) ([]byte, error) {
 	codec, err := Get(codecID)
 	if err != nil {
@@ -53,7 +53,7 @@ func Marshal(codecID byte, v interface{}) ([]byte, error) {
 	return codec.Marshal(v)
 }
 
-//使用指定编解码器解码
+// Unmarshal 使用指定编解码器解码
 func Unmarshal(codecID byte, data []byte, v interface{}) error {
 	codec, err := Get(codecID)
 	if err != nil {
@@ -62,7 +62,7 @@ func Unmarshal(codecID byte, data []byte, v interface{}) error {
 	return codec.Unmarshal(data, v)
 }
 
-//注册编解码器到容器
+// Reg 注册编解码器到容器
 func Reg(codec Codec) {
 	if codec.ID() == NilCodecID {
 		panic(fmt.Sprintf("codec id can not be %d", NilCodecID))

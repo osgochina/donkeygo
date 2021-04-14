@@ -34,7 +34,7 @@ type BufferPool struct {
 
 var defaultBufferPool BufferPool
 
-// AcquireByteBuffer returns an empty byte buffer from the pool.
+// GetByteBuffer returns an empty byte buffer from the pool.
 //
 // Got byte buffer may be returned to the pool via Put call.
 // This reduces the number of memory allocations required for byte buffer

@@ -137,7 +137,7 @@ func IsEmpty(value interface{}) bool {
 	return false
 }
 
-//判断值是否为nil
+// IsNil 判断值是否为nil
 func IsNil(value interface{}, traceSource ...bool) bool {
 	if value == nil {
 		return true
