@@ -1,1 +1,1 @@
-package rwmutex
+package rwmutex_test

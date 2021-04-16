@@ -1,13 +1,14 @@
-package dlist
+package dlist_test
 
 import (
+	"donkeygo/container/dlist"
 	"fmt"
 	"testing"
 )
 
 func ExampleNew() {
 	n := 10
-	l := New()
+	l := dlist.New()
 	for i := 0; i < n; i++ {
 		l.PushBack(i)
 	}
@@ -30,7 +31,7 @@ func ExampleNew() {
 }
 
 func TestMove(t *testing.T) {
-	l := New()
+	l := dlist.New()
 	e1 := l.PushBack(1)
 	e2 := l.PushBack(2)
 	e3 := l.PushBack(3)
