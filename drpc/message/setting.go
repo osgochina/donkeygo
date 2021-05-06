@@ -7,6 +7,13 @@ import (
 	"math"
 )
 
+const (
+	// MetaRealIP real IP metadata key
+	MetaRealIP = "X-Real-IP"
+	// MetaAcceptBodyCodec the key of body codec that the sender wishes to accept
+	MetaAcceptBodyCodec = "X-Accept-Body-Codec"
+)
+
 var (
 	messageSizeLimit uint32 = math.MaxUint32
 	// ErrExceedMessageSizeLimit error

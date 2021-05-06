@@ -7,8 +7,10 @@ import (
 	"donkeygo/drpc/proto"
 	"donkeygo/drpc/socket"
 	"donkeygo/drpc/status"
+	"github.com/gogf/gf/os/glog"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -103,11 +105,11 @@ type CtxSession interface {
 	// Health 检查该session是否健康
 	Health() bool
 
-	// AsyncCall 发送消息，并异步接收响应
-	AsyncCall(serviceMethod string, args interface{}, result interface{}, callCmdChan chan<- CallCmd, setting ...message.MsgSetting) CallCmd
-
-	// Call 发送消息并获得响应值
-	Call(serviceMethod string, args interface{}, result interface{}, setting ...message.MsgSetting) CallCmd
+	//// AsyncCall 发送消息，并异步接收响应
+	//AsyncCall(serviceMethod string, args interface{}, result interface{}, callCmdChan chan<- CallCmd, setting ...message.MsgSetting) CallCmd
+	//
+	//// Call 发送消息并获得响应值
+	//Call(serviceMethod string, args interface{}, result interface{}, setting ...message.MsgSetting) CallCmd
 
 	// Push 发送消息，不接收响应，只返回发送状态
 	Push(serviceMethod string, args interface{}, setting ...message.MsgSetting) *status.Status
@@ -131,6 +133,18 @@ type Session interface {
 	CtxSession
 }
 
+// NOTE: Do not change the order
+const (
+	statusPreparing int32 = iota
+	statusOk
+	statusActiveClosing
+	statusActiveClosed
+	statusPassiveClosing
+	statusPassiveClosed
+	statusRedialing
+	statusRedialFailed
+)
+
 type session struct {
 	endpoint       *endpoint
 	getCallHandler func(serviceMethodPath string) (*Handler, bool)
@@ -152,4 +166,211 @@ type session struct {
 
 	//链接如果断开，重新拨号，只有作为客户端角色的时候才有效果
 	redialForClientLocked func() bool
+}
+
+func newSession(e *endpoint, conn net.Conn, protoFunc []proto.ProtoFunc) *session {
+	var s = &session{
+		endpoint:       e,
+		getCallHandler: e.router.subRouter.getCall,
+		getPushHandler: e.router.subRouter.getPush,
+		timeNow:        e.timeNow,
+		protoFuncList:  protoFunc,
+		status:         statusPreparing,
+		socket:         socket.NewSocket(conn, protoFunc...),
+		closeNotifyCh:  make(chan struct{}),
+		callCmdMap:     dmap.New(true),
+		sessionAge:     e.defaultSessionAge,
+		contextAge:     e.defaultContextAge,
+	}
+	return s
+}
+
+//原子性修改session的状态
+func (that *session) changeStatus(stat int32) {
+	atomic.StoreInt32(&that.status, stat)
+}
+
+//原子性尝试修改session的状态
+// 从fromList的多个状态修改成to的状态，修改成功则返回true，失败返回false
+func (that *session) tryChangeStatus(to int32, fromList ...int32) (changed bool) {
+	for _, from := range fromList {
+		if atomic.CompareAndSwapInt32(&that.status, from, to) {
+			return true
+		}
+	}
+	return false
+}
+
+//判断session的状态是否在checkList中，如果在checkList中，则返回true，否则返回false
+func (that *session) checkStatus(checkList ...int32) bool {
+	stat := atomic.LoadInt32(&that.status)
+	for _, v := range checkList {
+		if v == stat {
+			return true
+		}
+	}
+	return false
+}
+
+//原子性的获取当前session的状态
+func (that *session) getStatus() int32 {
+	return atomic.LoadInt32(&that.status)
+}
+
+//判断session的状态是否是开始或者将要结束
+func (that *session) goonRead() bool {
+	return that.checkStatus(statusOk, statusActiveClosing)
+}
+
+// 通知session准备关闭
+func (that *session) notifyClosed() {
+	if atomic.CompareAndSwapInt32(&that.didCloseNotify, 0, 1) {
+		close(that.closeNotifyCh)
+	}
+}
+
+// CloseNotify session将要关闭的通知
+func (that *session) CloseNotify() <-chan struct{} {
+	return that.closeNotifyCh
+}
+
+// IsActiveClosed 判断链接是否处已经关闭，并且并且是主动关闭的
+func (that *session) IsActiveClosed() bool {
+	return that.checkStatus(statusActiveClosed)
+}
+
+// IsPassiveClosed 判断链接是否已经关闭，并且是被动关闭的
+func (that *session) IsPassiveClosed() bool {
+	return that.checkStatus(statusPassiveClosed)
+}
+
+// Health 判断session会话是否可用
+func (that *session) Health() bool {
+	s := that.getStatus()
+	if s == statusOk {
+		return true
+	}
+	if that.redialForClientLocked == nil {
+		return false
+	}
+	if s == statusPassiveClosed {
+		return true
+	}
+	return false
+}
+
+func (that *session) Endpoint() Endpoint {
+	return that.endpoint
+}
+
+// ID 获取session的id
+func (that *session) ID() string {
+	return that.socket.ID()
+}
+
+// SetID 修改id
+func (that *session) SetID(newID string) {
+	oldID := that.ID()
+	if oldID == newID {
+		return
+	}
+	that.socket.SetID(newID)
+	hub := that.endpoint.sessHub
+	hub.set(that)
+	hub.delete(oldID)
+	glog.Info("session changes id: %s -> %s", oldID, newID)
+}
+
+// ControlFD 处理底层fd
+func (that *session) ControlFD(f func(fd uintptr)) error {
+	that.lock.RLock()
+	defer that.lock.RUnlock()
+	return that.socket.ControlFD(f)
+}
+
+//获取会话的原始链接
+func (that *session) getConn() net.Conn {
+	return that.socket.Raw()
+}
+
+func (that *session) ModifySocket(fn func(conn net.Conn) (modifiedConn net.Conn, newProtoFunc proto.ProtoFunc)) {
+	//conn := s.getConn()
+	//modifiedConn, newProtoFunc := fn(conn)
+	//isModifiedConn := modifiedConn != nil
+	//isNewProtoFunc := newProtoFunc != nil
+	//if isNewProtoFunc {
+	//	s.protoFuncs = s.protoFuncs[:0]
+	//	s.protoFuncs = append(s.protoFuncs, newProtoFunc)
+	//}
+	//if !isModifiedConn && !isNewProtoFunc {
+	//	return
+	//}
+	//var pub goutil.Map
+	//if s.socket.SwapLen() > 0 {
+	//	pub = s.socket.Swap()
+	//}
+	//id := s.ID()
+	//s.socket.Reset(modifiedConn, s.protoFuncs...)
+	//s.socket.Swap(pub) // set the old swap
+	//s.socket.SetID(id)
+}
+
+// GetProtoFunc 获取协议方法
+func (that *session) GetProtoFunc() proto.ProtoFunc {
+	if len(that.protoFuncList) > 0 && that.protoFuncList[0] != nil {
+		return that.protoFuncList[0]
+	}
+	return socket.DefaultProtoFunc()
+}
+
+// LocalAddr 获取本地监听地址
+func (that *session) LocalAddr() net.Addr {
+	return that.socket.LocalAddr()
+}
+
+// RemoteAddr 获取远程链接的地址
+func (that *session) RemoteAddr() net.Addr {
+	return that.socket.RemoteAddr()
+}
+
+// SessionAge 获取session的生存周期
+func (that *session) SessionAge() time.Duration {
+	that.sessionAgeLock.RLock()
+	age := that.sessionAge
+	that.sessionAgeLock.RUnlock()
+	return age
+}
+
+// SetSessionAge 设置会话的最大生命周期
+func (that *session) SetSessionAge(duration time.Duration) {
+	that.sessionAgeLock.Lock()
+	that.sessionAge = duration
+	if duration > 0 {
+		_ = that.socket.SetReadDeadline(time.Now().Add(duration))
+	} else {
+		_ = that.socket.SetReadDeadline(time.Time{})
+	}
+	that.sessionAgeLock.Unlock()
+}
+
+// ContextAge 获取CALL 或者PUSH上下文的最大生命周期
+func (that *session) ContextAge() time.Duration {
+	that.contextAgeLock.RLock()
+	age := that.contextAge
+	that.contextAgeLock.RUnlock()
+	return age
+}
+
+// SetContextAge 设置CALL 或者PUSH上下文的最大生命周期
+func (that *session) SetContextAge(duration time.Duration) {
+	that.contextAgeLock.Lock()
+	that.contextAge = duration
+	that.contextAgeLock.Unlock()
+}
+
+func (that *session) Close() error {
+	that.lock.Lock()
+	defer that.lock.Unlock()
+	//return that.closeLocked()
+	return nil
 }

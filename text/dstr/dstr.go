@@ -1,6 +1,9 @@
 package dstr
 
-import "strings"
+import (
+	"donkeygo/util/dconv"
+	"strings"
+)
 
 func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
 	array := make([]string, 0)
@@ -11,4 +14,22 @@ func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
 		}
 	}
 	return array
+}
+
+// SnakeString converts the accepted string to a snake string (XxYy to xx_yy)
+func SnakeString(s string) string {
+	data := make([]byte, 0, len(s)*2)
+	j := false
+	for _, d := range dconv.Bytes(s) {
+		if d >= 'A' && d <= 'Z' {
+			if j {
+				data = append(data, '_')
+				j = false
+			}
+		} else if d != '_' {
+			j = true
+		}
+		data = append(data, d)
+	}
+	return strings.ToLower(dconv.String(data))
 }

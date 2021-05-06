@@ -5,6 +5,7 @@ import (
 	"donkeygo/internal/rwmutex"
 	"donkeygo/util/dconv"
 	"encoding/json"
+	"math/rand"
 )
 
 // AnyAnyMap 并发安全的hash字典表
@@ -165,6 +166,24 @@ func (that *AnyAnyMap) Pops(size int) map[interface{}]interface{} {
 		}
 	}
 	return newData
+}
+
+func (that *AnyAnyMap) Random() (key, value interface{}, exist bool) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	length := len(that.data)
+	if length == 0 {
+		return
+	}
+	i := rand.Intn(length)
+	for key, value = range that.data {
+		if i == 0 {
+			exist = true
+			return
+		}
+		i--
+	}
+	return
 }
 
 //加锁设置值，支持传入方法生成值，如果传入的key存在于map中，则直接返回已存在的值，不会使用传入的值

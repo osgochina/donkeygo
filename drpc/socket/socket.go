@@ -17,6 +17,9 @@ type Message = message.Message
 
 type Socket interface {
 
+	// ControlFD 获取原始句柄
+	ControlFD(f func(fd uintptr)) error
+
 	// LocalAddr 获取socket本地的地址
 	LocalAddr() net.Addr
 

@@ -3,8 +3,10 @@ package drpc
 import (
 	"context"
 	"donkeygo/container/dmap"
+	"donkeygo/drpc/codec"
 	"donkeygo/drpc/message"
 	"donkeygo/drpc/status"
+	"github.com/gogf/gf/util/gconv"
 	"reflect"
 	"time"
 )
@@ -53,10 +55,10 @@ type inputCtx interface {
 	Seq() int32
 
 	// PeekMeta 窥视消息的元数据
-	PeekMeta(key string) []byte
+	PeekMeta(key string) interface{}
 
 	// VisitMeta 浏览消息的元数据
-	VisitMeta(f func(key, value []byte))
+	VisitMeta(f func(key, value interface{}) bool)
 
 	// CopyMeta 赋值消息的元数据
 	CopyMeta() *dmap.Map
@@ -109,9 +111,6 @@ type CallCtx interface {
 	// SetBodyCodec 设置响应消息的编码格式
 	SetBodyCodec(byte)
 
-	// AddMeta 添加元数据
-	AddMeta(key, value string)
-
 	// SetMeta 设置指定key的值
 	SetMeta(key, value string)
 
@@ -149,15 +148,14 @@ type UnknownCallCtx interface {
 	// SetBodyCodec 设置回复消息的编码格式
 	SetBodyCodec(byte)
 
-	// AddMeta 添加元数据
-	AddMeta(key, value string)
-
 	// SetMeta 设置指定key的值
 	SetMeta(key, value string)
 
 	// AddTFilterId 设置回复消息传输层的编码过滤方法id
 	AddTFilterId(filterID ...byte)
 }
+
+var emptyValue = reflect.Value{}
 
 // handlerCtx是 PushCtx 和 CallCtx 的底层公共实例
 type handlerCtx struct {
@@ -177,4 +175,143 @@ type handlerCtx struct {
 func (that *handlerCtx) reInit(s *session) {
 	that.sess = s
 	that.swap = s.socket.Swap().Clone(true)
+}
+
+func (that *handlerCtx) clean() {
+	that.sess = nil
+	that.handler = nil
+	that.arg = emptyValue
+	that.swap = nil
+	//that.callCmd = nil
+	that.cost = 0
+	that.stat = nil
+	that.context = nil
+	//that.input.Reset(socket.WithNewBody(c.binding))
+	that.output.Reset()
+}
+
+func (that *handlerCtx) Endpoint() Endpoint {
+	return that.sess.Endpoint()
+}
+
+func (that *handlerCtx) Session() CtxSession {
+	return that.sess
+}
+
+func (that *handlerCtx) Input() message.Message {
+	return that.input
+}
+
+func (that *handlerCtx) Output() message.Message {
+	return that.output
+}
+
+func (that *handlerCtx) Swap() *dmap.Map {
+	return that.swap
+}
+
+func (that *handlerCtx) Seq() int32 {
+	return that.input.Seq()
+}
+
+func (that *handlerCtx) ServiceMethod() string {
+	return that.input.ServiceMethod()
+}
+
+func (that *handlerCtx) ResetServiceMethod(serviceMethod string) {
+	that.input.SetServiceMethod(serviceMethod)
+}
+
+func (that *handlerCtx) PeekMeta(key string) interface{} {
+	return that.input.Meta().Get(key)
+}
+
+func (that *handlerCtx) VisitMeta(f func(key, value interface{}) bool) {
+	that.input.Meta().Iterator(f)
+}
+
+func (that *handlerCtx) CopyMeta() *dmap.Map {
+	return that.input.Meta().Clone(true)
+}
+
+func (that *handlerCtx) SetMeta(key, value string) {
+	that.output.Meta().Set(key, value)
+}
+
+func (that *handlerCtx) GetBodyCodec() byte {
+	return that.input.BodyCodec()
+}
+
+func (that *handlerCtx) SetBodyCodec(bodyCodec byte) {
+	that.output.SetBodyCodec(bodyCodec)
+}
+
+func (that *handlerCtx) AddTFilterId(filterID ...byte) {
+	_ = that.output.PipeTFilter().Append(filterID...)
+}
+
+func (that *handlerCtx) IP() string {
+	return that.sess.RemoteAddr().String()
+}
+
+func (that *handlerCtx) RealIP() string {
+	realIP := gconv.String(that.PeekMeta(message.MetaRealIP))
+	if len(realIP) > 0 {
+		return realIP
+	}
+	return that.sess.RemoteAddr().String()
+}
+
+func (that *handlerCtx) Context() context.Context {
+	if that.context == nil {
+		return that.input.Context()
+	}
+	return that.context
+}
+
+func (that *handlerCtx) setContext(ctx context.Context) {
+	that.context = ctx
+}
+
+func (that *handlerCtx) StatusOK() bool {
+	return that.stat.OK()
+}
+
+func (that *handlerCtx) Status() *status.Status {
+	return that.stat
+}
+
+func (that *handlerCtx) InputBodyBytes() []byte {
+	b, ok := that.input.Body().(*[]byte)
+	if !ok {
+		return nil
+	}
+	return *b
+}
+
+func (that *handlerCtx) Bind(v interface{}) (byte, error) {
+	b := that.InputBodyBytes()
+	if b == nil {
+		return codec.NilCodecID, nil
+	}
+	that.input.SetBody(v)
+	err := that.input.UnmarshalBody(b)
+	return that.input.BodyCodec(), err
+}
+
+func (that *handlerCtx) ReplyBodyCodec() byte {
+	id := that.output.BodyCodec()
+	if id != codec.NilCodecID {
+		return id
+	}
+	id, ok := GetAcceptBodyCodec(that.input.Meta())
+	if ok {
+		if _, err := codec.Get(id); err == nil {
+			that.output.SetBodyCodec(id)
+			return id
+		}
+	}
+	id = that.input.BodyCodec()
+	that.output.SetBodyCodec(id)
+	return id
 }
