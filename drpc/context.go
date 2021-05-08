@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-// BaseCtx 基础上下文
-type BaseCtx interface {
+// EarlyCtx 基础上下文
+type EarlyCtx interface {
 
 	// Endpoint 获取当前Endpoint
 	Endpoint() Endpoint
@@ -36,7 +36,7 @@ type BaseCtx interface {
 
 // WriteCtx 写消息时使用的上下文方法
 type WriteCtx interface {
-	BaseCtx
+	EarlyCtx
 
 	// Output 将要发送的消息对象
 	Output() message.Message
@@ -50,7 +50,7 @@ type WriteCtx interface {
 
 // InputCtx 该上下文是一个公共上下文
 type inputCtx interface {
-	BaseCtx
+	EarlyCtx
 
 	// Seq 获取消息的序列号
 	Seq() int32

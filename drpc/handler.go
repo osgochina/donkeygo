@@ -26,3 +26,15 @@ type Handler struct {
 	//是否找到绑定方法
 	isUnknown bool
 }
+
+func (that *Handler) RouterTypeName() string {
+	return that.routerTypeName
+}
+
+func (that *Handler) ReplyType() reflect.Type {
+	return that.reply
+}
+
+func (that *Handler) Name() string {
+	return that.name
+}
