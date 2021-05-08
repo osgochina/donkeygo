@@ -8,6 +8,7 @@ import (
 	"donkeygo/drpc/status"
 	"github.com/gogf/gf/util/gconv"
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -165,11 +166,28 @@ type handlerCtx struct {
 	handler *Handler
 	arg     reflect.Value // 消息传入的参数
 	//callCmd         *callCmd
-	swap    *dmap.Map
-	start   int64
-	cost    time.Duration
-	stat    *status.Status
-	context context.Context
+	swap            *dmap.Map
+	start           int64
+	cost            time.Duration
+	pluginContainer *PluginContainer
+	stat            *status.Status
+	context         context.Context
+}
+
+//newReadHandleCtx 创建一个给request/response或push使用的上下文
+func newReadHandleCtx() *handlerCtx {
+	c := new(handlerCtx)
+	c.input = message.NewMessage()
+	c.input.SetNewBody(c.binding)
+	c.output = message.NewMessage()
+	return c
+}
+
+//会话上下文生成池
+var handlerCtxPool = sync.Pool{
+	New: func() interface{} {
+		return newReadHandleCtx()
+	},
 }
 
 func (that *handlerCtx) reInit(s *session) {
@@ -186,7 +204,7 @@ func (that *handlerCtx) clean() {
 	that.cost = 0
 	that.stat = nil
 	that.context = nil
-	//that.input.Reset(socket.WithNewBody(c.binding))
+	that.input.Reset(message.WithNewBody(that.binding))
 	that.output.Reset()
 }
 
@@ -314,4 +332,25 @@ func (that *handlerCtx) ReplyBodyCodec() byte {
 	id = that.input.BodyCodec()
 	that.output.SetBodyCodec(id)
 	return id
+}
+
+//读取消息时候，执行该方法，作用是根据消息类型对消息进行不同的构造操作
+func (that *handlerCtx) binding(header message.Header) (body interface{}) {
+	that.start = that.sess.timeNow()
+	that.pluginContainer = that.sess.endpoint.pluginContainer
+	switch header.MType() {
+	case message.TypeReply:
+		return that.bindReply(header)
+	case message.TypePush:
+		return that.bindPush(header)
+	case message.TypeCall:
+		return that.bindCall(header)
+	default:
+		that.stat = statCodeMTypeNotAllowed
+		return nil
+	}
+}
+
+func (that *handlerCtx) handle() {
+
 }

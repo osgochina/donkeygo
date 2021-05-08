@@ -124,3 +124,24 @@ func (that *endpoint) SetTLSConfigFromFile(tlsCertFile, tlsKeyFile string, insec
 	}
 	return err
 }
+
+//从池子中获取会话上下文对象
+func (that *endpoint) getHandleCtx(s *session, withWg bool) *handlerCtx {
+	if withWg {
+		// 优雅控制器增加1
+		s.graceCtxWaitGroup.Add(1)
+	}
+	ctx := handlerCtxPool.Get().(*handlerCtx)
+	ctx.clean()
+	ctx.reInit(s)
+	return ctx
+}
+
+//归还会话上下文对象到池子
+func (that *endpoint) putHandleCtx(ctx *handlerCtx, withWg bool) {
+	if withWg {
+		// 处理成功，则优雅控制器done
+		ctx.sess.graceCtxWaitGroup.Done()
+	}
+	handlerCtxPool.Put(ctx)
+}

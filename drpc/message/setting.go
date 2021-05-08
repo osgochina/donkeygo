@@ -7,6 +7,16 @@ import (
 	"math"
 )
 
+//消息类型
+const (
+	TypeUndefined byte = 0 //未知类型
+	TypeCall      byte = 1 // call
+	TypeReply     byte = 2 // reply to call
+	TypePush      byte = 3
+	TypeAuthCall  byte = 4
+	TypeAuthReply byte = 5
+)
+
 const (
 	// MetaRealIP real IP metadata key
 	MetaRealIP = "X-Real-IP"

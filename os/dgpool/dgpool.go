@@ -41,6 +41,11 @@ func AddWithRecover(userFunc func(), recoverFunc ...func(err error)) error {
 	return pool.AddWithRecover(userFunc, recoverFunc...)
 }
 
+// AddWithSyncFunc 在默认协程池中执行方法，执行完成后回调
+func AddWithSyncFunc(useFunc func(), syncFunc func(bool)) error {
+	return pool.AddWithSyncFunc(useFunc, syncFunc)
+}
+
 // Size 默认协程池的大小
 func Size() int {
 	return pool.Size()
@@ -86,6 +91,20 @@ func (that *Pool) AddWithRecover(useFunc func(), recoverFunc ...func(err error))
 				if len(recoverFunc) > 0 && recoverFunc[0] == nil {
 					recoverFunc[0](errors.New(fmt.Sprintf("%v", err)))
 				}
+			}
+		}()
+		useFunc()
+	})
+}
+
+// AddWithSyncFunc 执行成功后回调方法
+func (that *Pool) AddWithSyncFunc(useFunc func(), syncFunc func(bool)) error {
+	return that.Add(func() {
+		defer func() {
+			if err := recover(); err != nil {
+				syncFunc(false)
+			} else {
+				syncFunc(true)
 			}
 		}()
 		useFunc()
