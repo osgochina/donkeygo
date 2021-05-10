@@ -81,6 +81,11 @@ type socket struct {
 	fromPool         bool
 }
 
+var (
+	_ net.Conn = Socket(nil)
+	//_ UnsafeSocket = new(socket)
+)
+
 var readerSize = 1024
 
 // GetSocket 获取一个socket

@@ -705,7 +705,7 @@ W:
 		return cmd
 	}
 	//发送call消息之后，执行插件
-	that.endpoint.pluginContainer.alterWriteCall(cmd)
+	that.endpoint.pluginContainer.afterWriteCall(cmd)
 	return cmd
 }
 
@@ -918,7 +918,6 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 		//执行会话关闭事件
 		that.endpoint.pluginContainer.afterDisconnect(that)
 	}
-
 }
 
 func (that *session) graceCtxWait() {
