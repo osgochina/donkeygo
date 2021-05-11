@@ -1,6 +1,9 @@
 package drpc
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+	"net"
+)
 
 // NewTLSConfigFromFile 通过证书文件生成证书信息
 func NewTLSConfigFromFile(tlsCertFile, tlsKeyFile string, insecureSkipVerifyForClient ...bool) (*tls.Config, error) {
@@ -37,4 +40,63 @@ func newTLSConfig(cert tls.Certificate, insecureSkipVerifyForClient ...bool) *tl
 			tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
 		},
 	}
+}
+
+// FakeAddr 是一个虚地址对象，实现了net.Add
+type FakeAddr struct {
+	network string
+	addr    string
+	host    string
+	port    string
+	udpAddr *net.UDPAddr
+}
+
+var _ net.Addr = (*FakeAddr)(nil)
+
+// NewFakeAddr 创建一个虚地址对象
+func NewFakeAddr(network, host, port string) *FakeAddr {
+	if network == "" {
+		network = "tcp"
+	}
+	if host == "" {
+		host = "0.0.0.0"
+	}
+	if port == "" {
+		port = "0"
+	}
+	addr := net.JoinHostPort(host, port)
+	return &FakeAddr{
+		network: network,
+		addr:    addr,
+		host:    host,
+		port:    port,
+	}
+}
+
+// NewFakeAddr2 创建另一个不同参数的虚地址对象
+func NewFakeAddr2(network, addr string) (*FakeAddr, error) {
+	if addr == "" {
+		return NewFakeAddr(network, "", ""), nil
+	}
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return nil, err
+	}
+	return NewFakeAddr(network, host, port), nil
+}
+
+func (f *FakeAddr) Network() string {
+	return f.network
+}
+
+func (f *FakeAddr) String() string {
+	return f.addr
+}
+
+func (f *FakeAddr) Host() string {
+	return f.host
+}
+
+func (f *FakeAddr) Port() string {
+	return f.port
 }

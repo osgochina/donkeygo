@@ -6,6 +6,7 @@ import (
 	"donkeygo/drpc/proto"
 	"donkeygo/drpc/socket"
 	"donkeygo/drpc/status"
+	"donkeygo/errors/derror"
 	"donkeygo/os/dgpool"
 	"errors"
 	"github.com/gogf/gf/os/glog"
@@ -162,7 +163,7 @@ func NewEndpoint(cfg EndpointConfig, globalLeftPlugin ...Plugin) Endpoint {
 		}
 	}
 
-	//addPeer(p)
+	addEndpoint(e)
 	//触发事件
 	e.pluginContainer.afterNewEndpoint(e)
 	return e
@@ -488,12 +489,51 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 
 }
 
+// ListenAndServe 端点启动并监听，对外提供服务
 func (that *endpoint) ListenAndServe(protoFunc ...proto.ProtoFunc) error {
-
-	return nil
+	lis, err := NewInheritedListener(that.listerAddr, that.tlsConfig)
+	if err != nil {
+		glog.Fatalf("%v", err)
+	}
+	return that.serveListener(lis, protoFunc...)
 }
 
+// Close 关闭端点
 func (that *endpoint) Close() (err error) {
+
+	defer func() {
+		if p := recover(); p != nil {
+			err = derror.NewSkipf(2, "panic:%v\n%s", p)
+		}
+	}()
+	close(that.closeCh)
+	for lis := range that.listeners {
+		//if _, ok := lis.(*quic.Listener); !ok {
+		_ = lis.Close()
+		//}
+	}
+	deleteEndpoint(that)
+	var (
+		count int
+		errCh = make(chan error, 1024)
+	)
+	that.sessHub.rangeCallback(func(s *session) bool {
+		count++
+		_ = dgpool.Add(func() {
+			errCh <- s.Close()
+		})
+		return true
+	})
+	for i := 0; i < count; i++ {
+		err = derror.Merge(err, <-errCh)
+	}
+	close(errCh)
+
+	//for lis := range that.listeners {
+	//	if qlis, ok := lis.(*quic.Listener); ok {
+	//		err = errors.Merge(err, qlis.Close())
+	//	}
+	//}
 
 	return nil
 }
