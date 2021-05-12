@@ -27,14 +27,42 @@ type Handler struct {
 	isUnknown bool
 }
 
+// RouterTypeName 获取处理器的路由方法名 pnPush/pnCall/pnUnknownPush/pnUnknownCall
 func (that *Handler) RouterTypeName() string {
 	return that.routerTypeName
 }
 
+// ReplyType 回复消息的类型
 func (that *Handler) ReplyType() reflect.Type {
 	return that.reply
 }
 
+// Name 名字
 func (that *Handler) Name() string {
 	return that.name
+}
+
+// NewArgValue 参数的反射值
+func (that *Handler) NewArgValue() reflect.Value {
+	return reflect.New(that.argElem)
+}
+
+// ArgElemType 参数的类型
+func (that *Handler) ArgElemType() reflect.Type {
+	return that.argElem
+}
+
+// IsCall 处理程序是否是Call
+func (that *Handler) IsCall() bool {
+	return that.routerTypeName == pnCall || that.routerTypeName == pnUnknownCall
+}
+
+// IsPush 处理程序是否是PUSH
+func (that *Handler) IsPush() bool {
+	return that.routerTypeName == pnPush || that.routerTypeName == pnUnknownPush
+}
+
+// IsUnknown 处理程序是否未找到
+func (that *Handler) IsUnknown() bool {
+	return that.isUnknown
 }

@@ -7,8 +7,10 @@ import (
 	"donkeygo/drpc/codec"
 	"donkeygo/drpc/status"
 	"donkeygo/drpc/tfilter"
+	"donkeygo/util/dconv"
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 // Header 消息头
@@ -318,4 +320,19 @@ func (that *message) String() string {
 		idsBytes,
 		that.size,
 	)
+}
+
+// GetAcceptBodyCodec 获取发送方希望接受的正文编解码器。
+////注意:如果指定的编解码器无效，接收器将忽略配对数据
+func GetAcceptBodyCodec(meta *dmap.Map) (byte, bool) {
+	s := dconv.Bytes(meta.Get(MetaAcceptBodyCodec))
+	if len(s) == 0 || len(s) > 3 {
+		return 0, false
+	}
+	b, err := strconv.ParseUint(dconv.String(s), 10, 8)
+	if err != nil {
+		return 0, false
+	}
+	c := byte(b)
+	return c, c != codec.NilCodecID
 }

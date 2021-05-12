@@ -13,7 +13,7 @@ import (
 // CallCmd CALL 命令调用后，响应操作的命令
 type CallCmd interface {
 	TraceEndpoint() (e Endpoint, found bool)
-	//TraceSession() (sess Session, found bool)
+	TraceSession() (sess Session, found bool)
 
 	// Context 协程上下文
 	Context() context.Context
