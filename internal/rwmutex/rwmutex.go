@@ -44,7 +44,7 @@ func (that *RWMutex) Unlock() {
 // RLock 读加锁 如果不是并发安全锁，则什么都不做
 func (that *RWMutex) RLock() {
 	if that.RWMutex != nil {
-		that.RWMutex.Lock()
+		that.RWMutex.RLock()
 	}
 }
 

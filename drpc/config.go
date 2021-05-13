@@ -100,6 +100,10 @@ func (that *EndpointConfig) check() (err error) {
 		that.slowCometDuration = that.SlowCometDuration
 	}
 
+	if len(that.DefaultBodyCodec) == 0 {
+		that.DefaultBodyCodec = DefaultBodyCodec().Name()
+	}
+
 	//作为客户端，链接服务器重试间隔时间，默认为100毫秒
 	if that.RedialInterval <= 0 {
 		that.RedialInterval = time.Millisecond * 100
@@ -158,6 +162,10 @@ func asKCP(network string) string {
 
 //默认消息体编码格式
 var defaultBodyCodec codec.Codec = new(codec.JSONCodec)
+
+func DefaultBodyCodec() codec.Codec {
+	return defaultBodyCodec
+}
 
 // SetDefaultBodyCodec 设置默认消息体编码格式
 func SetDefaultBodyCodec(codecID byte) error {

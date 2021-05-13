@@ -10,7 +10,7 @@ type String struct {
 	value atomic.Value
 }
 
-//创建并发安全的string对象
+// NewString 创建并发安全的string对象
 func NewString(value ...string) *String {
 	s := &String{}
 	if len(value) > 0 {

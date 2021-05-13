@@ -106,6 +106,7 @@ func newSocket(c net.Conn, protoFuncList []ProtoFunc) *socket {
 		Conn:             c,
 		readerWithBuffer: bufio.NewReaderSize(c, readerSize),
 	}
+	s.id = dtype.NewString()
 	s.protocol = getProto(protoFuncList, s)
 	s.initOptimize()
 	return s
