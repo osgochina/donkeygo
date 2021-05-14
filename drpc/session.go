@@ -892,7 +892,7 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 	//优化的等待所有处理程序结束
 	that.graceCtxWait()
 	// 循环处理该会话中的各个请求
-	that.callCmdMap.Iterator(func(_, v interface{}) bool {
+	for _, v := range that.callCmdMap.Values() {
 		cCmd := v.(*callCmd)
 		cCmd.mu.Lock()
 		//如果该请求不是回复，并且该请求当前状态是ok，则主动取消它
@@ -900,8 +900,7 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 			cCmd.cancel(reason)
 		}
 		cCmd.mu.Unlock()
-		return true
-	})
+	}
 	//如果当前会话为主动关闭
 	if stat == statusActiveClosing {
 		return

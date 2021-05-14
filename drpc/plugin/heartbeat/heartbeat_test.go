@@ -21,6 +21,7 @@ func TestHeartbeatCALl(t *testing.T) {
 		cli := drpc.NewEndpoint(drpc.EndpointConfig{PrintDetail: true}, heartbeat.NewPing(3, true))
 		cli.Dial(":9090")
 		time.Sleep(time.Second * 20)
+
 	})
 }
 
@@ -37,9 +38,9 @@ func TestHeartbeatCALl2(t *testing.T) {
 		cli := drpc.NewEndpoint(drpc.EndpointConfig{PrintDetail: true}, heartbeat.NewPing(3, true))
 		sess, _ := cli.Dial(":9090")
 		for i := 0; i < 8; i++ {
-			sess.Call("/", nil, nil)
+			sess.Call("/", nil, nil).Status()
 			time.Sleep(time.Second)
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 10)
 	})
 }

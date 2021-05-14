@@ -184,9 +184,7 @@ func (that *Status) MarshalJSON() ([]byte, error) {
 
 	b = append(b, reB...)
 	msg := dconv.String(that.msg)
-	if len(msg) == 0 {
-		msg = "\"\""
-	}
+	msg = "\"" + msg + "\""
 	b = append(b, []byte(msg)...)
 
 	var cause string
@@ -195,12 +193,11 @@ func (that *Status) MarshalJSON() ([]byte, error) {
 	}
 	b = append(b, reC...)
 	c := dconv.String(cause)
-	if len(c) == 0 {
-		c = "\"\""
-	}
+	c = "\"" + c + "\""
 	b = append(b, []byte(c)...)
 	b = append(b, '}')
 	return b, nil
+
 }
 
 // UnmarshalJSON json解码
