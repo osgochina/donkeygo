@@ -31,3 +31,21 @@ func MatchString(pattern string, src string) ([]string, error) {
 		return nil, err
 	}
 }
+
+// ReplaceFunc 使用自定义func按照规则替换数据
+func ReplaceFunc(pattern string, src []byte, replaceFunc func(b []byte) []byte) ([]byte, error) {
+	if r, err := getRegexp(pattern); err == nil {
+		return r.ReplaceAllFunc(src, replaceFunc), nil
+	} else {
+		return nil, err
+	}
+}
+
+// ReplaceStringFunc replace all matched <pattern> in string <src>
+// with custom replacement function <replaceFunc>.
+func ReplaceStringFunc(pattern string, src string, replaceFunc func(s string) string) (string, error) {
+	bytes, err := ReplaceFunc(pattern, []byte(src), func(bytes []byte) []byte {
+		return []byte(replaceFunc(string(bytes)))
+	})
+	return string(bytes), err
+}

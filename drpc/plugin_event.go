@@ -123,7 +123,7 @@ type AfterAcceptPlugin interface {
 	AfterAccept(EarlySession) *Status
 }
 
-// 接收到accept后，执行该事件，并返回status
+// 接收到accept后，执行该事件，并返回status接收到accept后，执行该事件，并返回status
 func (that *pluginSingleContainer) afterAccept(sess EarlySession) (stat *Status) {
 	var pluginName string
 	defer func() {
