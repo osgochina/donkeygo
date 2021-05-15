@@ -5,6 +5,7 @@ import (
 	"donkeygo/container/dtype"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/os/glog"
 )
 
 type Pool struct {
@@ -29,6 +30,15 @@ func New(limit ...int) *Pool {
 		p.limit = limit[0]
 	}
 	return p
+}
+
+// Go 执行协程
+func Go(fn func()) bool {
+	if err := pool.Add(fn); err != nil {
+		glog.Warningf("%s", err.Error())
+		return false
+	}
+	return true
 }
 
 // Add 往默认协程池中添加jobs
