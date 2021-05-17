@@ -53,7 +53,7 @@ func (that *heartPong) AfterNewEndpoint(endpoint drpc.EarlyEndpoint) error {
 
 	const initial = time.Second*minRateSecond - 1
 	interval := initial
-	_ = dgpool.Add(func() {
+	dgpool.Go(func() {
 		for {
 			time.Sleep(interval)
 			rangeSession(func(sess drpc.Session) bool {
