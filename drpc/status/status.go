@@ -183,8 +183,7 @@ func (that *Status) MarshalJSON() ([]byte, error) {
 	b := append(reA, strconv.FormatInt(int64(that.code), 10)...)
 
 	b = append(b, reB...)
-	msg := dconv.String(that.msg)
-	msg = "\"" + msg + "\""
+	msg := strconv.Quote(dconv.String(that.msg))
 	b = append(b, []byte(msg)...)
 
 	var cause string
@@ -192,8 +191,7 @@ func (that *Status) MarshalJSON() ([]byte, error) {
 		cause = that.cause.Error()
 	}
 	b = append(b, reC...)
-	c := dconv.String(cause)
-	c = "\"" + c + "\""
+	c := strconv.Quote(dconv.String(cause))
 	b = append(b, []byte(c)...)
 	b = append(b, '}')
 	return b, nil
