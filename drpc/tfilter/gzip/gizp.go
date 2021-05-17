@@ -9,9 +9,16 @@ import (
 	"sync"
 )
 
+var ids = map[byte]bool{}
+
 // Reg registers a gzip filter for transfer.
 func Reg(id byte, name string, level int) {
 	tfilter.Reg(newGzip(id, name, level))
+	ids[id] = true
+}
+
+func Is(id byte) bool {
+	return ids[id]
 }
 
 type Gzip struct {
@@ -45,24 +52,24 @@ func newGzip(id byte, name string, level int) *Gzip {
 }
 
 // ID returns transfer filter id.
-func (g *Gzip) ID() byte {
-	return g.id
+func (that *Gzip) ID() byte {
+	return that.id
 }
 
-// ID returns transfer filter name.
-func (g *Gzip) Name() string {
-	return g.name
+// Name  returns transfer filter name.
+func (that *Gzip) Name() string {
+	return that.name
 }
 
 // OnPack performs filtering on packing.
-func (g *Gzip) OnPack(src []byte) ([]byte, error) {
+func (that *Gzip) OnPack(src []byte) ([]byte, error) {
 	var bb = new(bytes.Buffer)
-	gw := g.wPool.Get().(*gzip.Writer)
+	gw := that.wPool.Get().(*gzip.Writer)
 	gw.Reset(bb)
 	_, _ = gw.Write(src)
 	err := gw.Close()
 	gw.Reset(nil)
-	g.wPool.Put(gw)
+	that.wPool.Put(gw)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +77,16 @@ func (g *Gzip) OnPack(src []byte) ([]byte, error) {
 }
 
 // OnUnpack performs filtering on unpacking.
-func (g *Gzip) OnUnpack(src []byte) (dest []byte, err error) {
+func (that *Gzip) OnUnpack(src []byte) (dest []byte, err error) {
 	if len(src) == 0 {
 		return src, nil
 	}
-	gr := g.rPool.Get().(*gzip.Reader)
+	gr := that.rPool.Get().(*gzip.Reader)
 	err = gr.Reset(bytes.NewReader(src))
 	if err == nil {
 		dest, err = ioutil.ReadAll(gr)
 	}
 	_ = gr.Close()
-	g.rPool.Put(gr)
+	that.rPool.Put(gr)
 	return dest, err
 }

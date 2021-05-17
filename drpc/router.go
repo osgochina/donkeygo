@@ -32,6 +32,12 @@ func HTTPServiceMethodMapper(prefix, name string) string {
 	return path.Join("/", prefix, toServiceMethods(name, '/', true))
 }
 
+type ServiceMethodMapper func(prefix, name string) (serviceMethod string)
+
+func SetServiceMethodMapper(mapper ServiceMethodMapper) {
+	globalServiceMethodMapper = mapper
+}
+
 var globalServiceMethodMapper = HTTPServiceMethodMapper
 
 // toServiceMethods maps struct(func) name to service methods.

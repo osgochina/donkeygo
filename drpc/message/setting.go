@@ -17,6 +17,23 @@ const (
 	TypeAuthReply byte = 5
 )
 
+func TypeText(typ byte) string {
+	switch typ {
+	case TypeCall:
+		return "CALL"
+	case TypeReply:
+		return "REPLY"
+	case TypePush:
+		return "PUSH"
+	case TypeAuthCall:
+		return "AUTH_CALL"
+	case TypeAuthReply:
+		return "AUTH_REPLY"
+	default:
+		return "Undefined"
+	}
+}
+
 const (
 	// MetaRealIP real IP metadata key
 	MetaRealIP = "X-Real-IP"
