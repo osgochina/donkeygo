@@ -1,4 +1,4 @@
-module donkeygo
+module github.com/osgochina/donkeygo
 
 go 1.15
 
