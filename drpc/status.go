@@ -1,6 +1,6 @@
 package drpc
 
-import "donkeygo/drpc/status"
+import "github.com/osgochina/donkeygo/drpc/status"
 
 type Status = status.Status
 

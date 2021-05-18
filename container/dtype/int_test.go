@@ -1,8 +1,8 @@
 package dtype_test
 
 import (
-	"donkeygo/container/dtype"
-	"donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 )
 

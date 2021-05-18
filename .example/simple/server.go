@@ -1,9 +1,9 @@
 package main
 
 import (
-	"donkeygo/drpc"
 	"fmt"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
 	"time"
 )
 

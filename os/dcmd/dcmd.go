@@ -1,8 +1,8 @@
 package dcmd
 
 import (
-	"donkeygo/container/dvar"
-	"donkeygo/internal/command"
+	"github.com/osgochina/donkeygo/container/dvar"
+	"github.com/osgochina/donkeygo/internal/command"
 	"os"
 	"strings"
 )

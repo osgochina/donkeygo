@@ -2,10 +2,10 @@ package drpc
 
 import (
 	"context"
-	"donkeygo/container/dmap"
-	"donkeygo/drpc/message"
-	"donkeygo/drpc/status"
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"sync"
 	"time"
 )

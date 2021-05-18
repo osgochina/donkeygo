@@ -1,8 +1,8 @@
 package message
 
 import (
-	"donkeygo/container/dmap"
-	"donkeygo/drpc/tfilter"
+	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/drpc/tfilter"
 	"sync"
 )
 

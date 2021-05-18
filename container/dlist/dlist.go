@@ -3,9 +3,9 @@ package dlist
 import (
 	"bytes"
 	"container/list"
-	"donkeygo/internal/rwmutex"
-	"donkeygo/util/dconv"
 	"encoding/json"
+	"github.com/osgochina/donkeygo/internal/rwmutex"
+	"github.com/osgochina/donkeygo/util/dconv"
 )
 
 type (

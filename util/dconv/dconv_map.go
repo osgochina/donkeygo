@@ -1,9 +1,9 @@
 package dconv
 
 import (
-	"donkeygo/internal/empty"
-	"donkeygo/internal/utils"
 	"encoding/json"
+	"github.com/osgochina/donkeygo/internal/empty"
+	"github.com/osgochina/donkeygo/internal/utils"
 	"reflect"
 	"strings"
 )

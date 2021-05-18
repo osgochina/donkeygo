@@ -1,11 +1,11 @@
 package rawproto
 
 import (
-	"donkeygo/container/dbuffer"
-	"donkeygo/drpc/proto"
-	"donkeygo/util/dconv"
 	"encoding/binary"
 	"errors"
+	"github.com/osgochina/donkeygo/container/dbuffer"
+	"github.com/osgochina/donkeygo/drpc/proto"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"io"
 	"math"
 	"strconv"

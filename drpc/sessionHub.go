@@ -1,6 +1,6 @@
 package drpc
 
-import "donkeygo/container/dmap"
+import "github.com/osgochina/donkeygo/container/dmap"
 
 type SessionHub struct {
 	// key: session id (ip, name and so on)

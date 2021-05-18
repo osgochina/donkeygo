@@ -2,7 +2,7 @@ package derror
 
 import (
 	"bytes"
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 )
 

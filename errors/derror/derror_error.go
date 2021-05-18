@@ -2,9 +2,9 @@ package derror
 
 import (
 	"bytes"
-	"donkeygo/internal/utils"
 	"errors"
 	"fmt"
+	"github.com/osgochina/donkeygo/internal/utils"
 	"io"
 	"runtime"
 	"strings"

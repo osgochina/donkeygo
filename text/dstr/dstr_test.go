@@ -1,8 +1,8 @@
 package dstr_test
 
 import (
-	"donkeygo/test/dtest"
-	"donkeygo/text/dstr"
+	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"testing"
 )
 

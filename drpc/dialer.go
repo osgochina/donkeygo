@@ -2,8 +2,8 @@ package drpc
 
 import (
 	"crypto/tls"
-	"donkeygo/container/dtype"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/container/dtype"
 	"net"
 	"time"
 )

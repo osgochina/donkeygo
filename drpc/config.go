@@ -1,10 +1,10 @@
 package drpc
 
 import (
-	"donkeygo/drpc/codec"
-	"donkeygo/drpc/message"
-	"donkeygo/drpc/socket"
 	"errors"
+	"github.com/osgochina/donkeygo/drpc/codec"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/socket"
 	"math"
 	"net"
 	"strconv"

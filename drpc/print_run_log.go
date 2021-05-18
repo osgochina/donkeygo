@@ -1,10 +1,10 @@
 package drpc
 
 import (
-	"donkeygo/drpc/message"
-	"donkeygo/util/dconv"
 	"encoding/json"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 	"time"
 )

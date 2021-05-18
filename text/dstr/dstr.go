@@ -1,7 +1,7 @@
 package dstr
 
 import (
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strings"
 )
 

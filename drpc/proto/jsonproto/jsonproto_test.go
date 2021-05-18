@@ -1,12 +1,12 @@
 package jsonproto_test
 
 import (
-	"donkeygo/drpc"
-	"donkeygo/drpc/message"
-	"donkeygo/drpc/proto/jsonproto"
-	"donkeygo/drpc/tfilter/gzip"
-	"donkeygo/util/dconv"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/proto/jsonproto"
+	"github.com/osgochina/donkeygo/drpc/tfilter/gzip"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
 	"time"
 )

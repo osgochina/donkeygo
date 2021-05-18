@@ -1,9 +1,9 @@
 package dconv
 
 import (
-	"donkeygo/encoding/dbinary"
 	"encoding/json"
 	"fmt"
+	"github.com/osgochina/donkeygo/encoding/dbinary"
 	"reflect"
 	"strconv"
 	"strings"

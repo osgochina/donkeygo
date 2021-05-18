@@ -1,7 +1,7 @@
 package dtest_test
 
 import (
-	"donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 )
 

@@ -1,12 +1,12 @@
 package ignorecase_test
 
 import (
-	"donkeygo/drpc"
-	"donkeygo/drpc/message"
-	"donkeygo/drpc/plugin/ignorecase"
-	"donkeygo/test/dtest"
-	"donkeygo/util/dconv"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/plugin/ignorecase"
+	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
 	"time"
 )

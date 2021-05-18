@@ -1,8 +1,8 @@
 package drpc
 
 import (
-	"donkeygo/drpc/status"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc/status"
 	"net"
 )
 

@@ -1,7 +1,7 @@
 package heartbeat
 
 import (
-	"donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/container/dmap"
 	"sync"
 	"time"
 )

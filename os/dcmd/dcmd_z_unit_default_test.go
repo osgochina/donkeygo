@@ -9,9 +9,9 @@
 package dcmd_test
 
 import (
-	"donkeygo/os/dcmd"
-	"donkeygo/os/denv"
-	"donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/os/dcmd"
+	"github.com/osgochina/donkeygo/os/denv"
+	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 )
 

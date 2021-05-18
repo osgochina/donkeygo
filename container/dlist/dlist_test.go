@@ -1,8 +1,8 @@
 package dlist_test
 
 import (
-	"donkeygo/container/dlist"
 	"fmt"
+	"github.com/osgochina/donkeygo/container/dlist"
 	"testing"
 )
 

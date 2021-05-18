@@ -2,10 +2,10 @@ package socket
 
 import (
 	"bufio"
-	"donkeygo/container/dmap"
-	"donkeygo/container/dtype"
-	"donkeygo/drpc/message"
-	"donkeygo/drpc/proto"
+	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/proto"
 	"net"
 	"sync"
 	"sync/atomic"

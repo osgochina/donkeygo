@@ -2,8 +2,8 @@ package message
 
 import (
 	"context"
-	"donkeygo/drpc/status"
 	"errors"
+	"github.com/osgochina/donkeygo/drpc/status"
 	"math"
 )
 

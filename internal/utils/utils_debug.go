@@ -1,6 +1,6 @@
 package utils
 
-import "donkeygo/internal/command"
+import "github.com/osgochina/donkeygo/internal/command"
 
 const (
 	debugKey                 = "dk.debug"                        // Debug key for checking if in debug mode.

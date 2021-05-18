@@ -1,10 +1,10 @@
 package heartbeat
 
 import (
-	"donkeygo/drpc"
-	"donkeygo/drpc/message"
-	"donkeygo/os/dgpool"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/os/dgpool"
 	"strconv"
 	"sync"
 	"time"

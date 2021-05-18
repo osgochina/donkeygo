@@ -1,7 +1,7 @@
 package proto
 
 import (
-	"donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/drpc/message"
 	"io"
 )
 

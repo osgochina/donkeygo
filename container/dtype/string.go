@@ -2,7 +2,7 @@ package dtype
 
 import (
 	"bytes"
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"sync/atomic"
 )
 

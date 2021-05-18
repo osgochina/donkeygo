@@ -3,8 +3,8 @@ package md5
 import (
 	"bytes"
 	"crypto/md5"
-	"donkeygo/drpc/tfilter"
 	"errors"
+	"github.com/osgochina/donkeygo/drpc/tfilter"
 )
 
 const md5Length = 16

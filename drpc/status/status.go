@@ -1,10 +1,10 @@
 package status
 
 import (
-	"donkeygo/util/dconv"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"io"
 	"strconv"
 )

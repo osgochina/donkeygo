@@ -1,9 +1,9 @@
 package drpc
 
 import (
-	"donkeygo/drpc/status"
-	"donkeygo/text/dstr"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"github.com/pkg/errors"
 	"path"
 	"reflect"

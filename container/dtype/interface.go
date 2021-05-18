@@ -1,8 +1,8 @@
 package dtype
 
 import (
-	"donkeygo/util/dconv"
 	"encoding/json"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"sync/atomic"
 )
 

@@ -1,6 +1,6 @@
 package socket
 
-import "donkeygo/container/dmap"
+import "github.com/osgochina/donkeygo/container/dmap"
 
 // HubSocket socket 仓库
 type HubSocket struct {

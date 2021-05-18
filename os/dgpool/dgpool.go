@@ -1,11 +1,11 @@
 package dgpool
 
 import (
-	"donkeygo/container/dlist"
-	"donkeygo/container/dtype"
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/container/dlist"
+	"github.com/osgochina/donkeygo/container/dtype"
 )
 
 type Pool struct {

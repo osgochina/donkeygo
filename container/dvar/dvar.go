@@ -1,10 +1,10 @@
 package dvar
 
 import (
-	"donkeygo/container/dtype"
-	"donkeygo/util/dconv"
 	"encoding/json"
 	"github.com/gogf/gf/container/gtype"
+	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/util/dconv"
 )
 
 type Var struct {

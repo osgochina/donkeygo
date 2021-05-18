@@ -4,8 +4,8 @@ package graceful
 
 import (
 	"context"
-	"donkeygo/os/denv"
-	"donkeygo/os/dfile"
+	"github.com/osgochina/donkeygo/os/denv"
+	"github.com/osgochina/donkeygo/os/dfile"
 	"os"
 	"os/signal"
 	"syscall"

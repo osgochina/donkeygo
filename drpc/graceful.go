@@ -1,11 +1,11 @@
 package drpc
 
 import (
-	"donkeygo/errors/derror"
-	"donkeygo/net/inherit"
-	"donkeygo/os/graceful"
-	"donkeygo/util/dconv"
 	"encoding/json"
+	"github.com/osgochina/donkeygo/errors/derror"
+	"github.com/osgochina/donkeygo/net/inherit"
+	"github.com/osgochina/donkeygo/os/graceful"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
 	"sync"
 	"time"

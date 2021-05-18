@@ -3,8 +3,8 @@ package gzip
 import (
 	"bytes"
 	"compress/gzip"
-	"donkeygo/drpc/tfilter"
 	"fmt"
+	"github.com/osgochina/donkeygo/drpc/tfilter"
 	"io/ioutil"
 	"sync"
 )

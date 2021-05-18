@@ -1,8 +1,8 @@
 package dtest
 
 import (
-	"donkeygo/util/dconv"
 	"fmt"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
 	"reflect"
 	"testing"

@@ -2,7 +2,7 @@
 package ignorecase
 
 import (
-	"donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc"
 	"strings"
 )
 

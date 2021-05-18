@@ -1,10 +1,10 @@
 package dmap
 
 import (
-	"donkeygo/internal/empty"
-	"donkeygo/internal/rwmutex"
-	"donkeygo/util/dconv"
 	"encoding/json"
+	"github.com/osgochina/donkeygo/internal/empty"
+	"github.com/osgochina/donkeygo/internal/rwmutex"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"math/rand"
 )
 

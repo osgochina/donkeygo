@@ -3,13 +3,13 @@ package message
 
 import (
 	"context"
-	"donkeygo/container/dmap"
-	"donkeygo/drpc/codec"
-	"donkeygo/drpc/status"
-	"donkeygo/drpc/tfilter"
-	"donkeygo/util/dconv"
 	"encoding/json"
 	"fmt"
+	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/drpc/codec"
+	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/drpc/tfilter"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 )
 

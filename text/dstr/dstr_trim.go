@@ -1,7 +1,7 @@
 package dstr
 
 import (
-	"donkeygo/internal/utils"
+	"github.com/osgochina/donkeygo/internal/utils"
 	"strings"
 )
 

@@ -2,9 +2,9 @@ package dlog
 
 import (
 	"context"
-	"donkeygo/container/dtype"
-	"donkeygo/text/dregex"
 	"github.com/gogf/gf/os/gfile"
+	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/text/dregex"
 	"io"
 	"strings"
 	"time"

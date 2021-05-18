@@ -2,8 +2,8 @@ package drpc
 
 import (
 	"crypto/tls"
-	"donkeygo/net/inherit"
 	"errors"
+	"github.com/osgochina/donkeygo/net/inherit"
 	"net"
 )
 

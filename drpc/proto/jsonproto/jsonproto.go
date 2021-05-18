@@ -1,14 +1,14 @@
 package jsonproto
 
 import (
-	"donkeygo/container/dbuffer"
-	"donkeygo/container/dmap"
-	"donkeygo/drpc"
-	"donkeygo/drpc/proto"
-	"donkeygo/util/dconv"
 	"encoding/binary"
 	"encoding/json"
 	"github.com/gogf/gf/encoding/gjson"
+	"github.com/osgochina/donkeygo/container/dbuffer"
+	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/proto"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"io"
 	"sync"
 )

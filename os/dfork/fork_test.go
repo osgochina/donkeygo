@@ -1,7 +1,7 @@
 package dfork_test
 
 import (
-	"donkeygo/os/dfork"
+	"github.com/osgochina/donkeygo/os/dfork"
 	"testing"
 )
 import "github.com/gogf/gf/test/gtest"

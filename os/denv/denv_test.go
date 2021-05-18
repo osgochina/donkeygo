@@ -1,9 +1,9 @@
 package denv_test
 
 import (
-	"donkeygo/os/denv"
-	"donkeygo/test/dtest"
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/os/denv"
+	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
 	"testing"
 	"time"

@@ -2,8 +2,8 @@ package dcmd
 
 import (
 	"bufio"
-	"donkeygo/text/dstr"
 	"fmt"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"os"
 )
 

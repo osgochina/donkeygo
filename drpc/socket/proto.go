@@ -1,8 +1,8 @@
 package socket
 
 import (
-	"donkeygo/drpc/proto"
-	"donkeygo/drpc/proto/rawproto"
+	"github.com/osgochina/donkeygo/drpc/proto"
+	"github.com/osgochina/donkeygo/drpc/proto/rawproto"
 )
 
 type Proto = proto.Proto

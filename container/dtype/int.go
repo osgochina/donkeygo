@@ -1,7 +1,7 @@
 package dtype
 
 import (
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 	"sync/atomic"
 )

@@ -1,9 +1,9 @@
 package heartbeat_test
 
 import (
-	"donkeygo/drpc"
-	"donkeygo/drpc/plugin/heartbeat"
-	"donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/plugin/heartbeat"
+	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 	"time"
 )

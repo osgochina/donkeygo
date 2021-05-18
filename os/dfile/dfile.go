@@ -1,9 +1,9 @@
 package dfile
 
 import (
-	"donkeygo/container/dtype"
-	"donkeygo/text/dstr"
-	"donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/text/dstr"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
 	"os/exec"
 	"path/filepath"
