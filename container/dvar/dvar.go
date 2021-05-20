@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/container/gtype"
 	"github.com/osgochina/donkeygo/container/dtype"
 	"github.com/osgochina/donkeygo/util/dconv"
+	"time"
 )
 
 type Var struct {
@@ -149,13 +150,13 @@ func (that *Var) Float64() float64 {
 //func (v *Var) Time(format ...string) time.Time {
 //	return gconv.Time(v.Val(), format...)
 //}
-//
-//// Duration converts and returns <v> as time.Duration.
-//// If value of <v> is string, then it uses time.ParseDuration for conversion.
-//func (v *Var) Duration() time.Duration {
-//	return gconv.Duration(v.Val())
-//}
-//
+
+// Duration converts and returns <v> as time.Duration.
+// If value of <v> is string, then it uses time.ParseDuration for conversion.
+func (that *Var) Duration() time.Duration {
+	return dconv.Duration(that.Val())
+}
+
 //// GTime converts and returns <v> as *gtime.Time.
 //// The parameter <format> specifies the format of the time string using gtime,
 //// eg: Y-m-d H:i:s.

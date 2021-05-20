@@ -33,3 +33,27 @@ func Trim(str string, characterMask ...string) string {
 	}
 	return strings.Trim(str, trimChars)
 }
+
+// IsNumeric 判断字符串是否是数字
+func IsNumeric(s string) bool {
+	length := len(s)
+	if length == 0 {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] == '-' && i == 0 {
+			continue
+		}
+		if s[i] == '.' {
+			if i > 0 && i < len(s)-1 {
+				continue
+			} else {
+				return false
+			}
+		}
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
+}
