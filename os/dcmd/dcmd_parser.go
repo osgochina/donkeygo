@@ -1,12 +1,12 @@
 package dcmd
 
 import (
-	"donkeygo/container/dvar"
-	"donkeygo/text/dregex"
-	dstr2 "donkeygo/text/dstr"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/osgochina/donkeygo/container/dvar"
+	"github.com/osgochina/donkeygo/text/dregex"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"os"
 	"strings"
 )
@@ -138,7 +138,7 @@ func (that *Parser) isOptionNeedArgument(name string) bool {
 // setOptionValue sets the option value for name and according alias.
 func (that *Parser) setOptionValue(name, value string) {
 	for optionName, _ := range that.passedOptions {
-		array := dstr2.SplitAndTrim(optionName, ",")
+		array := dstr.SplitAndTrim(optionName, ",")
 		for _, v := range array {
 			if strings.EqualFold(v, name) {
 				for _, v1 := range array {

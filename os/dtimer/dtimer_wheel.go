@@ -23,7 +23,7 @@ func (that *wheel) start() {
 	go func() {
 		var tickDuration = time.Duration(that.intervalMs) * time.Millisecond
 		var ticker = time.NewTicker(tickDuration)
-
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
@@ -33,7 +33,6 @@ func (that *wheel) start() {
 				case StatusStopped:
 					//什么也不做
 				case StatusClosed:
-					ticker.Stop()
 					return
 				}
 			}
@@ -55,16 +54,16 @@ func (that *wheel) proceed() {
 	)
 	//如果当前刻度需要处理的任务数大于0，则启动一个协程去处理这些任务，如果没有任务要处理，则什么都不做
 	if length > 0 {
-		go func(jobs *dlist.List, nowTicks int64, length int, nowMs int64) {
+		go func(jobs *dlist.List, nowTicks int64) {
 
 			var entry *Entry
 			for i := length; i > 0; i-- {
 				job := jobs.PopFront() //从队列头部取出任务
 				if job == nil {
 					break
+				} else {
+					entry = job.(*Entry)
 				}
-				entry = job.(*Entry)
-
 				//检查任务的运行时间是否正确
 				runnable, addable := entry.check(nowTicks, nowMs)
 
@@ -97,7 +96,7 @@ func (that *wheel) proceed() {
 				}
 			}
 
-		}(list, nowTicks, length, nowMs)
+		}(list, nowTicks)
 	}
 }
 
@@ -123,7 +122,7 @@ func (that *wheel) addEntry(interval time.Duration, jobFunc JobFunc, singleton b
 		intervalTicks = 1
 	}
 
-	nowMs := that.timer.nowFunc().UnixNano() / 1e6
+	nowMs := time.Now().UnixNano() / 1e6
 	nowTicks := that.ticks.Val()
 	entry := &Entry{
 		wheel:             that,

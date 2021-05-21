@@ -27,7 +27,7 @@ type Timer struct {
 func NewTimer(slot int, interval time.Duration, level ...int) *Timer {
 	timer := doNewWithoutAutoStart(slot, interval, level...)
 	timer.wheels[0].start()
-	return nil
+	return timer
 }
 
 // 创建定时器并启动
@@ -92,7 +92,7 @@ func (that *Timer) newWheel(level int, slot int, interval time.Duration) *wheel 
 		number:     int64(slot),                                //当前轮盘刻度数
 		ticks:      dtype.NewInt64(),                           //记录当前轮盘走过的滴答数
 		totalMs:    int64(slot) * interval.Nanoseconds() / 1e6, //当前轮盘要走完一圈需要的总毫秒数
-		createMs:   that.nowFunc().UnixNano() / 1e6,            //创建该轮盘的毫秒时间戳
+		createMs:   time.Now().UnixNano() / 1e6,                //创建该轮盘的毫秒时间戳
 		intervalMs: interval.Nanoseconds() / 1e6,               //当前时间盘的滴答间隔毫秒数
 	}
 
@@ -210,7 +210,7 @@ func (that *Timer) getLevelByIntervalMs(intervalMs int64) int {
 		// -1 表示匹配到了最近的一个轮盘，但是精度不够，需要往下匹配，需要从这个轮盘往下，一个个的匹配，找到最适合的那个轮盘
 		i := pos
 		for ; i > 0; i-- {
-			if intervalMs > that.wheels[i].intervalMs && intervalMs < that.wheels[i].totalMs {
+			if intervalMs > that.wheels[i].intervalMs && intervalMs <= that.wheels[i].totalMs {
 				return i
 			}
 		}

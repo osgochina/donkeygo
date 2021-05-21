@@ -56,30 +56,28 @@ func (that *Entry) check(nowTicks int64, nowMs int64) (runnable, addable bool) {
 					return false, false
 				}
 			}
-
-			//如果当前任务是单例任务，并且正在运行中,那么此次任务略过，把任务丢到处理器中，等待下次执行
-			if that.IsSingleton() {
-				if that.status.Set(StatusRunning) == StatusRunning {
-					return false, true
-				}
-			}
-
-			//如果任务的执行次数到了设置值，此次不需要执行，也不需要再次添加到任务处理器中
-			times := that.times.Add(-1)
-			if times <= 0 {
-				if that.status.Set(StatusClosed) == StatusClosed || times < 0 {
-					return false, false
-				}
-			}
-
-			// 这里是一个快速判断逻辑，如果任务的最大执行次数小于20E，则让任务的执行次数变为最大
-			// 针对不限制执行次数的任务使用
-			if times < 2000000000 && times > 1000000000 {
-				that.times.Set(defaultTimes)
-			}
-
-			return true, true
 		}
+		//如果当前任务是单例任务，并且正在运行中,那么此次任务略过，把任务丢到处理器中，等待下次执行
+		if that.IsSingleton() {
+			if that.status.Set(StatusRunning) == StatusRunning {
+				return false, true
+			}
+		}
+
+		//如果任务的执行次数到了设置值，此次不需要执行，也不需要再次添加到任务处理器中
+		times := that.times.Add(-1)
+		if times <= 0 {
+			if that.status.Set(StatusClosed) == StatusClosed || times < 0 {
+				return false, false
+			}
+		}
+
+		// 这里是一个快速判断逻辑，如果任务的最大执行次数小于20E，则让任务的执行次数变为最大
+		// 针对不限制执行次数的任务使用
+		if times < 2000000000 && times > 1000000000 {
+			that.times.Set(defaultTimes)
+		}
+		return true, true
 	}
 
 	//默认情况下，如果未到执行时间，都把该条目放到轮盘中，等待到期执行
