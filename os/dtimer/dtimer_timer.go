@@ -11,13 +11,13 @@ import (
 type Timer struct {
 	// 当前管理器状态
 	status *dtype.Int
-	//时间轮
+	//分层时间轮
 	wheels []*wheel
 	//时间轮层数
 	length int
-	// 每一个时间轮层数有多少个刻度
+	// 每层时间轮刻度
 	number int
-	//定时器最小触发单位
+	//定时器最小滴答声
 	intervalMs int64
 	// 获取当前时间的方法
 	nowFunc func() time.Time

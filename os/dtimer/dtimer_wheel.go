@@ -10,11 +10,11 @@ import (
 type wheel struct {
 	timer      *Timer        //该时间轮属于那个定时任务管理器
 	level      int           //当前时间轮是第几层
-	slots      []*dlist.List //任务槽，每一个刻度代表一个任务槽
+	slots      []*dlist.List //刻度数组，每一个刻度代表一个任务槽
 	number     int64         //该时间轮的刻度总数
 	ticks      *dtype.Int64  //时间轮的滴答声，每次滴答表示走过了一个刻度
 	totalMs    int64         //该时间轮走完一圈需要消耗多少毫秒 总毫秒数(totalMs)=刻度数(number)*每一个刻度间隔(intervalMs)
-	createMs   int64         //该时间轮创建时的毫秒数
+	createMs   int64         //该时间轮创建时的毫秒时间戳
 	intervalMs int64         //该时间轮每一个刻度代表的毫秒数
 }
 

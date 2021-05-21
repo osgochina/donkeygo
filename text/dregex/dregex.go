@@ -14,6 +14,19 @@ func Validate(pattern string) error {
 	return err
 }
 
+// IsMatch 是否匹配
+func IsMatch(pattern string, src []byte) bool {
+	if r, err := getRegexp(pattern); err == nil {
+		return r.Match(src)
+	}
+	return false
+}
+
+// IsMatchString 字符串是否匹配
+func IsMatchString(pattern string, src string) bool {
+	return IsMatch(pattern, []byte(src))
+}
+
 //Match 返回匹配的byte数组
 func Match(pattern string, src []byte) ([][]byte, error) {
 	if r, err := getRegexp(pattern); err == nil {
