@@ -10,7 +10,244 @@ import (
 	"time"
 )
 
+type (
+	// errorStack is the interface for Stack feature.
+	errorStack interface {
+		Error() string
+		Stack() string
+	}
+)
+
 var StructTagPriority = []string{"c", "p", "json"}
+
+func Convert(any interface{}, t string, params ...interface{}) interface{} {
+	switch t {
+	case "int":
+		return Int(any)
+	case "*int":
+		if _, ok := any.(*int); ok {
+			return any
+		}
+		v := Int(any)
+		return &v
+
+	case "int8":
+		return Int8(any)
+	case "*int8":
+		if _, ok := any.(*int8); ok {
+			return any
+		}
+		v := Int8(any)
+		return &v
+
+	case "int16":
+		return Int16(any)
+	case "*int16":
+		if _, ok := any.(*int16); ok {
+			return any
+		}
+		v := Int16(any)
+		return &v
+
+	case "int32":
+		return Int32(any)
+	case "*int32":
+		if _, ok := any.(*int32); ok {
+			return any
+		}
+		v := Int32(any)
+		return &v
+
+	case "int64":
+		return Int64(any)
+	case "*int64":
+		if _, ok := any.(*int64); ok {
+			return any
+		}
+		v := Int64(any)
+		return &v
+
+	case "uint":
+		return Uint(any)
+	case "*uint":
+		if _, ok := any.(*uint); ok {
+			return any
+		}
+		v := Uint(any)
+		return &v
+
+	case "uint8":
+		return Uint8(any)
+	case "*uint8":
+		if _, ok := any.(*uint8); ok {
+			return any
+		}
+		v := Uint8(any)
+		return &v
+
+	case "uint16":
+		return Uint16(any)
+	case "*uint16":
+		if _, ok := any.(*uint16); ok {
+			return any
+		}
+		v := Uint16(any)
+		return &v
+
+	case "uint32":
+		return Uint32(any)
+	case "*uint32":
+		if _, ok := any.(*uint32); ok {
+			return any
+		}
+		v := Uint32(any)
+		return &v
+
+	case "uint64":
+		return Uint64(any)
+	case "*uint64":
+		if _, ok := any.(*uint64); ok {
+			return any
+		}
+		v := Uint64(any)
+		return &v
+
+	case "float32":
+		return Float32(any)
+	case "*float32":
+		if _, ok := any.(*float32); ok {
+			return any
+		}
+		v := Float32(any)
+		return &v
+
+	case "float64":
+		return Float64(any)
+	case "*float64":
+		if _, ok := any.(*float64); ok {
+			return any
+		}
+		v := Float64(any)
+		return &v
+
+	case "bool":
+		return Bool(any)
+	case "*bool":
+		if _, ok := any.(*bool); ok {
+			return any
+		}
+		v := Bool(any)
+		return &v
+
+	case "string":
+		return String(any)
+	case "*string":
+		if _, ok := any.(*string); ok {
+			return any
+		}
+		v := String(any)
+		return &v
+
+	case "[]byte":
+		return Bytes(any)
+	//case "[]int":
+	//	return Ints(any)
+	//case "[]int32":
+	//	return Int32s(any)
+	//case "[]int64":
+	//	return Int64s(any)
+	//case "[]uint":
+	//	return Uints(any)
+	//case "[]uint32":
+	//	return Uint32s(any)
+	//case "[]uint64":
+	//	return Uint64s(any)
+	//case "[]float32":
+	//	return Float32s(any)
+	//case "[]float64":
+	//	return Float64s(any)
+	//case "[]string":
+	//	return Strings(any)
+	//
+	//case "Time", "time.Time":
+	//	if len(params) > 0 {
+	//		return Time(any, String(params[0]))
+	//	}
+	//	return Time(any)
+	//case "*time.Time":
+	//	var v interface{}
+	//	if len(params) > 0 {
+	//		v = Time(any, String(params[0]))
+	//	} else {
+	//		if _, ok := any.(*time.Time); ok {
+	//			return any
+	//		}
+	//		v = Time(any)
+	//	}
+	//	return &v
+	//
+	//case "GTime", "gtime.Time":
+	//	if len(params) > 0 {
+	//		if v := GTime(any, String(params[0])); v != nil {
+	//			return *v
+	//		} else {
+	//			return *gtime.New()
+	//		}
+	//	}
+	//	if v := GTime(any); v != nil {
+	//		return *v
+	//	} else {
+	//		return *gtime.New()
+	//	}
+	//case "*gtime.Time":
+	//	if len(params) > 0 {
+	//		if v := GTime(any, String(params[0])); v != nil {
+	//			return v
+	//		} else {
+	//			return gtime.New()
+	//		}
+	//	}
+	//	if v := GTime(any); v != nil {
+	//		return v
+	//	} else {
+	//		return gtime.New()
+	//	}
+	//
+	//case "Duration", "time.Duration":
+	//	return Duration(any)
+	//case "*time.Duration":
+	//	if _, ok := any.(*time.Duration); ok {
+	//		return any
+	//	}
+	//	v := Duration(any)
+	//	return &v
+	//
+	//case "map[string]string":
+	//	return MapStrStr(any)
+	//
+	//case "map[string]interface{}":
+	//	return Map(any)
+	//
+	//case "[]map[string]interface{}":
+	//	return Maps(any)
+
+	//case "gvar.Var":
+	//	// TODO remove reflect usage to create gvar.Var, considering using unsafe pointer
+	//	rv := reflect.New(intstore.ReflectTypeVarImp)
+	//	ri := rv.Interface()
+	//	if v, ok := ri.(apiSet); ok {
+	//		v.Set(any)
+	//	} else if v, ok := ri.(apiUnmarshalValue); ok {
+	//		v.UnmarshalValue(any)
+	//	} else {
+	//		rv.Set(reflect.ValueOf(any))
+	//	}
+	//	return ri
+
+	default:
+		return any
+	}
+}
 
 // Byte 把对象转换成一个byte
 func Byte(i interface{}) byte {

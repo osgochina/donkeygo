@@ -1,10 +1,10 @@
 package ignorecase_test
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc"
 	"github.com/osgochina/donkeygo/drpc/message"
 	"github.com/osgochina/donkeygo/drpc/plugin/ignorecase"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
@@ -62,6 +62,6 @@ type Push struct {
 }
 
 func (p *Push) Test(arg *map[string]string) *drpc.Status {
-	glog.Infof("receive push(%s):\narg: %#v\n", p.IP(), arg)
+	dlog.Infof("receive push(%s):\narg: %#v\n", p.IP(), arg)
 	return nil
 }

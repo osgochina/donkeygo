@@ -1,9 +1,9 @@
 package main
 
 import (
-	"donkeygo/drpc"
-	"donkeygo/drpc/message"
-	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func main() {
 
 	sess, stat := cli.Dial(":9090")
 	if !stat.OK() {
-		glog.Fatalf("%v", stat)
+		dlog.Fatalf("%v", stat)
 	}
 	var result int
 	stat = sess.Call("/math/add",
@@ -25,10 +25,10 @@ func main() {
 		message.WithSetMeta("author", "henrylee2cn"),
 	).Status()
 	if !stat.OK() {
-		glog.Fatalf("%v", stat)
+		dlog.Fatalf("%v", stat)
 	}
-	glog.Printf("result: %d", result)
-	glog.Printf("Wait 10 seconds to receive the push...")
+	dlog.Printf("result: %d", result)
+	dlog.Printf("Wait 10 seconds to receive the push...")
 	time.Sleep(time.Second * 10)
 }
 
@@ -37,6 +37,6 @@ type Push struct {
 }
 
 func (that *Push) Status(arg *string) *drpc.Status {
-	glog.Printf("%s", *arg)
+	dlog.Printf("%s", *arg)
 	return nil
 }

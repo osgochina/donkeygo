@@ -2,12 +2,12 @@ package httpproto_test
 
 import (
 	"bytes"
-	"donkeygo/drpc"
-	"donkeygo/drpc/proto/httpproto"
-	"donkeygo/test/dtest"
-	"donkeygo/util/dconv"
 	"encoding/json"
-	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/drpc/proto/httpproto"
+	"github.com/osgochina/donkeygo/os/dlog"
+	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -19,7 +19,7 @@ type Home struct {
 }
 
 func (h *Home) Test(arg *map[string]string) (map[string]interface{}, *drpc.Status) {
-	glog.Infof("peer_id: %s", dconv.String(h.PeekMeta("peer_id")))
+	dlog.Infof("peer_id: %s", dconv.String(h.PeekMeta("peer_id")))
 	return map[string]interface{}{
 		"arg": *arg,
 	}, nil

@@ -2,12 +2,12 @@ package drpc
 
 import (
 	"context"
-	"github.com/gogf/gf/os/glog"
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/container/dmap"
 	"github.com/osgochina/donkeygo/drpc/codec"
 	"github.com/osgochina/donkeygo/drpc/message"
 	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/os/dlog"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"reflect"
 	"sync"
 	"time"
@@ -304,7 +304,7 @@ func (that *handlerCtx) IP() string {
 
 // RealIP 获取远程服务的真实ip
 func (that *handlerCtx) RealIP() string {
-	realIP := gconv.String(that.PeekMeta(message.MetaRealIP))
+	realIP := dconv.String(that.PeekMeta(message.MetaRealIP))
 	if len(realIP) > 0 {
 		return realIP
 	}
@@ -480,7 +480,7 @@ func (that *handlerCtx) buildReplyBody(header message.Header) interface{} {
 	//从call消息暂存池获取改消息对象
 	_callCmd, ok := that.sess.callCmdMap.Search(header.Seq())
 	if !ok {
-		glog.Warningf("not found call cmd: %v", that.input)
+		dlog.Warningf("not found call cmd: %v", that.input)
 	}
 	that.callCmd = _callCmd.(*callCmd)
 
@@ -522,7 +522,7 @@ func (that *handlerCtx) handleReply() {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			glog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
+			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
 		}
 		//把响应消息的消息体赋值给返回值
 		that.callCmd.result = that.input.Body()
@@ -576,7 +576,7 @@ func (that *handlerCtx) handle() {
 	}
 E:
 	that.output.SetStatus(statCodeMTypeNotAllowed)
-	glog.Errorf(logFormatDisconnected,
+	dlog.Errorf(logFormatDisconnected,
 		that.input.MType(), that.IP(), that.input.ServiceMethod(), that.input.Seq(),
 		messageLogBytes(that.input, that.sess.endpoint.printDetail))
 
@@ -597,7 +597,7 @@ func (that *handlerCtx) handlePush() {
 
 	defer func() {
 		if p := recover(); p != nil {
-			glog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
+			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
 		}
 		//计算该请求处理消耗时间
 		that.recordCost()
@@ -618,7 +618,7 @@ func (that *handlerCtx) handlePush() {
 		}
 	}
 	if !that.stat.OK() {
-		glog.Warningf("%s", that.stat.String())
+		dlog.Warningf("%s", that.stat.String())
 	}
 }
 
@@ -628,7 +628,7 @@ func (that *handlerCtx) handleCall() {
 
 	defer func() {
 		if p := recover(); p != nil {
-			glog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
+			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
 			//报错的情况，如果没有写入响应，则再次写入响应
 			if !isWrite {
 				if that.stat.OK() {

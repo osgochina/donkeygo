@@ -3,11 +3,11 @@ package dcron
 import (
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/os/glog"
 	"github.com/gogf/gf/os/gtimer"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dmap"
 	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"reflect"
@@ -30,7 +30,7 @@ func NewCron() *Cron {
 		status:   dtype.NewInt(StatusRunning),
 		entries:  dmap.NewStrAnyMap(true),
 		logPath:  dtype.NewString(),
-		logLevel: dtype.NewInt(glog.LEVEL_PROD),
+		logLevel: dtype.NewInt(dlog.LevelProd),
 	}
 }
 

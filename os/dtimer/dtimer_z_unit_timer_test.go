@@ -9,8 +9,8 @@
 package dtimer_test
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
@@ -55,7 +55,7 @@ func TestTimer_Start_Stop_Close(t *testing.T) {
 		timer := New()
 		array := darray.New(true)
 		timer.Add(200*time.Millisecond, func() {
-			//glog.Println("add...")
+			//dlog.Println("add...")
 			array.Append(1)
 		})
 		t.Assert(array.Len(), 0)
@@ -77,14 +77,14 @@ func TestTimer_Reset(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
-		glog.Printf("start time:%d", time.Now().Unix())
+		dlog.Printf("start time:%d", time.Now().Unix())
 		singleton := timer.AddSingleton(2*time.Second, func() {
 			timestamp := time.Now().Unix()
-			glog.Println(timestamp)
+			dlog.Println(timestamp)
 			array.Append(timestamp)
 		})
 		time.Sleep(5 * time.Second)
-		glog.Printf("reset time:%d", time.Now().Unix())
+		dlog.Printf("reset time:%d", time.Now().Unix())
 		singleton.Reset()
 		time.Sleep(10 * time.Second)
 		t.Assert(array.Len(), 6)
@@ -246,15 +246,15 @@ func TestTimer_AddLeveledEntry1(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
-		//glog.Println("start")
+		//dlog.Println("start")
 		timer.DelayAdd(1000*time.Millisecond, 1000*time.Millisecond, func() {
-			//glog.Println("add")
+			//dlog.Println("add")
 			array.Append(1)
 		})
 		time.Sleep(1500 * time.Millisecond)
 		t.Assert(array.Len(), 0)
 		time.Sleep(1300 * time.Millisecond)
-		//glog.Println("check")
+		//dlog.Println("check")
 		t.Assert(array.Len(), 1)
 	})
 }

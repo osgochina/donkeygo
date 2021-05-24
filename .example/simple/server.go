@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"time"
 )
 
@@ -42,7 +42,7 @@ type Math struct {
 
 func (m *Math) Add(arg *[]int) (int, *drpc.Status) {
 	// test meta
-	glog.Infof("author: %s", m.PeekMeta("author"))
+	dlog.Infof("author: %s", m.PeekMeta("author"))
 	// add
 	var r int
 	for _, a := range *arg {

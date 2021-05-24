@@ -62,3 +62,18 @@ func ReplaceStringFunc(pattern string, src string, replaceFunc func(s string) st
 	})
 	return string(bytes), err
 }
+
+// ReplaceString 使用正则匹配替换字符串
+func ReplaceString(pattern, replace, src string) (string, error) {
+	r, e := Replace(pattern, []byte(replace), []byte(src))
+	return string(r), e
+}
+
+// Replace 使用正则匹配替换
+func Replace(pattern string, replace, src []byte) ([]byte, error) {
+	if r, err := getRegexp(pattern); err == nil {
+		return r.ReplaceAll(src, replace), nil
+	} else {
+		return nil, err
+	}
+}

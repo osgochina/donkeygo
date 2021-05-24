@@ -57,3 +57,30 @@ func IsNumeric(s string) bool {
 	}
 	return true
 }
+
+// EqualFoldWithoutChars 对比两个字符串是否相等，先分别删除两个字符串中的所有符合，只留下字母和数字，在对比两个字符串
+func EqualFoldWithoutChars(s1, s2 string) bool {
+	return strings.EqualFold(RemoveSymbols(s1), RemoveSymbols(s2))
+}
+
+// RemoveSymbols 删除字符串中的所有符号，只留下字母和数字
+func RemoveSymbols(s string) string {
+	var b []byte
+	for _, c := range s {
+		if (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') {
+			b = append(b, byte(c))
+		}
+	}
+	return string(b)
+}
+
+func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
+	array := make([]string, 0)
+	for _, v := range strings.Split(str, delimiter) {
+		v = Trim(v, characterMask...)
+		if v != "" {
+			array = append(array, v)
+		}
+	}
+	return array
+}

@@ -3,11 +3,12 @@ package dgpool
 import (
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/dlist"
 	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/internal/intlog"
 )
 
+// Pool Goroutine Pool
 type Pool struct {
 	limit  int
 	count  *dtype.Int
@@ -35,7 +36,7 @@ func New(limit ...int) *Pool {
 // Go 执行协程
 func Go(fn func()) bool {
 	if err := pool.Add(fn); err != nil {
-		glog.Warningf("%s", err.Error())
+		intlog.Errorf("%s", err.Error())
 		return false
 	}
 	return true

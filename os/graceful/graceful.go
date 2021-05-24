@@ -2,7 +2,7 @@ package graceful
 
 import (
 	"context"
-	"github.com/gogf/gf/os/glog"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"os"
 	"sync"
 	"time"
@@ -17,7 +17,7 @@ type Graceful struct {
 	beforeExiting                func() error
 	locker                       sync.Mutex
 	signal                       chan os.Signal
-	logger                       *glog.Logger
+	logger                       *dlog.Logger
 	inheritedEnv                 map[string]string
 	inheritedProcFiles           []*os.File
 	defaultInheritedProcFilesLen int
@@ -32,7 +32,7 @@ func NewGraceful() *Graceful {
 		beforeExiting: func() error {
 			return nil
 		},
-		logger:             glog.New(),
+		logger:             dlog.New(),
 		inheritedEnv:       make(map[string]string),
 		inheritedProcFiles: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 	}

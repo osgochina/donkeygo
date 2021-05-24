@@ -1,8 +1,8 @@
 package drpc
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"github.com/pkg/errors"
 	"path"
@@ -153,9 +153,9 @@ func (that *Router) SetUnknownCall(fn func(UnknownCallCtx) (interface{}, *status
 		},
 	}
 	if *that.subRouter.unknownCall == nil {
-		glog.Printf("set %s handler", h.name)
+		dlog.Printf("set %s handler", h.name)
 	} else {
-		glog.Warningf("covered %s handler", h.name)
+		dlog.Warningf("covered %s handler", h.name)
 	}
 	that.subRouter.unknownCall = &h
 }
@@ -176,9 +176,9 @@ func (that *Router) SetUnknownPush(fn func(UnknownPushCtx) *status.Status, plugi
 	}
 
 	if *that.subRouter.unknownPush == nil {
-		glog.Printf("set %s handler", h.name)
+		dlog.Printf("set %s handler", h.name)
 	} else {
-		glog.Warningf("covered %s handler", h.name)
+		dlog.Warningf("covered %s handler", h.name)
 	}
 	that.subRouter.unknownPush = &h
 }
@@ -243,7 +243,7 @@ func (that *SubRouter) reg(
 		pluginContainer,
 	)
 	if err != nil {
-		glog.Fatalf("%v", err)
+		dlog.Fatalf("%v", err)
 	}
 	var names []string
 	var hadHandlers map[string]*Handler
@@ -256,12 +256,12 @@ func (that *SubRouter) reg(
 
 	for _, h := range handlers {
 		if _, ok := hadHandlers[h.name]; ok {
-			glog.Fatalf("there is a handler conflict: %s", h.name)
+			dlog.Fatalf("there is a handler conflict: %s", h.name)
 		}
 		h.routerTypeName = routerTypeName
 		hadHandlers[h.name] = h
 		//pluginContainer.postReg(h)
-		glog.Printf("register %s handler: %s", routerTypeName, h.name)
+		dlog.Printf("register %s handler: %s", routerTypeName, h.name)
 		names = append(names, h.name)
 	}
 	return names

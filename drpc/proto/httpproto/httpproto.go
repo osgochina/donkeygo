@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/dbuffer"
 	"github.com/osgochina/donkeygo/drpc"
 	"github.com/osgochina/donkeygo/drpc/codec"
@@ -12,6 +11,7 @@ import (
 	"github.com/osgochina/donkeygo/drpc/proto"
 	"github.com/osgochina/donkeygo/drpc/tfilter"
 	"github.com/osgochina/donkeygo/drpc/tfilter/gzip"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"io"
@@ -163,7 +163,7 @@ func (that *httpProto) Pack(msg proto.Message) error {
 	_ = msg.SetSize(uint32(bb.Len()))
 
 	if that.printMessage {
-		glog.Printf("Send HTTP Message:\n%s", dconv.String(bb.B))
+		dlog.Printf("Send HTTP Message:\n%s", dconv.String(bb.B))
 	}
 	_, err = that.rw.Write(bb.B)
 	return err
@@ -271,7 +271,7 @@ func (that *httpProto) Unpack(m proto.Message) error {
 			return err
 		}
 		if that.printMessage {
-			glog.Printf("Recv HTTP Message:\n%s\r\n%s",
+			dlog.Printf("Recv HTTP Message:\n%s\r\n%s",
 				dconv.String(firstLine), dconv.String(msg))
 		}
 		size += len(firstLine)
@@ -306,7 +306,7 @@ func (that *httpProto) Unpack(m proto.Message) error {
 		return err
 	}
 	if that.printMessage {
-		glog.Printf("Recv HTTP Message:\n%s\r\n%s",
+		dlog.Printf("Recv HTTP Message:\n%s\r\n%s",
 			dconv.String(firstLine), dconv.String(msg))
 	}
 	size += len(firstLine)

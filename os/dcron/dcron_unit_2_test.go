@@ -7,9 +7,9 @@
 package dcron_test
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/os/dcron"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 	"time"
@@ -22,7 +22,7 @@ func TestCron_Entry_Operations(t *testing.T) {
 			array = darray.New(true)
 		)
 		cron.DelayAddTimes(500*time.Millisecond, "* * * * * *", 2, func() {
-			glog.Println("add times")
+			dlog.Println("add times")
 			array.Append(1)
 		})
 		t.Assert(cron.Size(), 0)
@@ -40,7 +40,7 @@ func TestCron_Entry_Operations(t *testing.T) {
 			array = darray.New(true)
 		)
 		entry, err1 := cron.Add("* * * * * *", func() {
-			glog.Println("add")
+			dlog.Println("add")
 			array.Append(1)
 		})
 		t.Assert(err1, nil)
@@ -54,7 +54,7 @@ func TestCron_Entry_Operations(t *testing.T) {
 		t.Assert(array.Len(), 1)
 		t.Assert(cron.Size(), 1)
 		entry.Start()
-		glog.Println("start")
+		dlog.Println("start")
 		time.Sleep(1000 * time.Millisecond)
 		t.Assert(array.Len(), 2)
 		t.Assert(cron.Size(), 1)

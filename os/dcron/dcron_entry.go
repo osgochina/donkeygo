@@ -1,8 +1,8 @@
 package dcron
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"time"
 )
@@ -28,7 +28,7 @@ func (that *Entry) check() {
 			return
 		case StatusClosed:
 			that.Close()
-			glog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s removed", that.Name, that.schedule.pattern, that.jobName)
+			dlog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s removed", that.Name, that.schedule.pattern, that.jobName)
 		case StatusReady:
 			fallthrough
 		case StatusRunning:
@@ -41,12 +41,12 @@ func (that *Entry) check() {
 			if times < 2000000000 && times > 1000000000 {
 				that.times.Set(defaultTimes)
 			}
-			glog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s start", that.Name, that.schedule.pattern, that.jobName)
+			dlog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s start", that.Name, that.schedule.pattern, that.jobName)
 			defer func() {
 				if err := recover(); err != nil {
-					glog.Path(path).Level(level).Errorf("[dcron] %s(%s) %s end with error: %v", that.Name, that.schedule.pattern, that.jobName, err)
+					dlog.Path(path).Level(level).Errorf("[dcron] %s(%s) %s end with error: %v", that.Name, that.schedule.pattern, that.jobName, err)
 				} else {
-					glog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s end", that.Name, that.schedule.pattern, that.jobName)
+					dlog.Path(path).Level(level).Debugf("[dcron] %s(%s) %s end", that.Name, that.schedule.pattern, that.jobName)
 				}
 				if that.entry.Status() == StatusClosed {
 					that.Close()

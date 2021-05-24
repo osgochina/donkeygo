@@ -1,9 +1,9 @@
 package heartbeat
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc"
 	"github.com/osgochina/donkeygo/os/dgpool"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 	"time"
@@ -143,9 +143,9 @@ func handheldHeartbeat(sess drpc.CtxSession, peekMeta func(string) interface{}) 
 		return drpc.NewStatus(drpc.CodeBadMessage, "invalid heartbeat rate", rateStr)
 	}
 	if rateSecond == 0 {
-		glog.Infof("heart-pong: %s", sess.ID())
+		dlog.Infof("heart-pong: %s", sess.ID())
 	} else {
-		glog.Infof("heart-pong: %s, set rate: %ds", sess.ID(), rateSecond)
+		dlog.Infof("heart-pong: %s, set rate: %ds", sess.ID(), rateSecond)
 	}
 	return nil
 }

@@ -2,8 +2,8 @@ package drpc
 
 import (
 	"encoding/json"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc/message"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 	"time"
@@ -24,7 +24,7 @@ const (
 )
 
 func enablePrintRunLog() bool {
-	return glog.GetLevel() >= glog.LEVEL_DEBU
+	return dlog.GetLevel() >= dlog.LevelDebug
 	//return true
 }
 
@@ -40,20 +40,20 @@ func (that *session) printRunLog(realIP string, costTime time.Duration, input, o
 	addr += "(real:" + realIP + ")"
 	var (
 		costTimeStr string
-		printFunc   = glog.Infof
+		printFunc   = dlog.Infof
 	)
 	if that.endpoint.countTime {
 		if costTime >= that.endpoint.slowCometDuration {
 			costTimeStr = costTime.String() + "(slow)"
-			printFunc = glog.Warningf
+			printFunc = dlog.Warningf
 		} else {
-			if glog.GetLevel() < glog.LEVEL_INFO {
+			if dlog.GetLevel() < dlog.LevelInfo {
 				return
 			}
 			costTimeStr = costTime.String() + "(fast)"
 		}
 	} else {
-		if glog.GetLevel() < glog.LEVEL_INFO {
+		if dlog.GetLevel() < dlog.LevelInfo {
 			return
 		}
 		costTimeStr = "(-)"

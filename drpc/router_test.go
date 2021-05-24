@@ -1,8 +1,8 @@
 package drpc
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 )
@@ -28,7 +28,7 @@ type Math struct {
 // Add handles addition request
 func (m *Math) Add(arg *[]int) (int, *status.Status) {
 	// test meta
-	glog.Infof("author: %s", m.PeekMeta("author"))
+	dlog.Infof("author: %s", m.PeekMeta("author"))
 	// add
 	var r int
 	for _, a := range *arg {

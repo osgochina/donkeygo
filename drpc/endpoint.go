@@ -3,13 +3,13 @@ package drpc
 import (
 	"crypto/tls"
 	"errors"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc/codec"
 	"github.com/osgochina/donkeygo/drpc/proto"
 	"github.com/osgochina/donkeygo/drpc/socket"
 	"github.com/osgochina/donkeygo/drpc/status"
 	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/os/dgpool"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"net"
 	"sync"
 	"time"
@@ -122,7 +122,7 @@ func NewEndpoint(cfg EndpointConfig, globalLeftPlugin ...Plugin) Endpoint {
 
 	// 检查配置项是否正确
 	if err := cfg.check(); err != nil {
-		glog.Fatalf("%v", err)
+		dlog.Fatalf("%v", err)
 	}
 
 	var e = &endpoint{
@@ -148,7 +148,7 @@ func NewEndpoint(cfg EndpointConfig, globalLeftPlugin ...Plugin) Endpoint {
 	}
 	//默认的消息体编码格式
 	if c, err := codec.GetByName(cfg.DefaultBodyCodec); err != nil {
-		glog.Fatalf("%v", err)
+		dlog.Fatalf("%v", err)
 	} else {
 		e.defaultBodyCodec = c.ID()
 	}
@@ -335,7 +335,7 @@ func (that *endpoint) Dial(addr string, protoFunc ...proto.ProtoFunc) (Session, 
 				_ = sess.closeLocked()
 				//防止状态没有修改成功，再次尝试修改状态
 				sess.tryChangeStatus(statusRedialFailed, statusRedialing)
-				glog.Errorf("redial fail (network:%s, addr:%s, id:%s): %s", that.network, addr, oldID, err.Error())
+				dlog.Errorf("redial fail (network:%s, addr:%s, id:%s): %s", that.network, addr, oldID, err.Error())
 				return false
 			}
 			//原始链接如果存在，则关闭
@@ -346,16 +346,16 @@ func (that *endpoint) Dial(addr string, protoFunc ...proto.ProtoFunc) (Session, 
 			sess.changeStatus(statusOk)
 			dgpool.Go(sess.startReadAndHandle)
 			if err != nil {
-				glog.Errorf("redial fail (network:%s, addr:%s, id:%s): %s", that.network, addr, oldID, err.Error())
+				dlog.Errorf("redial fail (network:%s, addr:%s, id:%s): %s", that.network, addr, oldID, err.Error())
 				return false
 			}
 			//把当前会话加入会话池
 			that.sessHub.set(sess)
-			glog.Infof("redial ok (network:%s, addr:%s, id:%s)", that.network, addr, sess.ID())
+			dlog.Infof("redial ok (network:%s, addr:%s, id:%s)", that.network, addr, sess.ID())
 			return true
 		}
 	}
-	glog.Infof("dial ok (network:%s, addr:%s, id:%s)", that.network, addr, sess.ID())
+	dlog.Infof("dial ok (network:%s, addr:%s, id:%s)", that.network, addr, sess.ID())
 	//修改会话状态，并且启动响应监听
 	sess.changeStatus(statusOk)
 	err = dgpool.Add(sess.startReadAndHandle)
@@ -392,7 +392,7 @@ func (that *endpoint) ServeConn(conn net.Conn, protoFunc ...proto.ProtoFunc) (Se
 		_ = sess.Close()
 		return nil, stat
 	}
-	glog.Infof("serve ok (network:%s, addr:%s, id:%s)", network, sess.RemoteAddr().String(), sess.ID())
+	dlog.Infof("serve ok (network:%s, addr:%s, id:%s)", network, sess.RemoteAddr().String(), sess.ID())
 	sess.changeStatus(statusOk)
 	err := dgpool.Add(sess.startReadAndHandle)
 	if err != nil {
@@ -421,7 +421,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 	//}
 
 	addr := lis.Addr().String()
-	glog.Printf("listen and serve (network:%s, addr:%s)", network, addr)
+	dlog.Printf("listen and serve (network:%s, addr:%s)", network, addr)
 	that.pluginContainer.afterListen(lis.Addr())
 
 	var tempDelay time.Duration
@@ -448,7 +448,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 					tempDelay = max
 				}
 
-				glog.Infof("accept error: %s; retrying in %v", err.Error(), tempDelay)
+				dlog.Infof("accept error: %s; retrying in %v", err.Error(), tempDelay)
 				time.Sleep(tempDelay)
 				continue
 			}
@@ -467,7 +467,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 					_ = c.SetReadDeadline(time.Now().Add(that.defaultContextAge))
 				}
 				if err = c.Handshake(); err != nil {
-					glog.Errorf("TLS handshake error from %s: %s", c.RemoteAddr(), err.Error())
+					dlog.Errorf("TLS handshake error from %s: %s", c.RemoteAddr(), err.Error())
 					return
 				}
 			}
@@ -479,7 +479,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 				return
 			}
 
-			glog.Infof("accept ok (network:%s, addr:%s, id:%s)", network, sess.RemoteAddr().String(), sess.ID())
+			dlog.Infof("accept ok (network:%s, addr:%s, id:%s)", network, sess.RemoteAddr().String(), sess.ID())
 			that.sessHub.set(sess)
 			sess.changeStatus(statusOk)
 			// 启动消息侦听
@@ -493,7 +493,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 func (that *endpoint) ListenAndServe(protoFunc ...proto.ProtoFunc) error {
 	lis, err := NewInheritedListener(that.listerAddr, that.tlsConfig)
 	if err != nil {
-		glog.Fatalf("%v", err)
+		dlog.Fatalf("%v", err)
 	}
 	return that.serveListener(lis, protoFunc...)
 }

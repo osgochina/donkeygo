@@ -3,7 +3,6 @@ package drpc
 import (
 	"context"
 	"fmt"
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/dmap"
 	"github.com/osgochina/donkeygo/drpc/codec"
 	"github.com/osgochina/donkeygo/drpc/message"
@@ -11,6 +10,7 @@ import (
 	"github.com/osgochina/donkeygo/drpc/socket"
 	"github.com/osgochina/donkeygo/drpc/status"
 	"github.com/osgochina/donkeygo/os/dgpool"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"io"
 	"net"
 	"sync"
@@ -293,7 +293,7 @@ func (that *session) SetID(newID string) {
 	hub := that.endpoint.sessHub
 	hub.set(that)
 	hub.delete(oldID)
-	glog.Info("session changes id: %s -> %s", oldID, newID)
+	dlog.Info("session changes id: %s -> %s", oldID, newID)
 }
 
 // ControlFD 处理底层fd
@@ -461,7 +461,7 @@ func (that *session) doSend(output message.Message) *status.Status {
 		if err == io.EOF || err == socket.ErrProactivelyCloseSocket {
 			return statConnClosed
 		}
-		glog.Debugf("write error: %s", err.Error())
+		dlog.Debugf("write error: %s", err.Error())
 		return statWriteFailed.Copy(err)
 	}
 }
@@ -590,7 +590,7 @@ func (that *session) Push(serviceMethod string, args interface{}, setting ...mes
 		//把上下文对象放回池子
 		that.endpoint.putHandleCtx(ctx, true)
 		if p := recover(); p != nil {
-			glog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
+			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
 		}
 	}()
 
@@ -644,7 +644,7 @@ func (that *session) AsyncCall(serviceMethod string, args interface{}, result in
 		callCmdChan = make(chan CallCmd, 10)
 	} else {
 		if cap(callCmdChan) == 0 {
-			glog.Panicf("*session.AsyncCall(): callCmdChan channel is unbuffered")
+			dlog.Panicf("*session.AsyncCall(): callCmdChan channel is unbuffered")
 		}
 	}
 	output := message.NewMessage()
@@ -686,7 +686,7 @@ func (that *session) AsyncCall(serviceMethod string, args interface{}, result in
 	that.callCmdMap.Set(seq, cmd)
 	defer func() {
 		if p := recover(); p != nil {
-			glog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
+			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
 		}
 	}()
 	//write call消息写入之前执行插件
@@ -759,7 +759,7 @@ func (that *session) write(msg message.Message) (net.Conn, *Status) {
 	if err == io.EOF || err == socket.ErrProactivelyCloseSocket {
 		return usedConn, statConnClosed
 	}
-	glog.Debugf("write error: %s", err.Error())
+	dlog.Debugf("write error: %s", err.Error())
 ERR:
 	return usedConn, statWriteFailed.Copy(err)
 }
@@ -886,7 +886,7 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 		if errStr := err.Error(); errStr != "EOF" {
 			reason = errStr
 			//记录会话关闭原因
-			glog.Debugf("disconnect(%s) when reading: %T %s", that.RemoteAddr().String(), err, errStr)
+			dlog.Debugf("disconnect(%s) when reading: %T %s", that.RemoteAddr().String(), err, errStr)
 		}
 	}
 	//优化的等待所有处理程序结束

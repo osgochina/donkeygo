@@ -12,3 +12,13 @@ func Intn(max int) int {
 	}
 	return n
 }
+
+func Perm(n int) []int {
+	m := make([]int, n)
+	for i := 0; i < n; i++ {
+		j := Intn(i + 1)
+		m[i] = m[j]
+		m[j] = i
+	}
+	return m
+}

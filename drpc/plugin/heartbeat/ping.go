@@ -1,10 +1,10 @@
 package heartbeat
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc"
 	"github.com/osgochina/donkeygo/drpc/message"
 	"github.com/osgochina/donkeygo/os/dgpool"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"strconv"
 	"sync"
 	"time"
@@ -83,7 +83,7 @@ func (that *heartPing) SetRate(rateSecond int) {
 	that.pingRate = time.Second * time.Duration(rateSecond)
 	that.pingRateSecond = strconv.Itoa(rateSecond)
 	that.mu.Unlock()
-	glog.Infof("set heartbeat rate: %ds", rateSecond)
+	dlog.Infof("set heartbeat rate: %ds", rateSecond)
 }
 
 //获取心跳频率

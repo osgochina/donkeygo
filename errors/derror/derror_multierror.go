@@ -2,7 +2,6 @@ package derror
 
 import (
 	"bytes"
-	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
 )
 
@@ -22,10 +21,10 @@ func (that *multiError) Error() string {
 	for i, err := range that.errs {
 		bText = append(bText, strconv.Itoa(i+1)...)
 		bText = append(bText, ". "...)
-		bText = append(bText, bytes.Trim(dconv.Bytes(err.Error()), "\n")...)
+		bText = append(bText, bytes.Trim([]byte(err.Error()), "\n")...)
 		bText = append(bText, '\n')
 	}
-	that.text = dconv.String(bText)
+	that.text = string(bText)
 	return that.text
 }
 

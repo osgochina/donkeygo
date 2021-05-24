@@ -1,9 +1,9 @@
 package dcron_test
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/os/dcron"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 	"time"
@@ -14,11 +14,11 @@ func TestCron_Add_Close(t *testing.T) {
 		cron := dcron.NewCron()
 		array := darray.NewArray(true)
 		_, err1 := cron.Add("* * * * * *", func() {
-			glog.Println("cron1")
+			dlog.Println("cron1")
 			array.Append(1)
 		})
 		_, err2 := cron.Add("* * * * * *", func() {
-			glog.Println("cron2")
+			dlog.Println("cron2")
 			array.Append(1)
 		}, "test")
 		t.Assert(err1, nil)

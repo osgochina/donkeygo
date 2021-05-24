@@ -1,11 +1,11 @@
 package jsonproto_test
 
 import (
-	"github.com/gogf/gf/os/glog"
 	"github.com/osgochina/donkeygo/drpc"
 	"github.com/osgochina/donkeygo/drpc/message"
 	"github.com/osgochina/donkeygo/drpc/proto/jsonproto"
 	"github.com/osgochina/donkeygo/drpc/tfilter/gzip"
+	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
 	"time"
@@ -61,6 +61,6 @@ type Push struct {
 }
 
 func (p *Push) Test(arg *map[string]string) *drpc.Status {
-	glog.Infof("receive push(%s):\narg: %#v\n", p.IP(), arg)
+	dlog.Infof("receive push(%s):\narg: %#v\n", p.IP(), arg)
 	return nil
 }
