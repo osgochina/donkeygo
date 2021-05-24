@@ -81,7 +81,7 @@ func newSchedule(pattern string) (*cronSchedule, error) {
 				return nil, err
 			} else {
 				return &cronSchedule{
-					create:  time.Now().UnixNano(),
+					create:  time.Now().Unix(),
 					every:   int64(d.Seconds()),
 					pattern: pattern,
 				}, nil
