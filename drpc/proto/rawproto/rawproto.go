@@ -115,7 +115,7 @@ func (that *rawProto) Pack(m proto.Message) error {
 //写入消息头
 func (that *rawProto) writeHeader(bb *dbuffer.ByteBuffer, m proto.Message) error {
 
-	seqStr := strconv.FormatInt(int64(m.Seq()), 32)
+	seqStr := strconv.FormatInt(int64(m.Seq()), 36)
 	//写入序列号长度
 	_ = bb.WriteByte(byte(len(seqStr)))
 	//写入序列号

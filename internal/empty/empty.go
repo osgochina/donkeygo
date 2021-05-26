@@ -17,7 +17,7 @@ type apiMapStrAny interface {
 	MapStrAny() map[string]interface{}
 }
 
-//判断任意一个值是否为空
+// IsEmpty 判断任意一个值是否为空
 //It returns true if <value> is in: 0, nil, false, "", len(slice/map/chan) == 0
 func IsEmpty(value interface{}) bool {
 	if value == nil {
