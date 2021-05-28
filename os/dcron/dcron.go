@@ -108,3 +108,21 @@ func Start(name string) {
 func Stop(name string) {
 	defaultCron.Stop(name)
 }
+
+// CronNext 获取表达式指定次数的运行的时间列表
+func CronNext(pattern string, t time.Time, queryTimes ...int) ([]time.Time, error) {
+	schedule, err := newSchedule(pattern)
+	if err != nil {
+		return nil, err
+	}
+	times := 1
+	if len(queryTimes) > 0 {
+		times = queryTimes[0]
+	}
+	var tArr []time.Time
+	for ; times > 0; times-- {
+		t = schedule.Next(t)
+		tArr = append(tArr, t)
+	}
+	return tArr, nil
+}
