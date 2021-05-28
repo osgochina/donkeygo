@@ -97,3 +97,19 @@ func (that *Entry) Close() {
 	that.cron.entries.Remove(that.Name)
 	that.entry.Close()
 }
+
+// Next 获取下一次运行的时间
+// t: 指定的时间
+// queryTimes: 要获取接下来几次
+func (that *Entry) Next(t time.Time, queryTimes ...int) ([]time.Time, error) {
+	times := 1
+	if len(queryTimes) > 0 {
+		times = queryTimes[0]
+	}
+	var tArr []time.Time
+	for ; times > 0; times-- {
+		t = that.schedule.Next(t)
+		tArr = append(tArr, t)
+	}
+	return tArr, nil
+}
