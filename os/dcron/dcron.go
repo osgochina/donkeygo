@@ -109,8 +109,8 @@ func Stop(name string) {
 	defaultCron.Stop(name)
 }
 
-// CronNext 获取表达式指定次数的运行的时间列表
-func CronNext(pattern string, t time.Time, queryTimes ...int) ([]time.Time, error) {
+// CronPlan  获取表达式的执行计划
+func CronPlan(pattern string, t time.Time, queryTimes ...int) ([]time.Time, error) {
 	schedule, err := newSchedule(pattern)
 	if err != nil {
 		return nil, err

@@ -242,15 +242,15 @@ func TestCronSchedule_GetRunTimeList(t *testing.T) {
 	})
 }
 
-func TestCronNext(t *testing.T) {
+func TestCronPlan(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		now := time.Now()
-		l, err := dcron.CronNext("@every 2s", now)
+		l, err := dcron.CronPlan("@every 2s", now)
 		t.Assert(err, nil)
 		t.Assert(now.Add(2*time.Second), l[0])
 
 		now = time.Now()
-		l, err = dcron.CronNext("11 1 * * * *", now, 2)
+		l, err = dcron.CronPlan("11 1 * * * *", now, 2)
 		t.Assert(err, nil)
 		t.Assert(time.Date(
 			now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, time.Local).Add(time.Hour).Add(time.Minute).Add(time.Second*11),
