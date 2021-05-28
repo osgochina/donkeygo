@@ -6,12 +6,12 @@ import (
 	"sync/atomic"
 )
 
-//并发安全的 bool 对象
+// Bool 并发安全的 bool 对象
 type Bool struct {
 	value int32
 }
 
-//创建一个并发安全的bool对象，并且默认值是可选
+// NewBool 创建一个并发安全的bool对象，并且默认值是可选
 func NewBool(value ...bool) *Bool {
 	b := &Bool{}
 	if len(value) > 0 {
@@ -24,17 +24,17 @@ func NewBool(value ...bool) *Bool {
 	return b
 }
 
-//并发安全的克隆它
+// Clone 并发安全的克隆它
 func (that *Bool) Clone() *Bool {
 	return NewBool(that.Val())
 }
 
-//并发安全的获取bool对象的值
+// Val 并发安全的获取bool对象的值
 func (that *Bool) Val() bool {
 	return atomic.LoadInt32(&that.value) > 0
 }
 
-//并发安全的设置值
+// Set 并发安全的设置值
 func (that *Bool) Set(val bool) (old bool) {
 	if val {
 		old = atomic.SwapInt32(&that.value, 1) == 1
@@ -44,7 +44,7 @@ func (that *Bool) Set(val bool) (old bool) {
 	return
 }
 
-//并发安全的值比较与值交换
+// Cas 并发安全的值比较与值交换
 func (that *Bool) Cas(old, new bool) (swapped bool) {
 	var oldInt32, newInt32 int32
 	if old {
@@ -69,7 +69,7 @@ var (
 	bytesFalse = []byte("false")
 )
 
-//json序列化
+// MarshalJson json序列化
 func (that *Bool) MarshalJson() ([]byte, error) {
 	if that.Val() {
 		return bytesTrue, nil
@@ -77,13 +77,13 @@ func (that *Bool) MarshalJson() ([]byte, error) {
 	return bytesFalse, nil
 }
 
-//json反序列化
+// UnmarshalJson json反序列化
 func (that *Bool) UnmarshalJson(b []byte) error {
 	that.Set(dconv.Bool(bytes.Trim(b, `"`)))
 	return nil
 }
 
-//json反序列化的时候针对值的判断
+// UnmarshalValue json反序列化的时候针对值的判断
 func (that *Bool) UnmarshalValue(value interface{}) error {
 	that.Set(dconv.Bool(value))
 	return nil
