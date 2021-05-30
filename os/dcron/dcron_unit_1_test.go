@@ -215,3 +215,48 @@ func TestCron_DelayAddTimes(t *testing.T) {
 		t.Assert(cron.Size(), 0)
 	})
 }
+
+func TestCronSchedule_GetRunTimeList(t *testing.T) {
+	dtest.C(t, func(t *dtest.T) {
+		cron := dcron.NewCron()
+		add, err := cron.Add("@every 2s", func() {})
+		t.Assert(err, nil)
+		add.Close()
+		now := time.Now()
+		l, err1 := add.Next(now, 1)
+		t.Assert(err1, nil)
+		t.Assert(now.Add(2*time.Second), l[0])
+
+		add, err = cron.Add("11 1 * * * *", func() {})
+		t.Assert(err, nil)
+		add.Close()
+		now = time.Now()
+		l, err1 = add.Next(now, 2)
+		t.Assert(err1, nil)
+		t.Assert(time.Date(
+			now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, time.Local).Add(time.Hour).Add(time.Minute).Add(time.Second*11),
+			l[0])
+		t.Assert(time.Date(
+			now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, time.Local).Add(time.Hour*2).Add(time.Minute).Add(time.Second*11),
+			l[1])
+	})
+}
+
+func TestCronPlan(t *testing.T) {
+	dtest.C(t, func(t *dtest.T) {
+		now := time.Now()
+		l, err := dcron.CronPlan("@every 2s", now)
+		t.Assert(err, nil)
+		t.Assert(now.Add(2*time.Second), l[0])
+
+		now = time.Now()
+		l, err = dcron.CronPlan("11 1 * * * *", now, 2)
+		t.Assert(err, nil)
+		t.Assert(time.Date(
+			now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, time.Local).Add(time.Hour).Add(time.Minute).Add(time.Second*11),
+			l[0])
+		t.Assert(time.Date(
+			now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, time.Local).Add(time.Hour*2).Add(time.Minute).Add(time.Second*11),
+			l[1])
+	})
+}

@@ -2,10 +2,12 @@ package dconv
 
 import "reflect"
 
+// SliceStr Strings的别名
 func SliceStr(i interface{}) []string {
 	return Strings(i)
 }
 
+// Strings 把<i>这个interface转换成 []string
 func Strings(i interface{}) []string {
 	if i == nil {
 		return nil
@@ -90,12 +92,12 @@ func Strings(i interface{}) []string {
 			array[k] = String(v)
 		}
 	default:
-		//if v, ok := i.(apiStrings); ok {
-		//	return v.Strings()
-		//}
-		//if v, ok := i.(apiInterfaces); ok {
-		//	return Strings(v.Interfaces())
-		//}
+		if v, ok := i.(apiStrings); ok {
+			return v.Strings()
+		}
+		if v, ok := i.(apiInterfaces); ok {
+			return Strings(v.Interfaces())
+		}
 		// Use reflect feature at last.
 		rv := reflect.ValueOf(i)
 		switch rv.Kind() {

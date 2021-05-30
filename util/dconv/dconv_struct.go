@@ -12,7 +12,21 @@ import (
 	"strings"
 )
 
+// Struct 将参数params 的key-value字典对象映射成pointer指向的struct的对象属性。
+// mapping参数不是必须的，它的作用是映射转换的key名
 func Struct(params interface{}, pointer interface{}, mapping ...map[string]string) (err error) {
+	var keyToAttributeNameMapping map[string]string
+	if len(mapping) > 0 {
+		keyToAttributeNameMapping = mapping[0]
+	}
+	return doStruct(params, pointer, keyToAttributeNameMapping, "")
+}
+
+func StructTag(params interface{}, pointer interface{}, priorityTag string) (err error) {
+	return doStruct(params, pointer, nil, priorityTag)
+}
+
+func StructDeep(params interface{}, pointer interface{}, mapping ...map[string]string) error {
 	var keyToAttributeNameMapping map[string]string
 	if len(mapping) > 0 {
 		keyToAttributeNameMapping = mapping[0]

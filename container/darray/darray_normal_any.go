@@ -1,9 +1,13 @@
 package darray
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/osgochina/donkeygo/internal/empty"
 	"github.com/osgochina/donkeygo/internal/rwmutex"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"github.com/osgochina/donkeygo/util/drand"
 	"math"
@@ -516,4 +520,229 @@ func (that *Array) Chunk(size int) [][]interface{} {
 		i++
 	}
 	return n
+}
+
+// Pad 将数组用指定的值 val 填充到指定的长度
+//如果size是正的，则数组在右边填充，如果size是负数，则在左边填充。
+//如果的绝对值小于或等于数组的长度那么不填充。
+func (that *Array) Pad(size int, val interface{}) *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	if size == 0 || (size > 0 && size < len(that.array)) || (size < 0 && size > -len(that.array)) {
+		return that
+	}
+	n := size
+	if size < 0 {
+		n = -size
+	}
+	n -= len(that.array)
+	tmp := make([]interface{}, n)
+	for i := 0; i < n; i++ {
+		tmp[i] = val
+	}
+	if size > 0 {
+		that.array = append(that.array, tmp...)
+	} else {
+		that.array = append(tmp, that.array...)
+	}
+	return that
+}
+
+// Rand 随机返回一个数组元素
+func (that *Array) Rand() (value interface{}, found bool) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	if len(that.array) == 0 {
+		return nil, false
+	}
+	return that.array[drand.Intn(len(that.array))], true
+}
+
+// Rands 随机返回指定 size 的数组元素
+func (that *Array) Rands(size int) []interface{} {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	if size <= 0 || len(that.array) == 0 {
+		return nil
+	}
+	array := make([]interface{}, size)
+	for i := 0; i < size; i++ {
+		array[i] = that.array[drand.Intn(len(that.array))]
+	}
+	return array
+}
+
+// Shuffle 随机打乱数组中的元素
+func (that *Array) Shuffle() *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for i, v := range drand.Perm(len(that.array)) {
+		that.array[i], that.array[v] = that.array[v], that.array[i]
+	}
+	return that
+}
+
+// Reverse 反向排序数组
+func (that *Array) Reverse() *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for i, j := 0, len(that.array)-1; i < j; i, j = i+1, j-1 {
+		that.array[i], that.array[j] = that.array[j], that.array[i]
+	}
+	return that
+}
+
+// Join 把数组元素以 glue分隔符链接起来
+func (that *Array) Join(glue string) string {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	if len(that.array) == 0 {
+		return ""
+	}
+	buffer := bytes.NewBuffer(nil)
+	for k, v := range that.array {
+		buffer.WriteString(dconv.String(v))
+		if k != len(that.array)-1 {
+			buffer.WriteString(glue)
+		}
+	}
+	return buffer.String()
+}
+
+// CountValues 计算数组各元素的数量
+func (that *Array) CountValues() map[interface{}]int {
+	m := make(map[interface{}]int)
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	for _, v := range that.array {
+		m[v]++
+	}
+	return m
+}
+
+// Iterator 迭代
+func (that *Array) Iterator(f func(k int, v interface{}) bool) {
+	that.IteratorAsc(f)
+}
+
+// IteratorAsc 顺序迭代
+func (that *Array) IteratorAsc(f func(k int, v interface{}) bool) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	for k, v := range that.array {
+		if !f(k, v) {
+			break
+		}
+	}
+}
+
+// IteratorDesc 反向迭代
+func (that *Array) IteratorDesc(f func(k int, v interface{}) bool) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	for i := len(that.array) - 1; i >= 0; i-- {
+		if !f(i, that.array[i]) {
+			break
+		}
+	}
+}
+
+// 把数组转换成字符串
+func (that *Array) String() string {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	buffer := bytes.NewBuffer(nil)
+	buffer.WriteByte('[')
+	s := ""
+	for k, v := range that.array {
+		s = dconv.String(v)
+		if dstr.IsNumeric(s) {
+			buffer.WriteString(s)
+		} else {
+			buffer.WriteString(`"` + dstr.QuoteMeta(s, `"\`) + `"`)
+		}
+		if k != len(that.array)-1 {
+			buffer.WriteByte(',')
+		}
+	}
+	buffer.WriteByte(']')
+	return buffer.String()
+}
+
+// MarshalJSON 序列化成json
+// 这里的Array不能使用指针
+func (that Array) MarshalJSON() ([]byte, error) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	return json.Marshal(that.array)
+}
+
+// UnmarshalJSON 把json序列化转成数组
+func (that *Array) UnmarshalJSON(b []byte) error {
+	if that.array == nil {
+		that.array = make([]interface{}, 0)
+	}
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	if err := json.Unmarshal(b, &that.array); err != nil {
+		return err
+	}
+	return nil
+}
+
+// UnmarshalValue 把任意值转换成数组
+func (that *Array) UnmarshalValue(value interface{}) error {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	switch value.(type) {
+	case string, []byte:
+		return json.Unmarshal(dconv.Bytes(value), &that.array)
+	default:
+		that.array = dconv.SliceAny(value)
+	}
+	return nil
+}
+
+// FilterNil 移除数组中的nil
+func (that *Array) FilterNil() *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for i := 0; i < len(that.array); {
+		if empty.IsNil(that.array[i]) {
+			that.array = append(that.array[:i], that.array[i+1:]...)
+		} else {
+			i++
+		}
+	}
+	return that
+}
+
+// FilterEmpty 移除数组中的空元素
+//Values like: 0, nil, false, "", len(slice/map/chan) == 0 are considered empty.
+func (that *Array) FilterEmpty() *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for i := 0; i < len(that.array); {
+		if empty.IsEmpty(that.array[i]) {
+			that.array = append(that.array[:i], that.array[i+1:]...)
+		} else {
+			i++
+		}
+	}
+	return that
+}
+
+// Walk 对数组中的每个元素都执行指定的 func
+func (that *Array) Walk(f func(value interface{}) interface{}) *Array {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for i, v := range that.array {
+		that.array[i] = f(v)
+	}
+	return that
+}
+
+// IsEmpty 判断数组是否为空
+func (that *Array) IsEmpty() bool {
+	return that.Len() == 0
 }
