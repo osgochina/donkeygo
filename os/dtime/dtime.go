@@ -103,6 +103,11 @@ func Timestamp() int64 {
 	return Now().Timestamp()
 }
 
+// 获取
+func TimestampMilli() int64 {
+	return Now().TimestampMilli()
+}
+
 // 解析日期字符串
 func parseDateStr(s string) (year, month, day int) {
 	array := strings.Split(s, "-")
