@@ -216,6 +216,7 @@ func (that *handlerCtx) clean() {
 	that.swap = nil
 	that.callCmd = nil
 	that.cost = 0
+	that.pluginContainer = nil
 	that.stat = nil
 	that.context = nil
 	that.input.Reset(message.WithNewBody(that.buildingBody))
