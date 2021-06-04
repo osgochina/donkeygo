@@ -11,7 +11,7 @@ type adapterMemoryItem struct {
 // IsExpired 判断是否过期
 func (that *adapterMemoryItem) IsExpired() bool {
 
-	if that.expire >= dtime.Timestamp() {
+	if that.expire >= dtime.TimestampMilli() {
 		return false
 	}
 	return true
