@@ -14,7 +14,7 @@ func MTime(path string) time.Time {
 	return s.ModTime()
 }
 
-// MTimestamp returns the modification time of file given by <path> in second.
+// MTimestamp 返回文件或目录路径的最后修改时间戳
 func MTimestamp(path string) int64 {
 	mtime := MTime(path)
 	if mtime.IsZero() {
@@ -23,7 +23,7 @@ func MTimestamp(path string) int64 {
 	return mtime.Unix()
 }
 
-// MTimestampMilli returns the modification time of file given by <path> in millisecond.
+// MTimestampMilli 返回文件或目录路径的最后修改毫秒时间戳
 func MTimestampMilli(path string) int64 {
 	mtime := MTime(path)
 	if mtime.IsZero() {

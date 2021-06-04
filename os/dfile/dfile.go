@@ -72,13 +72,22 @@ func Open(path string) (*os.File, error) {
 	return os.Open(path)
 }
 
-// OpenFile opens file/directory with custom <flag> and <perm>.
-// The parameter <flag> is like: O_RDONLY, O_RDWR, O_RDWR|O_CREATE|O_TRUNC, etc.
+// OpenFile 打开文件/文件夹，可以使用自定义flag和mode。
+// <flag> : O_RDONLY, O_RDWR, O_RDWR|O_CREATE|O_TRUNC,
 func OpenFile(path string, flag int, perm os.FileMode) (*os.File, error) {
 	return os.OpenFile(path, flag, perm)
 }
 
-// OpenWithFlagPerm opens file/directory with custom <flag> and <perm>.
+// OpenWithFlag 打开文件/文件夹，可以使用自定义flag。
+func OpenWithFlag(path string, flag int) (*os.File, error) {
+	f, err := os.OpenFile(path, flag, DefaultPermOpen)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+// OpenWithFlagPerm 打开文件/文件夹，可以使用自定义flag和mode。
 // The parameter <flag> is like: O_RDONLY, O_RDWR, O_RDWR|O_CREATE|O_TRUNC, etc.
 // The parameter <perm> is like: 0600, 0666, 0777, etc.
 func OpenWithFlagPerm(path string, flag int, perm os.FileMode) (*os.File, error) {
@@ -89,7 +98,7 @@ func OpenWithFlagPerm(path string, flag int, perm os.FileMode) (*os.File, error)
 	return f, nil
 }
 
-// Join joins string array paths with file separator of current system.
+// Join 使用当前系统的文件分隔符连接字符串数组路径。
 func Join(paths ...string) string {
 	var s string
 	for _, path := range paths {

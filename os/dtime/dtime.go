@@ -2,6 +2,7 @@ package dtime
 
 import (
 	"fmt"
+	"github.com/gogf/gf/text/gregex"
 	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/internal/utils"
 	"github.com/osgochina/donkeygo/text/dregex"
@@ -118,6 +119,66 @@ func TimestampNano() int64 {
 	return Now().TimestampNano()
 }
 
+// TimestampStr 获取时间戳的字符串形式
+func TimestampStr() string {
+	return Now().TimestampStr()
+}
+
+// TimestampMilliStr 获取毫秒时间戳的字符串格式
+func TimestampMilliStr() string {
+	return Now().TimestampMilliStr()
+}
+
+// TimestampMicroStr 获取微秒时间戳的字符串格式
+func TimestampMicroStr() string {
+	return Now().TimestampMicroStr()
+}
+
+// TimestampNanoStr 获取纳秒时间戳的字符格式
+func TimestampNanoStr() string {
+	return Now().TimestampNanoStr()
+}
+
+// Second 获取时间戳秒
+func Second() int64 {
+	return Timestamp()
+}
+
+// Millisecond 获取毫秒
+func Millisecond() int64 {
+	return TimestampMilli()
+}
+
+// Microsecond 微秒
+func Microsecond() int64 {
+	return TimestampMicro()
+}
+
+// Nanosecond 纳秒
+func Nanosecond() int64 {
+	return TimestampNano()
+}
+
+// Date 日期
+func Date() string {
+	return time.Now().Format("2006-01-02")
+}
+
+// Datetime 日期时间
+func Datetime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+// ISO8601 格式的时间
+func ISO8601() string {
+	return time.Now().Format("2006-01-02T15:04:05-07:00")
+}
+
+//RFC822 格式的时间
+func RFC822() string {
+	return time.Now().Format("Mon, 02 Jan 06 15:04 MST")
+}
+
 // 解析日期字符串
 func parseDateStr(s string) (year, month, day int) {
 	array := strings.Split(s, "-")
@@ -146,28 +207,6 @@ func parseDateStr(s string) (year, month, day int) {
 		day, _ = strconv.Atoi(array[0])
 	}
 	return
-}
-
-func ParseDuration(s string) (time.Duration, error) {
-	if utils.IsNumeric(s) {
-		v, err := strconv.ParseInt(s, 10, 64)
-		if err != nil {
-			return 0, err
-		}
-		return time.Duration(v), nil
-	}
-	match, err := dregex.MatchString(`^([\-\d]+)[dD](.*)$`, s)
-	if err != nil {
-		return 0, err
-	}
-	if len(match) == 3 {
-		v, err := strconv.ParseInt(match[1], 10, 64)
-		if err != nil {
-			return 0, err
-		}
-		return time.ParseDuration(fmt.Sprintf(`%dh%s`, v*24, match[2]))
-	}
-	return time.ParseDuration(s)
 }
 
 // StrToTime 通过字符串转换成dtime.Time对象
@@ -291,6 +330,26 @@ func StrToTime(str string, format ...string) (*Time, error) {
 	return NewFromTime(time.Date(year, time.Month(month), day, hour, min, sec, nsec, local)), nil
 }
 
+// ConvertZone 从字符串时间转换为0时区时间
+func ConvertZone(strTime string, toZone string, fromZone ...string) (*Time, error) {
+	t, err := StrToTime(strTime)
+	if err != nil {
+		return nil, err
+	}
+	if len(fromZone) > 0 {
+		if l, err := time.LoadLocation(fromZone[0]); err != nil {
+			return nil, err
+		} else {
+			t.Time = time.Date(t.Year(), time.Month(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Time.Second(), t.Time.Nanosecond(), l)
+		}
+	}
+	if l, err := time.LoadLocation(toZone); err != nil {
+		return nil, err
+	} else {
+		return t.ToLocation(l), nil
+	}
+}
+
 // StrToTimeFormat 传入时间字符串，要转换的格式，生成dtime.Time对象
 func StrToTimeFormat(str string, format string) (*Time, error) {
 	return StrToTimeLayout(str, formatToStdLayout(format))
@@ -303,6 +362,63 @@ func StrToTimeLayout(str string, layout string) (*Time, error) {
 	} else {
 		return nil, err
 	}
+}
+
+// ParseTimeFromContent retrieves time information for content string, it then parses and returns it
+// as *Time object.
+// It returns the first time information if there're more than one time string in the content.
+// It only retrieves and parses the time information with given <format> if it's passed.
+func ParseTimeFromContent(content string, format ...string) *Time {
+	if len(format) > 0 {
+		if match, err := gregex.MatchString(formatToRegexPattern(format[0]), content); err == nil && len(match) > 0 {
+			return NewFromStrFormat(match[0], format[0])
+		}
+	} else {
+		if match := timeRegex1.FindStringSubmatch(content); len(match) >= 1 {
+			return NewFromStr(strings.Trim(match[0], "./_- \n\r"))
+		} else if match := timeRegex2.FindStringSubmatch(content); len(match) >= 1 {
+			return NewFromStr(strings.Trim(match[0], "./_- \n\r"))
+		} else if match := timeRegex3.FindStringSubmatch(content); len(match) >= 1 {
+			return NewFromStr(strings.Trim(match[0], "./_- \n\r"))
+		}
+	}
+	return nil
+}
+
+// ParseDuration parses a duration string.
+// A duration string is a possibly signed sequence of
+// decimal numbers, each with optional fraction and a unit suffix,
+// such as "300ms", "-1.5h", "1d" or "2h45m".
+// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h", "d".
+//
+// Very note that it supports unit "d" more than function time.ParseDuration.
+func ParseDuration(s string) (time.Duration, error) {
+	if utils.IsNumeric(s) {
+		v, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return 0, err
+		}
+		return time.Duration(v), nil
+	}
+	match, err := dregex.MatchString(`^([\-\d]+)[dD](.*)$`, s)
+	if err != nil {
+		return 0, err
+	}
+	if len(match) == 3 {
+		v, err := strconv.ParseInt(match[1], 10, 64)
+		if err != nil {
+			return 0, err
+		}
+		return time.ParseDuration(fmt.Sprintf(`%dh%s`, v*24, match[2]))
+	}
+	return time.ParseDuration(s)
+}
+
+// FuncCost 执行函数耗时
+func FuncCost(f func()) int64 {
+	t := TimestampNano()
+	f()
+	return TimestampNano() - t
 }
 
 // 是不是时间戳格式

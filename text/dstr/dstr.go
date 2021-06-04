@@ -67,3 +67,21 @@ func QuoteMeta(str string, chars ...string) string {
 func Count(s, substr string) int {
 	return strings.Count(s, substr)
 }
+
+// Split 分割字符串
+func Split(str, delimiter string) []string {
+	return strings.Split(str, delimiter)
+}
+
+// Replace 替换内容
+// origin 原始内容
+// search 要查找的内容
+// replace 要替换的内容
+// count 替换次数
+func Replace(origin, search, replace string, count ...int) string {
+	n := -1
+	if len(count) > 0 {
+		n = count[0]
+	}
+	return strings.Replace(origin, search, replace, n)
+}

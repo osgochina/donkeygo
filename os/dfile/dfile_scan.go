@@ -13,6 +13,34 @@ const (
 	maxScanDepth = 100000
 )
 
+// ScanDir 扫描文件夹，找到匹配的文件夹
+func ScanDir(path string, pattern string, recursive ...bool) ([]string, error) {
+	isRecursive := false
+	if len(recursive) > 0 {
+		isRecursive = recursive[0]
+	}
+	list, err := doScanDir(0, path, pattern, isRecursive, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) > 0 {
+		sort.Strings(list)
+	}
+	return list, nil
+}
+
+// ScanDirFunc 扫描文件夹，找到匹配的文件夹，并且执行回调函数
+func ScanDirFunc(path string, pattern string, recursive bool, handler func(path string) string) ([]string, error) {
+	list, err := doScanDir(0, path, pattern, recursive, handler)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) > 0 {
+		sort.Strings(list)
+	}
+	return list, nil
+}
+
 // ScanDirFile 遍历返回文件夹中的文件
 func ScanDirFile(path string, pattern string, recursive ...bool) ([]string, error) {
 	isRecursive := false
@@ -24,6 +52,23 @@ func ScanDirFile(path string, pattern string, recursive ...bool) ([]string, erro
 			return ""
 		}
 		return path
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(list) > 0 {
+		sort.Strings(list)
+	}
+	return list, nil
+}
+
+// ScanDirFileFunc 遍历文件夹中的文件，并执行回调函数
+func ScanDirFileFunc(path string, pattern string, recursive bool, handler func(path string) string) ([]string, error) {
+	list, err := doScanDir(0, path, pattern, recursive, func(path string) string {
+		if IsDir(path) {
+			return ""
+		}
+		return handler(path)
 	})
 	if err != nil {
 		return nil, err
