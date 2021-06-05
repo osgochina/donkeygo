@@ -1,6 +1,8 @@
 package dtime
 
 import (
+	"bytes"
+	"github.com/osgochina/donkeygo/errors/derror"
 	"strconv"
 	"time"
 )
@@ -15,6 +17,7 @@ type apiUnixNano interface {
 	UnixNano() int64
 }
 
+// New 通过参数创建时间对象
 func New(param ...interface{}) *Time {
 	if len(param) > 0 {
 		switch r := param[0].(type) {
@@ -199,7 +202,252 @@ func (that *Time) String() string {
 	return that.Format("Y-m-d H:i:s")
 }
 
+// IsZero 判断时间是否为0时间
+func (that *Time) IsZero() bool {
+	if that == nil {
+		return true
+	}
+	return that.Time.IsZero()
+}
+
 // Clone 返回一个新的时间对象，值为当前时间
 func (that *Time) Clone() *Time {
 	return New(that.Time)
+}
+
+// Add 增加制定的时间
+func (that *Time) Add(d time.Duration) *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.Add(d)
+	return newTime
+}
+
+// AddStr 通过字符串格式的时间增加时间
+func (that *Time) AddStr(duration string) (*Time, error) {
+	if d, err := time.ParseDuration(duration); err != nil {
+		return nil, err
+	} else {
+		return that.Add(d), nil
+	}
+}
+
+// UTC 返回utc时间
+func (that *Time) UTC() *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.UTC()
+	return newTime
+}
+
+// ISO8601 formats the time as ISO8601 and returns it as string.
+func (that *Time) ISO8601() string {
+	return that.Layout("2006-01-02T15:04:05-07:00")
+}
+
+// RFC822 formats the time as RFC822 and returns it as string.
+func (that *Time) RFC822() string {
+	return that.Layout("Mon, 02 Jan 06 15:04 MST")
+}
+
+// AddDate adds year, month and day to the time.
+func (that *Time) AddDate(years int, months int, days int) *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.AddDate(years, months, days)
+	return newTime
+}
+
+// Round returns the result of rounding t to the nearest multiple of d (since the zero time).
+// The rounding behavior for halfway values is to round up.
+// If d <= 0, Round returns t stripped of any monotonic clock reading but otherwise unchanged.
+//
+// Round operates on the time as an absolute duration since the
+// zero time; it does not operate on the presentation form of the
+// time. Thus, Round(Hour) may return a time with a non-zero
+// minute, depending on the time's Location.
+func (that *Time) Round(d time.Duration) *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.Round(d)
+	return newTime
+}
+
+// Truncate returns the result of rounding t down to a multiple of d (since the zero time).
+// If d <= 0, Truncate returns t stripped of any monotonic clock reading but otherwise unchanged.
+//
+// Truncate operates on the time as an absolute duration since the
+// zero time; it does not operate on the presentation form of the
+// time. Thus, Truncate(Hour) may return a time with a non-zero
+// minute, depending on the time's Location.
+func (that *Time) Truncate(d time.Duration) *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.Truncate(d)
+	return newTime
+}
+
+// Equal reports whether t and u represent the same time instant.
+// Two times can be equal even if they are in different locations.
+// For example, 6:00 +0200 CEST and 4:00 UTC are Equal.
+// See the documentation on the Time type for the pitfalls of using == with
+// Time values; most code should use Equal instead.
+func (that *Time) Equal(u *Time) bool {
+	return that.Time.Equal(u.Time)
+}
+
+// Before reports whether the time instant t is before u.
+func (that *Time) Before(u *Time) bool {
+	return that.Time.Before(u.Time)
+}
+
+// After reports whether the time instant t is after u.
+func (that *Time) After(u *Time) bool {
+	return that.Time.After(u.Time)
+}
+
+// Sub returns the duration t-u. If the result exceeds the maximum (or minimum)
+// value that can be stored in a Duration, the maximum (or minimum) duration
+// will be returned.
+// To compute t-d for a duration d, use t.Add(-d).
+func (that *Time) Sub(u *Time) time.Duration {
+	return that.Time.Sub(u.Time)
+}
+
+// StartOfMinute clones and returns a new time of which the seconds is set to 0.
+func (that *Time) StartOfMinute() *Time {
+	newTime := that.Clone()
+	newTime.Time = newTime.Time.Truncate(time.Minute)
+	return newTime
+}
+
+// StartOfHour clones and returns a new time of which the hour, minutes and seconds are set to 0.
+func (that *Time) StartOfHour() *Time {
+	y, m, d := that.Date()
+	newTime := that.Clone()
+	newTime.Time = time.Date(y, m, d, newTime.Time.Hour(), 0, 0, 0, newTime.Time.Location())
+	return newTime
+}
+
+// StartOfDay clones and returns a new time which is the start of day, its time is set to 00:00:00.
+// clone 一个新的时间，并返回这一天的开始时间
+func (that *Time) StartOfDay() *Time {
+	y, m, d := that.Date()
+	newTime := that.Clone()
+	newTime.Time = time.Date(y, m, d, 0, 0, 0, 0, newTime.Time.Location())
+	return newTime
+}
+
+// StartOfWeek clones and returns a new time which is the first day of week and its time is set to
+// 00:00:00.
+func (that *Time) StartOfWeek() *Time {
+	weekday := int(that.Weekday())
+	return that.StartOfDay().AddDate(0, 0, -weekday)
+}
+
+// StartOfMonth clones and returns a new time which is the first day of the month and its is set to
+// 00:00:00
+func (that *Time) StartOfMonth() *Time {
+	y, m, _ := that.Date()
+	newTime := that.Clone()
+	newTime.Time = time.Date(y, m, 1, 0, 0, 0, 0, newTime.Time.Location())
+	return newTime
+}
+
+// StartOfQuarter clones and returns a new time which is the first day of the quarter and its time is set
+// to 00:00:00.
+func (that *Time) StartOfQuarter() *Time {
+	month := that.StartOfMonth()
+	offset := (int(month.Month()) - 1) % 3
+	return month.AddDate(0, -offset, 0)
+}
+
+// StartOfHalf clones and returns a new time which is the first day of the half year and its time is set
+// to 00:00:00.
+func (that *Time) StartOfHalf() *Time {
+	month := that.StartOfMonth()
+	offset := (int(month.Month()) - 1) % 6
+	return month.AddDate(0, -offset, 0)
+}
+
+// StartOfYear clones and returns a new time which is the first day of the year and its time is set to
+// 00:00:00.
+func (that *Time) StartOfYear() *Time {
+	y, _, _ := that.Date()
+	newTime := that.Clone()
+	newTime.Time = time.Date(y, time.January, 1, 0, 0, 0, 0, newTime.Time.Location())
+	return newTime
+}
+
+// EndOfMinute clones and returns a new time of which the seconds is set to 59.
+func (that *Time) EndOfMinute() *Time {
+	return that.StartOfMinute().Add(time.Minute - time.Nanosecond)
+}
+
+// EndOfHour clones and returns a new time of which the minutes and seconds are both set to 59.
+func (that *Time) EndOfHour() *Time {
+	return that.StartOfHour().Add(time.Hour - time.Nanosecond)
+}
+
+// EndOfDay clones and returns a new time which is the end of day the and its time is set to 23:59:59.
+func (that *Time) EndOfDay() *Time {
+	y, m, d := that.Date()
+	newTime := that.Clone()
+	newTime.Time = time.Date(y, m, d, 23, 59, 59, int(time.Second-time.Nanosecond), newTime.Time.Location())
+	return newTime
+}
+
+// EndOfWeek clones and returns a new time which is the end of week and its time is set to 23:59:59.
+func (that *Time) EndOfWeek() *Time {
+	return that.StartOfWeek().AddDate(0, 0, 7).Add(-time.Nanosecond)
+}
+
+// EndOfMonth clones and returns a new time which is the end of the month and its time is set to 23:59:59.
+func (that *Time) EndOfMonth() *Time {
+	return that.StartOfMonth().AddDate(0, 1, 0).Add(-time.Nanosecond)
+}
+
+// EndOfQuarter clones and returns a new time which is end of the quarter and its time is set to 23:59:59.
+func (that *Time) EndOfQuarter() *Time {
+	return that.StartOfQuarter().AddDate(0, 3, 0).Add(-time.Nanosecond)
+}
+
+// EndOfHalf clones and returns a new time which is the end of the half year and its time is set to 23:59:59.
+func (that *Time) EndOfHalf() *Time {
+	return that.StartOfHalf().AddDate(0, 6, 0).Add(-time.Nanosecond)
+}
+
+// EndOfYear clones and returns a new time which is the end of the year and its time is set to 23:59:59.
+func (that *Time) EndOfYear() *Time {
+	return that.StartOfYear().AddDate(1, 0, 0).Add(-time.Nanosecond)
+}
+
+// MarshalJSON implements the interface MarshalJSON for json.Marshal.
+func (that *Time) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + that.String() + `"`), nil
+}
+
+// UnmarshalJSON implements the interface UnmarshalJSON for json.Unmarshal.
+func (that *Time) UnmarshalJSON(b []byte) error {
+	if len(b) == 0 {
+		that.Time = time.Time{}
+		return nil
+	}
+	newTime, err := StrToTime(string(bytes.Trim(b, `"`)))
+	if err != nil {
+		return err
+	}
+	that.Time = newTime.Time
+	return nil
+}
+
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
+// Note that it overwrites the same implementer of `time.Time`.
+func (that *Time) UnmarshalText(data []byte) error {
+	vTime := New(data)
+	if vTime != nil {
+		*that = *vTime
+		return nil
+	}
+	return derror.Newf(`invalid time value: %s`, data)
+}
+
+// NoValidation marks this struct object will not be validated by package gvalid.
+func (that *Time) NoValidation() {
+
 }

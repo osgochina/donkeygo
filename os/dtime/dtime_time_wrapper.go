@@ -6,9 +6,9 @@ type wrapper struct {
 	time.Time
 }
 
-func (t wrapper) String() string {
-	if t.IsZero() {
+func (that wrapper) String() string {
+	if that.IsZero() {
 		return ""
 	}
-	return t.Format("2006-01-02 15:04:05")
+	return that.Format("2006-01-02 15:04:05")
 }
