@@ -1,10 +1,15 @@
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
 package darray
 
 import (
 	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/internal/rwmutex"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"github.com/osgochina/donkeygo/util/drand"
@@ -12,27 +17,47 @@ import (
 	"sort"
 )
 
-// IntArray int类型的数组
-type IntArray struct {
-	mu    rwmutex.RWMutex
-	array []int
+// SortedIntArray is a golang sorted int array with rich features.
+// It is using increasing order in default, which can be changed by
+// setting it a custom comparator.
+// It contains a concurrent-safe/unsafe switch, which should be set
+// when its initialization and cannot be changed then.
+type SortedIntArray struct {
+	mu         rwmutex.RWMutex
+	array      []int
+	unique     bool               // Whether enable unique feature(false)
+	comparator func(a, b int) int // Comparison function(it returns -1: a < b; 0: a == b; 1: a > b)
 }
 
-// NewIntArray 创建int类型的数组
-func NewIntArray(safe ...bool) *IntArray {
-	return NewIntArraySize(0, 0, safe...)
+// NewSortedIntArray creates and returns an empty sorted array.
+// The parameter <safe> is used to specify whether using array in concurrent-safety,
+// which is false in default.
+func NewSortedIntArray(safe ...bool) *SortedIntArray {
+	return NewSortedIntArraySize(0, safe...)
 }
 
-// NewIntArraySize 创建指定长度的int类型的数组
-func NewIntArraySize(size int, cap int, safe ...bool) *IntArray {
-	return &IntArray{
-		mu:    rwmutex.Create(safe...),
-		array: make([]int, size, cap),
+// NewSortedIntArrayComparator creates and returns an empty sorted array with specified comparator.
+// The parameter <safe> is used to specify whether using array in concurrent-safety which is false in default.
+func NewSortedIntArrayComparator(comparator func(a, b int) int, safe ...bool) *SortedIntArray {
+	array := NewSortedIntArray(safe...)
+	array.comparator = comparator
+	return array
+}
+
+// NewSortedIntArraySize create and returns an sorted array with given size and cap.
+// The parameter <safe> is used to specify whether using array in concurrent-safety,
+// which is false in default.
+func NewSortedIntArraySize(cap int, safe ...bool) *SortedIntArray {
+	return &SortedIntArray{
+		mu:         rwmutex.Create(safe...),
+		array:      make([]int, 0, cap),
+		comparator: defaultComparatorInt,
 	}
 }
 
-// NewIntArrayRange 创建一个切片，从start开始到end结束，步进未step
-func NewIntArrayRange(start, end, step int, safe ...bool) *IntArray {
+// NewSortedIntArrayRange creates and returns a array by a range from <start> to <end>
+// with step value <step>.
+func NewSortedIntArrayRange(start, end, step int, safe ...bool) *SortedIntArray {
 	if step == 0 {
 		panic(fmt.Sprintf(`invalid step value: %d`, step))
 	}
@@ -42,39 +67,82 @@ func NewIntArrayRange(start, end, step int, safe ...bool) *IntArray {
 		slice[index] = i
 		index++
 	}
-	return NewIntArrayFrom(slice, safe...)
+	return NewSortedIntArrayFrom(slice, safe...)
 }
 
-// NewIntArrayFrom 从基础数据结构切片中创建自定义数组
-func NewIntArrayFrom(array []int, safe ...bool) *IntArray {
-	return &IntArray{
-		mu:    rwmutex.Create(safe...),
-		array: array,
-	}
+// NewIntArrayFrom creates and returns an sorted array with given slice <array>.
+// The parameter <safe> is used to specify whether using array in concurrent-safety,
+// which is false in default.
+func NewSortedIntArrayFrom(array []int, safe ...bool) *SortedIntArray {
+	a := NewSortedIntArraySize(0, safe...)
+	a.array = array
+	sort.Ints(a.array)
+	return a
 }
 
-// NewIntArrayFromCopy 创建一个新的自定义数组，值是复制传入的切片
-func NewIntArrayFromCopy(array []int, safe ...bool) *IntArray {
+// NewSortedIntArrayFromCopy creates and returns an sorted array from a copy of given slice <array>.
+// The parameter <safe> is used to specify whether using array in concurrent-safety,
+// which is false in default.
+func NewSortedIntArrayFromCopy(array []int, safe ...bool) *SortedIntArray {
 	newArray := make([]int, len(array))
 	copy(newArray, array)
-	return &IntArray{
-		mu:    rwmutex.Create(safe...),
-		array: newArray,
-	}
+	return NewSortedIntArrayFrom(newArray, safe...)
 }
 
-func (that *IntArray) Set(index int, value int) error {
+// SetArray sets the underlying slice array with the given <array>.
+func (that *SortedIntArray) SetArray(array []int) *SortedIntArray {
 	that.mu.Lock()
 	defer that.mu.Unlock()
-	if index < 0 || index >= len(that.array) {
-		return errors.New(fmt.Sprintf("index %d out of array range %d", index, len(that.array)))
-	}
-	that.array[index] = value
-	return nil
+	that.array = array
+	quickSortInt(that.array, that.getComparator())
+	return that
 }
 
-// Get 获取指定index的值
-func (that *IntArray) Get(index int) (value int, found bool) {
+// Sort sorts the array in increasing order.
+// The parameter <reverse> controls whether sort
+// in increasing order(default) or decreasing order.
+func (that *SortedIntArray) Sort() *SortedIntArray {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	quickSortInt(that.array, that.getComparator())
+	return that
+}
+
+// Add adds one or multiple values to sorted array, the array always keeps sorted.
+// It's alias of function Append, see Append.
+func (that *SortedIntArray) Add(values ...int) *SortedIntArray {
+	return that.Append(values...)
+}
+
+// Append adds one or multiple values to sorted array, the array always keeps sorted.
+func (that *SortedIntArray) Append(values ...int) *SortedIntArray {
+	if len(values) == 0 {
+		return that
+	}
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	for _, value := range values {
+		index, cmp := that.binSearch(value, false)
+		if that.unique && cmp == 0 {
+			continue
+		}
+		if index < 0 {
+			that.array = append(that.array, value)
+			continue
+		}
+		if cmp > 0 {
+			index++
+		}
+		rear := append([]int{}, that.array[index:]...)
+		that.array = append(that.array[0:index], value)
+		that.array = append(that.array, rear...)
+	}
+	return that
+}
+
+// Get returns the value by the specified index.
+// If the given <index> is out of range of the array, the <found> is false.
+func (that *SortedIntArray) Get(index int) (value int, found bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	if index < 0 || index >= len(that.array) {
@@ -83,104 +151,20 @@ func (that *IntArray) Get(index int) (value int, found bool) {
 	return that.array[index], true
 }
 
-// SetArray 赋值
-func (that *IntArray) SetArray(array []int) *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	that.array = array
-	return that
-}
-
-// Replace 把传入的array替换原来的数组
-func (that *IntArray) Replace(array []int) *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	max := len(array)
-	if max > len(that.array) {
-		max = len(that.array)
-	}
-	for i := 0; i < max; i++ {
-		that.array[i] = array[i]
-	}
-	return that
-}
-
-// Sum 统计int的总数
-func (that *IntArray) Sum() (sum int) {
-	that.mu.RLock()
-	defer that.mu.RUnlock()
-	for _, v := range that.array {
-		sum += v
-	}
-	return
-}
-
-// Sort 数组排序
-func (that *IntArray) Sort(reverse ...bool) *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	if len(reverse) > 0 && reverse[0] {
-		sort.Slice(that.array, func(i, j int) bool {
-			if that.array[i] < that.array[j] {
-				return false
-			}
-			return true
-		})
-	} else {
-		sort.Ints(that.array)
-	}
-	return that
-}
-
-// SortFunc 使用指定的排序函数排序数组
-func (that *IntArray) SortFunc(less func(v1, v2 int) bool) *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	sort.Slice(that.array, func(i, j int) bool {
-		return less(that.array[i], that.array[j])
-	})
-	return that
-}
-
-// InsertBefore 在指定index之前插入value
-func (that *IntArray) InsertBefore(index int, value int) error {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	if index < 0 || index >= len(that.array) {
-		return errors.New(fmt.Sprintf("index %d out of array range %d", index, len(that.array)))
-	}
-	rear := append([]int{}, that.array[index:]...)
-	that.array = append(that.array[0:index], value)
-	that.array = append(that.array, rear...)
-	return nil
-}
-
-// InsertAfter 在数组index之后插入value
-func (that *IntArray) InsertAfter(index int, value int) error {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	if index < 0 || index >= len(that.array) {
-		return errors.New(fmt.Sprintf("index %d out of array range %d", index, len(that.array)))
-	}
-	rear := append([]int{}, that.array[index+1:]...)
-	that.array = append(that.array[0:index+1], value)
-	that.array = append(that.array, rear...)
-	return nil
-}
-
-// Remove 移除指定的index对应的值
-func (that *IntArray) Remove(index int) (value int, found bool) {
+// Remove removes an item by index.
+// If the given <index> is out of range of the array, the <found> is false.
+func (that *SortedIntArray) Remove(index int) (value int, found bool) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	return that.doRemoveWithoutLock(index)
 }
 
-// 从数组中找到指定indxe的值，从数组中移除它，并返回它。
-func (that *IntArray) doRemoveWithoutLock(index int) (value int, found bool) {
+// doRemoveWithoutLock removes an item by index without lock.
+func (that *SortedIntArray) doRemoveWithoutLock(index int) (value int, found bool) {
 	if index < 0 || index >= len(that.array) {
 		return 0, false
 	}
-	// 在删除的时候确认数组边界，提升效率
+	// Determine array boundaries when deleting to improve deletion efficiency.
 	if index == 0 {
 		value := that.array[0]
 		that.array = that.array[1:]
@@ -198,8 +182,9 @@ func (that *IntArray) doRemoveWithoutLock(index int) (value int, found bool) {
 	return value, true
 }
 
-// RemoveValue 查找指定的值，并从数组中移除它
-func (that *IntArray) RemoveValue(value int) bool {
+// RemoveValue removes an item by value.
+// It returns true if value is found in the array, or else false if not found.
+func (that *SortedIntArray) RemoveValue(value int) bool {
 	if i := that.Search(value); i != -1 {
 		_, found := that.Remove(i)
 		return found
@@ -207,25 +192,9 @@ func (that *IntArray) RemoveValue(value int) bool {
 	return false
 }
 
-func (that *IntArray) PushLeft(value ...int) *IntArray {
-	that.mu.Lock()
-	that.array = append(value, that.array...)
-	that.mu.Unlock()
-	return that
-}
-
-// PushRight pushes one or multiple items to the end of array.
-// It equals to Append.
-func (that *IntArray) PushRight(value ...int) *IntArray {
-	that.mu.Lock()
-	that.array = append(that.array, value...)
-	that.mu.Unlock()
-	return that
-}
-
 // PopLeft pops and returns an item from the beginning of array.
 // Note that if the array is empty, the <found> is false.
-func (that *IntArray) PopLeft() (value int, found bool) {
+func (that *SortedIntArray) PopLeft() (value int, found bool) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	if len(that.array) == 0 {
@@ -238,7 +207,7 @@ func (that *IntArray) PopLeft() (value int, found bool) {
 
 // PopRight pops and returns an item from the end of array.
 // Note that if the array is empty, the <found> is false.
-func (that *IntArray) PopRight() (value int, found bool) {
+func (that *SortedIntArray) PopRight() (value int, found bool) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	index := len(that.array) - 1
@@ -250,9 +219,9 @@ func (that *IntArray) PopRight() (value int, found bool) {
 	return value, true
 }
 
-// PopRand randomly pops and return thatn item out of array.
+// PopRand randomly pops and return an item out of array.
 // Note that if the array is empty, the <found> is false.
-func (that *IntArray) PopRand() (value int, found bool) {
+func (that *SortedIntArray) PopRand() (value int, found bool) {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	return that.doRemoveWithoutLock(drand.Intn(len(that.array)))
@@ -261,7 +230,7 @@ func (that *IntArray) PopRand() (value int, found bool) {
 // PopRands randomly pops and returns <size> items out of array.
 // If the given <size> is greater than size of the array, it returns all elements of the array.
 // Note that if given <size> <= 0 or the array is empty, it returns nil.
-func (that *IntArray) PopRands(size int) []int {
+func (that *SortedIntArray) PopRands(size int) []int {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	if size <= 0 || len(that.array) == 0 {
@@ -280,7 +249,7 @@ func (that *IntArray) PopRands(size int) []int {
 // PopLefts pops and returns <size> items from the beginning of array.
 // If the given <size> is greater than size of the array, it returns all elements of the array.
 // Note that if given <size> <= 0 or the array is empty, it returns nil.
-func (that *IntArray) PopLefts(size int) []int {
+func (that *SortedIntArray) PopLefts(size int) []int {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	if size <= 0 || len(that.array) == 0 {
@@ -299,7 +268,7 @@ func (that *IntArray) PopLefts(size int) []int {
 // PopRights pops and returns <size> items from the end of array.
 // If the given <size> is greater than size of the array, it returns all elements of the array.
 // Note that if given <size> <= 0 or the array is empty, it returns nil.
-func (that *IntArray) PopRights(size int) []int {
+func (that *SortedIntArray) PopRights(size int) []int {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	if size <= 0 || len(that.array) == 0 {
@@ -318,12 +287,12 @@ func (that *IntArray) PopRights(size int) []int {
 
 // Range picks and returns items by range, like array[start:end].
 // Notice, if in concurrent-safe usage, it returns a copy of slice;
-// else a pointer to the underlying datthat.
+// else a pointer to the underlying data.
 //
 // If <end> is negative, then the offset will start from the end of array.
 // If <end> is omitted, then the sequence will have everything from start up
 // until the end of the array.
-func (that *IntArray) Range(start int, end ...int) []int {
+func (that *SortedIntArray) Range(start int, end ...int) []int {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	offsetEnd := len(that.array)
@@ -359,7 +328,7 @@ func (that *IntArray) Range(start int, end ...int) []int {
 // If it is omitted, then the sequence will have everything from offset up until the end of the array.
 //
 // Any possibility crossing the left border of array, it will fail.
-func (that *IntArray) SubSlice(offset int, length ...int) []int {
+func (that *SortedIntArray) SubSlice(offset int, length ...int) []int {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	size := len(that.array)
@@ -396,26 +365,28 @@ func (that *IntArray) SubSlice(offset int, length ...int) []int {
 	}
 }
 
-// Append See PushRight.
-func (that *IntArray) Append(value ...int) *IntArray {
-	that.mu.Lock()
-	that.array = append(that.array, value...)
-	that.mu.Unlock()
-	return that
-}
-
 // Len returns the length of array.
-func (that *IntArray) Len() int {
+func (that *SortedIntArray) Len() int {
 	that.mu.RLock()
 	length := len(that.array)
 	that.mu.RUnlock()
 	return length
 }
 
+// Sum returns the sum of values in an array.
+func (that *SortedIntArray) Sum() (sum int) {
+	that.mu.RLock()
+	defer that.mu.RUnlock()
+	for _, v := range that.array {
+		sum += v
+	}
+	return
+}
+
 // Slice returns the underlying data of array.
 // Note that, if it's in concurrent-safe usage, it returns a copy of underlying data,
-// or else a pointer to the underlying datthat.
-func (that *IntArray) Slice() []int {
+// or else a pointer to the underlying data.
+func (that *SortedIntArray) Slice() []int {
 	array := ([]int)(nil)
 	if that.mu.IsSafe() {
 		that.mu.RLock()
@@ -429,7 +400,7 @@ func (that *IntArray) Slice() []int {
 }
 
 // Interfaces returns current array as []interface{}.
-func (that *IntArray) Interfaces() []interface{} {
+func (that *SortedIntArray) Interfaces() []interface{} {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	array := make([]interface{}, len(that.array))
@@ -439,17 +410,96 @@ func (that *IntArray) Interfaces() []interface{} {
 	return array
 }
 
+// Contains checks whether a value exists in the array.
+func (that *SortedIntArray) Contains(value int) bool {
+	return that.Search(value) != -1
+}
+
+// Search searches array by <value>, returns the index of <value>,
+// or returns -1 if not exists.
+func (that *SortedIntArray) Search(value int) (index int) {
+	if i, r := that.binSearch(value, true); r == 0 {
+		return i
+	}
+	return -1
+}
+
+// Binary search.
+// It returns the last compared index and the result.
+// If <result> equals to 0, it means the value at <index> is equals to <value>.
+// If <result> lesser than 0, it means the value at <index> is lesser than <value>.
+// If <result> greater than 0, it means the value at <index> is greater than <value>.
+func (that *SortedIntArray) binSearch(value int, lock bool) (index int, result int) {
+	if lock {
+		that.mu.RLock()
+		defer that.mu.RUnlock()
+	}
+	if len(that.array) == 0 {
+		return -1, -2
+	}
+	min := 0
+	max := len(that.array) - 1
+	mid := 0
+	cmp := -2
+	for min <= max {
+		mid = min + int((max-min)/2)
+		cmp = that.getComparator()(value, that.array[mid])
+		switch {
+		case cmp < 0:
+			max = mid - 1
+		case cmp > 0:
+			min = mid + 1
+		default:
+			return mid, cmp
+		}
+	}
+	return mid, cmp
+}
+
+// SetUnique sets unique mark to the array,
+// which means it does not contain any repeated items.
+// It also do unique check, remove all repeated items.
+func (that *SortedIntArray) SetUnique(unique bool) *SortedIntArray {
+	oldUnique := that.unique
+	that.unique = unique
+	if unique && oldUnique != unique {
+		that.Unique()
+	}
+	return that
+}
+
+// Unique uniques the array, clear repeated items.
+func (that *SortedIntArray) Unique() *SortedIntArray {
+	that.mu.Lock()
+	defer that.mu.Unlock()
+	if len(that.array) == 0 {
+		return that
+	}
+	i := 0
+	for {
+		if i == len(that.array)-1 {
+			break
+		}
+		if that.getComparator()(that.array[i], that.array[i+1]) == 0 {
+			that.array = append(that.array[:i+1], that.array[i+1+1:]...)
+		} else {
+			i++
+		}
+	}
+	return that
+}
+
 // Clone returns a new array, which is a copy of current array.
-func (that *IntArray) Clone() (newArray *IntArray) {
+func (that *SortedIntArray) Clone() (newArray *SortedIntArray) {
 	that.mu.RLock()
 	array := make([]int, len(that.array))
 	copy(array, that.array)
 	that.mu.RUnlock()
-	return NewIntArrayFrom(array, that.mu.IsSafe())
+	return NewSortedIntArrayFrom(array, that.mu.IsSafe())
 }
 
 // Clear deletes all items of current array.
-func (that *IntArray) Clear() *IntArray {
+func (that *SortedIntArray) Clear() *SortedIntArray {
 	that.mu.Lock()
 	if len(that.array) > 0 {
 		that.array = make([]int, 0)
@@ -458,48 +508,8 @@ func (that *IntArray) Clear() *IntArray {
 	return that
 }
 
-// Contains checks whether a value exists in the array.
-func (that *IntArray) Contains(value int) bool {
-	return that.Search(value) != -1
-}
-
-// Search searches array by <value>, returns the index of <value>,
-// or returns -1 if not exists.
-func (that *IntArray) Search(value int) int {
-	that.mu.RLock()
-	defer that.mu.RUnlock()
-	if len(that.array) == 0 {
-		return -1
-	}
-	result := -1
-	for index, v := range that.array {
-		if v == value {
-			result = index
-			break
-		}
-	}
-	return result
-}
-
-// Unique uniques the array, clear repeated items.
-// Example: [1,1,2,3,2] -> [1,2,3]
-func (that *IntArray) Unique() *IntArray {
-	that.mu.Lock()
-	for i := 0; i < len(that.array)-1; i++ {
-		for j := i + 1; j < len(that.array); {
-			if that.array[i] == that.array[j] {
-				that.array = append(that.array[:j], that.array[j+1:]...)
-			} else {
-				j++
-			}
-		}
-	}
-	that.mu.Unlock()
-	return that
-}
-
 // LockFunc locks writing by callback function <f>.
-func (that *IntArray) LockFunc(f func(array []int)) *IntArray {
+func (that *SortedIntArray) LockFunc(f func(array []int)) *SortedIntArray {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	f(that.array)
@@ -507,7 +517,7 @@ func (that *IntArray) LockFunc(f func(array []int)) *IntArray {
 }
 
 // RLockFunc locks reading by callback function <f>.
-func (that *IntArray) RLockFunc(f func(array []int)) *IntArray {
+func (that *SortedIntArray) RLockFunc(f func(array []int)) *SortedIntArray {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	f(that.array)
@@ -518,32 +528,14 @@ func (that *IntArray) RLockFunc(f func(array []int)) *IntArray {
 // The parameter <array> can be any garray or slice type.
 // The difference between Merge and Append is Append supports only specified slice type,
 // but Merge supports more parameter types.
-func (that *IntArray) Merge(array interface{}) *IntArray {
-	return that.Append(dconv.Ints(array)...)
-}
-
-// Fill fills an array with num entries of the value <value>,
-// keys starting at the <startIndex> parameter.
-func (that *IntArray) Fill(startIndex int, num int, value int) error {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	if startIndex < 0 || startIndex > len(that.array) {
-		return errors.New(fmt.Sprintf("index %d out of array range %d", startIndex, len(that.array)))
-	}
-	for i := startIndex; i < startIndex+num; i++ {
-		if i > len(that.array)-1 {
-			that.array = append(that.array, value)
-		} else {
-			that.array[i] = value
-		}
-	}
-	return nil
+func (that *SortedIntArray) Merge(array interface{}) *SortedIntArray {
+	return that.Add(dconv.Ints(array)...)
 }
 
 // Chunk splits an array into multiple arrays,
 // the size of each array is determined by <size>.
 // The last chunk may contain less than size elements.
-func (that *IntArray) Chunk(size int) [][]int {
+func (that *SortedIntArray) Chunk(size int) [][]int {
 	if size < 1 {
 		return nil
 	}
@@ -563,35 +555,8 @@ func (that *IntArray) Chunk(size int) [][]int {
 	return n
 }
 
-// Pad pads array to the specified length with <value>.
-// If size is positive then the array is padded on the right, or negative on the left.
-// If the absolute value of <size> is less than or equal to the length of the array
-// then no padding takes place.
-func (that *IntArray) Pad(size int, value int) *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	if size == 0 || (size > 0 && size < len(that.array)) || (size < 0 && size > -len(that.array)) {
-		return that
-	}
-	n := size
-	if size < 0 {
-		n = -size
-	}
-	n -= len(that.array)
-	tmp := make([]int, n)
-	for i := 0; i < n; i++ {
-		tmp[i] = value
-	}
-	if size > 0 {
-		that.array = append(that.array, tmp...)
-	} else {
-		that.array = append(tmp, that.array...)
-	}
-	return that
-}
-
 // Rand randomly returns one item from array(no deleting).
-func (that *IntArray) Rand() (value int, found bool) {
+func (that *SortedIntArray) Rand() (value int, found bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	if len(that.array) == 0 {
@@ -601,7 +566,7 @@ func (that *IntArray) Rand() (value int, found bool) {
 }
 
 // Rands randomly returns <size> items from array(no deleting).
-func (that *IntArray) Rands(size int) []int {
+func (that *SortedIntArray) Rands(size int) []int {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	if size <= 0 || len(that.array) == 0 {
@@ -614,28 +579,8 @@ func (that *IntArray) Rands(size int) []int {
 	return array
 }
 
-// Shuffle randomly shuffles the array.
-func (that *IntArray) Shuffle() *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	for i, v := range drand.Perm(len(that.array)) {
-		that.array[i], that.array[v] = that.array[v], that.array[i]
-	}
-	return that
-}
-
-// Reverse makes array with elements in reverse order.
-func (that *IntArray) Reverse() *IntArray {
-	that.mu.Lock()
-	defer that.mu.Unlock()
-	for i, j := 0, len(that.array)-1; i < j; i, j = i+1, j-1 {
-		that.array[i], that.array[j] = that.array[j], that.array[i]
-	}
-	return that
-}
-
 // Join joins array elements with a string <glue>.
-func (that *IntArray) Join(glue string) string {
+func (that *SortedIntArray) Join(glue string) string {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	if len(that.array) == 0 {
@@ -652,7 +597,7 @@ func (that *IntArray) Join(glue string) string {
 }
 
 // CountValues counts the number of occurrences of all values in the array.
-func (that *IntArray) CountValues() map[int]int {
+func (that *SortedIntArray) CountValues() map[int]int {
 	m := make(map[int]int)
 	that.mu.RLock()
 	defer that.mu.RUnlock()
@@ -663,13 +608,13 @@ func (that *IntArray) CountValues() map[int]int {
 }
 
 // Iterator is alias of IteratorAsc.
-func (that *IntArray) Iterator(f func(k int, v int) bool) {
+func (that *SortedIntArray) Iterator(f func(k int, v int) bool) {
 	that.IteratorAsc(f)
 }
 
 // IteratorAsc iterates the array readonly in ascending order with given callback function <f>.
 // If <f> returns true, then it continues iterating; or false to stop.
-func (that *IntArray) IteratorAsc(f func(k int, v int) bool) {
+func (that *SortedIntArray) IteratorAsc(f func(k int, v int) bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	for k, v := range that.array {
@@ -681,7 +626,7 @@ func (that *IntArray) IteratorAsc(f func(k int, v int) bool) {
 
 // IteratorDesc iterates the array readonly in descending order with given callback function <f>.
 // If <f> returns true, then it continues iterating; or false to stop.
-func (that *IntArray) IteratorDesc(f func(k int, v int) bool) {
+func (that *SortedIntArray) IteratorDesc(f func(k int, v int) bool) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	for i := len(that.array) - 1; i >= 0; i-- {
@@ -692,62 +637,83 @@ func (that *IntArray) IteratorDesc(f func(k int, v int) bool) {
 }
 
 // String returns current array as a string, which implements like json.Marshal does.
-func (that *IntArray) String() string {
+func (that *SortedIntArray) String() string {
 	return "[" + that.Join(",") + "]"
 }
 
 // MarshalJSON implements the interface MarshalJSON for json.Marshal.
 // Note that do not use pointer as its receiver here.
-func (that IntArray) MarshalJSON() ([]byte, error) {
+func (that SortedIntArray) MarshalJSON() ([]byte, error) {
 	that.mu.RLock()
 	defer that.mu.RUnlock()
 	return json.Marshal(that.array)
 }
 
 // UnmarshalJSON implements the interface UnmarshalJSON for json.Unmarshal.
-func (that *IntArray) UnmarshalJSON(b []byte) error {
-	if that.array == nil {
+func (that *SortedIntArray) UnmarshalJSON(b []byte) error {
+	if that.comparator == nil {
 		that.array = make([]int, 0)
+		that.comparator = defaultComparatorInt
 	}
 	that.mu.Lock()
 	defer that.mu.Unlock()
-	if err := json.Unmarshal(b, &that.array); err != nil {
+	if err := json.UnmarshalUseNumber(b, &that.array); err != nil {
 		return err
+	}
+	if that.array != nil {
+		sort.Ints(that.array)
 	}
 	return nil
 }
 
 // UnmarshalValue is an interface implement which sets any type of value for array.
-func (that *IntArray) UnmarshalValue(value interface{}) error {
+func (that *SortedIntArray) UnmarshalValue(value interface{}) (err error) {
+	if that.comparator == nil {
+		that.comparator = defaultComparatorInt
+	}
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	switch value.(type) {
 	case string, []byte:
-		return json.Unmarshal(dconv.Bytes(value), &that.array)
+		err = json.UnmarshalUseNumber(dconv.Bytes(value), &that.array)
 	default:
 		that.array = dconv.SliceInt(value)
 	}
-	return nil
+	if that.array != nil {
+		sort.Ints(that.array)
+	}
+	return err
 }
 
 // FilterEmpty removes all zero value of the array.
-func (that *IntArray) FilterEmpty() *IntArray {
+func (that *SortedIntArray) FilterEmpty() *SortedIntArray {
 	that.mu.Lock()
 	defer that.mu.Unlock()
 	for i := 0; i < len(that.array); {
 		if that.array[i] == 0 {
 			that.array = append(that.array[:i], that.array[i+1:]...)
 		} else {
-			i++
+			break
+		}
+	}
+	for i := len(that.array) - 1; i >= 0; {
+		if that.array[i] == 0 {
+			that.array = append(that.array[:i], that.array[i+1:]...)
+		} else {
+			break
 		}
 	}
 	return that
 }
 
 // Walk applies a user supplied function <f> to every item of array.
-func (that *IntArray) Walk(f func(value int) int) *IntArray {
+func (that *SortedIntArray) Walk(f func(value int) int) *SortedIntArray {
 	that.mu.Lock()
 	defer that.mu.Unlock()
+
+	// Keep the array always sorted.
+	defer quickSortInt(that.array, that.getComparator())
+
 	for i, v := range that.array {
 		that.array[i] = f(v)
 	}
@@ -755,6 +721,15 @@ func (that *IntArray) Walk(f func(value int) int) *IntArray {
 }
 
 // IsEmpty checks whether the array is empty.
-func (that *IntArray) IsEmpty() bool {
+func (that *SortedIntArray) IsEmpty() bool {
 	return that.Len() == 0
+}
+
+// getComparator returns the comparator if it's previously set,
+// or else it returns a default comparator.
+func (that *SortedIntArray) getComparator() func(a, b int) int {
+	if that.comparator == nil {
+		return defaultComparatorInt
+	}
+	return that.comparator
 }
