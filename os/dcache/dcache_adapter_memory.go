@@ -2,8 +2,8 @@ package dcache
 
 import (
 	"context"
-	"github.com/gogf/gf/container/gset"
 	"github.com/osgochina/donkeygo/container/dlist"
+	"github.com/osgochina/donkeygo/container/dset"
 	"github.com/osgochina/donkeygo/container/dtype"
 	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/os/dtimer"
@@ -322,7 +322,7 @@ func (that *adapterMemory) syncEventAndClearExpired() {
 	// Data Cleaning up.
 	// ========================
 	var (
-		expireSet *gset.Set
+		expireSet *dset.Set
 		ek        = that.makeExpireKey(dtime.TimestampMilli())
 		eks       = []int64{ek - 1000, ek - 2000, ek - 3000, ek - 4000, ek - 5000}
 	)

@@ -13,8 +13,8 @@ func Interfaces(i interface{}) []interface{} {
 	}
 	if r, ok := i.([]interface{}); ok {
 		return r
-		//} else if r, ok := i.(apiInterfaces); ok {
-		//	return r.Interfaces()
+	} else if r, ok := i.(apiInterfaces); ok {
+		return r.Interfaces()
 	} else {
 		var array []interface{}
 		switch value := i.(type) {
