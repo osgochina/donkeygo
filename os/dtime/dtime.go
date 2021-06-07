@@ -104,12 +104,12 @@ func Timestamp() int64 {
 	return Now().Timestamp()
 }
 
-// TimestampMilli 获取微秒时间戳
+// TimestampMilli 获取毫秒时间戳
 func TimestampMilli() int64 {
 	return Now().TimestampMilli()
 }
 
-// TimestampMicro 获取毫秒时间戳
+// TimestampMicro 获取微秒时间戳
 func TimestampMicro() int64 {
 	return Now().TimestampMicro()
 }

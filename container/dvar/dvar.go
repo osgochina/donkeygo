@@ -2,8 +2,8 @@ package dvar
 
 import (
 	"encoding/json"
-	"github.com/gogf/gf/container/gtype"
 	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"time"
 )
@@ -40,7 +40,7 @@ func Create(value interface{}, safe ...bool) Var {
 // Set 设置值
 func (that *Var) Set(value interface{}) (old interface{}) {
 	if that.safe {
-		if t, ok := that.value.(*gtype.Interface); ok {
+		if t, ok := that.value.(*dtype.Interface); ok {
 			old = t.Set(value)
 			return
 		}
@@ -143,13 +143,12 @@ func (that *Var) Float64() float64 {
 	return dconv.Float64(that.Val())
 }
 
-//
-//// Time converts and returns <v> as time.Time.
-//// The parameter <format> specifies the format of the time string using gtime,
-//// eg: Y-m-d H:i:s.
-//func (v *Var) Time(format ...string) time.Time {
-//	return gconv.Time(v.Val(), format...)
-//}
+// Time converts and returns <v> as time.Time.
+// The parameter <format> specifies the format of the time string using gtime,
+// eg: Y-m-d H:i:s.
+func (that *Var) Time(format ...string) time.Time {
+	return dconv.Time(that.Val(), format...)
+}
 
 // Duration converts and returns <v> as time.Duration.
 // If value of <v> is string, then it uses time.ParseDuration for conversion.
@@ -157,12 +156,12 @@ func (that *Var) Duration() time.Duration {
 	return dconv.Duration(that.Val())
 }
 
-//// GTime converts and returns <v> as *gtime.Time.
-//// The parameter <format> specifies the format of the time string using gtime,
-//// eg: Y-m-d H:i:s.
-//func (v *Var) GTime(format ...string) *gtime.Time {
-//	return gconv.GTime(v.Val(), format...)
-//}
+// GTime converts and returns <v> as *gtime.Time.
+// The parameter <format> specifies the format of the time string using gtime,
+// eg: Y-m-d H:i:s.
+func (that *Var) GTime(format ...string) *dtime.Time {
+	return dconv.GTime(that.Val(), format...)
+}
 
 // MarshalJSON implements the interface MarshalJSON for json.Marshal.
 func (that *Var) MarshalJSON() ([]byte, error) {
