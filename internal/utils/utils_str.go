@@ -17,6 +17,7 @@ var (
 	})
 )
 
+// IsLetterUpper 检查给定的字节b是否为大写。
 func IsLetterUpper(b byte) bool {
 	if b >= byte('A') && b <= byte('Z') {
 		return true
@@ -24,14 +25,17 @@ func IsLetterUpper(b byte) bool {
 	return false
 }
 
-// Trim strips whitespace (or other characters) from the beginning and end of a string.
-// The optional parameter <characterMask> specifies the additional stripped characters.
-func Trim(str string, characterMask ...string) string {
-	trimChars := DefaultTrimChars
-	if len(characterMask) > 0 {
-		trimChars += characterMask[0]
+// IsLetterLower 检查给定的字节b是否为小写
+func IsLetterLower(b byte) bool {
+	if b >= byte('a') && b <= byte('z') {
+		return true
 	}
-	return strings.Trim(str, trimChars)
+	return false
+}
+
+// IsLetter 检查给定的字节b是否为字母
+func IsLetter(b byte) bool {
+	return IsLetterUpper(b) || IsLetterLower(b)
 }
 
 // IsNumeric 判断字符串是否是数字
@@ -58,9 +62,23 @@ func IsNumeric(s string) bool {
 	return true
 }
 
-// EqualFoldWithoutChars 对比两个字符串是否相等，先分别删除两个字符串中的所有符合，只留下字母和数字，在对比两个字符串
-func EqualFoldWithoutChars(s1, s2 string) bool {
-	return strings.EqualFold(RemoveSymbols(s1), RemoveSymbols(s2))
+// UcFirst 首字母大写
+func UcFirst(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	if IsLetterLower(s[0]) {
+		return string(s[0]-32) + s[1:]
+	}
+	return s
+}
+
+// ReplaceByMap 使用字典替换字符串，使用map的key作为查找串，查找origin串，替换成value的值
+func ReplaceByMap(origin string, replaces map[string]string) string {
+	for k, v := range replaces {
+		origin = strings.Replace(origin, k, v, -1)
+	}
+	return origin
 }
 
 // RemoveSymbols 删除字符串中的所有符号，只留下字母和数字
@@ -74,6 +92,12 @@ func RemoveSymbols(s string) string {
 	return string(b)
 }
 
+// EqualFoldWithoutChars 对比两个字符串是否相等，先分别删除两个字符串中的所有符合，只留下字母和数字，在对比两个字符串
+func EqualFoldWithoutChars(s1, s2 string) bool {
+	return strings.EqualFold(RemoveSymbols(s1), RemoveSymbols(s2))
+}
+
+// SplitAndTrim 以delimiter 分割字符串str，并且对分割后的字串去除头尾的characterMask字符
 func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
 	array := make([]string, 0)
 	for _, v := range strings.Split(str, delimiter) {
@@ -83,4 +107,14 @@ func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
 		}
 	}
 	return array
+}
+
+// Trim strips whitespace (or other characters) from the beginning and end of a string.
+// The optional parameter <characterMask> specifies the additional stripped characters.
+func Trim(str string, characterMask ...string) string {
+	trimChars := DefaultTrimChars
+	if len(characterMask) > 0 {
+		trimChars += characterMask[0]
+	}
+	return strings.Trim(str, trimChars)
 }
