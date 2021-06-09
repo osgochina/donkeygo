@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/osgochina/donkeygo/drpc/status"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"math"
 )
 
@@ -79,6 +80,15 @@ func WithStatus(stat *status.Status) MsgSetting {
 func WithSetMeta(key, value string) MsgSetting {
 	return func(m Message) {
 		m.Meta().Set(key, value)
+	}
+}
+
+// WithSetMetas 使用数组添加元数据
+func WithSetMetas(metas map[string]interface{}) MsgSetting {
+	return func(m Message) {
+		for key, value := range metas {
+			m.Meta().Set(key, dconv.String(value))
+		}
 	}
 }
 
