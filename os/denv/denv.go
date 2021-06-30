@@ -1,6 +1,8 @@
 package denv
 
 import (
+	"github.com/osgochina/donkeygo/container/dvar"
+	"github.com/osgochina/donkeygo/os/dcmd"
 	"os"
 	"strings"
 )
@@ -30,9 +32,14 @@ func Get(key string, def ...string) string {
 	return v
 }
 
-//func GetVer(key string, def ...interface{})  {
-//
-//}
+// GetVar 获取var类型的变量
+func GetVar(key string, def ...interface{}) *dvar.Var {
+	v, ok := os.LookupEnv(key)
+	if !ok && len(def) > 0 {
+		return dvar.New(def[0])
+	}
+	return dvar.New(v)
+}
 
 // Set 设置环境变量
 func Set(key string, value string) error {
@@ -68,23 +75,25 @@ func Remove(key ...string) error {
 	return nil
 }
 
-//func GetWithCmd(key string, def ...interface{}) *gvar.Var {
-//	value := interface{}(nil)
-//	if len(def) > 0 {
-//		value = def[0]
-//	}
-//	envKey := strings.ToUpper(strings.Replace(key, ".", "_", -1))
-//	if v := os.Getenv(envKey); v != "" {
-//		value = v
-//	} else {
-//		cmdKey := strings.ToLower(strings.Replace(key, "_", ".", -1))
-//		if v := gcmd.GetOpt(cmdKey); v != "" {
-//			value = v
-//		}
-//	}
-//	return gvar.New(value)
-//}
+// GetWithCmd 如果环境变量中没有，则去cmd中获取
+func GetWithCmd(key string, def ...interface{}) *dvar.Var {
+	value := interface{}(nil)
+	if len(def) > 0 {
+		value = def[0]
+	}
+	envKey := strings.ToUpper(strings.Replace(key, ".", "_", -1))
+	if v := os.Getenv(envKey); v != "" {
+		value = v
+	} else {
+		cmdKey := strings.ToLower(strings.Replace(key, "_", ".", -1))
+		if v := dcmd.GetOpt(cmdKey); v != "" {
+			value = v
+		}
+	}
+	return dvar.New(value)
+}
 
+// Build 创建环境变量
 func Build(m map[string]string) []string {
 	array := make([]string, len(m))
 	index := 0

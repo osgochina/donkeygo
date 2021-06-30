@@ -886,7 +886,7 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 		if errStr := err.Error(); errStr != "EOF" {
 			reason = errStr
 			//记录会话关闭原因
-			dlog.Debugf("disconnect(%s) when reading: %T %s", that.RemoteAddr().String(), err, errStr)
+			dlog.Errorf("disconnect when reading: %T %s", err, errStr)
 		}
 	}
 	//优化的等待所有处理程序结束
@@ -905,8 +905,10 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 	if stat == statusActiveClosing {
 		return
 	}
-	//关闭链接
-	_ = that.socket.Close()
+	if that.socket != nil {
+		//关闭链接
+		_ = that.socket.Close()
+	}
 
 	//重新链接失败
 	if !that.redialForClient(oldConn) {

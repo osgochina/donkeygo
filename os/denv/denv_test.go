@@ -1,6 +1,7 @@
 package denv_test
 
 import (
+	"github.com/osgochina/donkeygo/os/dcmd"
 	"github.com/osgochina/donkeygo/os/denv"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -88,5 +89,18 @@ func Test_DEnv_Remove(t *testing.T) {
 		err = denv.Remove(key)
 		t.Assert(err, nil)
 		t.AssertEQ(os.Getenv(key), "")
+	})
+}
+
+func Test_GetWithCmd(t *testing.T) {
+	dtest.C(t, func(t *dtest.T) {
+		dcmd.Init("-test", "2")
+		t.Assert(denv.GetWithCmd("TEST"), 2)
+	})
+	dtest.C(t, func(t *dtest.T) {
+		denv.Set("TEST", "1")
+		defer denv.Remove("TEST")
+		dcmd.Init("-test", "2")
+		t.Assert(denv.GetWithCmd("test"), 1)
 	})
 }
