@@ -293,7 +293,7 @@ func (that *session) SetID(newID string) {
 	hub := that.endpoint.sessHub
 	hub.set(that)
 	hub.delete(oldID)
-	dlog.Info("session changes id: %s -> %s", oldID, newID)
+	dlog.Infof("session changes id: %s -> %s", oldID, newID)
 }
 
 // ControlFD 处理底层fd
