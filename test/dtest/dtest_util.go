@@ -2,6 +2,7 @@ package dtest
 
 import (
 	"fmt"
+	"github.com/osgochina/donkeygo/internal/empty"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
 	"reflect"
@@ -315,4 +316,15 @@ func isNil(value interface{}) bool {
 	default:
 		return value == nil
 	}
+}
+
+// AssertNil asserts `value` is nil.
+func AssertNil(value interface{}) {
+	if empty.IsNil(value) {
+		return
+	}
+	if err, ok := value.(error); ok {
+		panic(fmt.Sprintf(`%+v`, err))
+	}
+	AssertNE(value, nil)
 }

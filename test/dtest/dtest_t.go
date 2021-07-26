@@ -56,6 +56,9 @@ func (that *T) AssertIN(value, expect interface{}) {
 func (that *T) AssertNI(value, expect interface{}) {
 	AssertNI(value, expect)
 }
+func (that *T) AssertNil(value interface{}) {
+	AssertNil(value)
+}
 
 //Error 产生错误
 func (that *T) Error(message ...interface{}) {
