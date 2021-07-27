@@ -354,55 +354,55 @@ func makeCallHandlersFromStruct(prefix string, callCtrlStruct interface{}, plugi
 		}
 		//如果方法的入参不是两个参数
 		if mType.NumIn() != 2 {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s needs one in argument, but have %d", cType.String(), mName, mType.NumIn())
 		}
 		//获取第0个参数，按理应该返回的是一个struct类型的指针
 		structType := mType.In(0)
 		if structType.Kind() != reflect.Ptr || structType.Elem().Kind() != reflect.Struct {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s receiver need be a struct pointer: %s", cType.String(), mName, structType)
 		}
 		//第一个参数必须是可以被外部调用的方法或者是内置数据类型的指针
 		argType := mType.In(1)
 		if !isExportedOrBuiltinType(argType) {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s arg type not exported: %s", cType.String(), mName, argType)
 		}
 		//必须是指针类型
 		if argType.Kind() != reflect.Ptr {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s arg type need be a pointer: %s", cType.String(), mName, argType)
 		}
 		// 返回值必须是两个
 		if mType.NumOut() != 2 {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s needs two out arguments, but have %d", cType.String(), mName, mType.NumOut())
 		}
 
 		//返回值的第一个参数必须是一个可以外部使用的类型或者基础类型
 		replyType := mType.Out(0)
 		if !isExportedOrBuiltinType(replyType) {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s first reply type not exported: %s", cType.String(), mName, replyType)
 		}
 		//第二个返回值必须是*Status类型
 		if returnType := mType.Out(1); !isStatusType(returnType.String()) {
-			//if isBelongToCallCtx(mName) {
-			//	continue
-			//}
+			if isBelongToCallCtx(mName) {
+				continue
+			}
 			return nil, errors.Errorf("call-handler: %s.%s second out argument %s is not *drpc.status.Status", cType.String(), mName, returnType)
 		}
 
