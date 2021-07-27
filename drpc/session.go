@@ -854,7 +854,7 @@ func (that *session) startReadAndHandle() {
 		// 给优雅处理器添加一次记录,优雅的结束会话之前，需要等待改协程处理完毕
 		that.graceCtxWaitGroup.Add(1)
 
-		if !dgpool.Go(func() {
+		if !dgpool.FILOGo(func() {
 			defer that.endpoint.putHandleCtx(ctx, true)
 			ctx.handle()
 		}) {

@@ -130,7 +130,7 @@ func (that *heartPing) Name() string {
 func (that *heartPing) AfterNewEndpoint(endpoint drpc.EarlyEndpoint) error {
 	rangeSession := endpoint.RangeSession
 
-	dgpool.Go(func() {
+	go func() {
 		var isCall bool
 		for {
 			time.Sleep(that.getRate())
@@ -156,7 +156,7 @@ func (that *heartPing) AfterNewEndpoint(endpoint drpc.EarlyEndpoint) error {
 				return true
 			})
 		}
-	})
+	}()
 	return nil
 }
 
@@ -196,7 +196,7 @@ func (that *heartPing) AfterReadPushHeader(ctx drpc.ReadCtx) *drpc.Status {
 
 //发送call类型的心跳
 func (that *heartPing) goCall(sess drpc.Session) {
-	dgpool.Go(func() {
+	dgpool.FILOGo(func() {
 		//发送call方法，如果没有发送成功，则关闭会话
 		stat := sess.Call(heartbeatServiceMethod, nil, nil, message.WithSetMeta(heartbeatMetaKey, that.getPingRateSecond())).Status()
 		if stat != nil {
@@ -210,7 +210,7 @@ func (that *heartPing) goCall(sess drpc.Session) {
 
 //发送push类型的心跳
 func (that *heartPing) goPush(sess drpc.Session) {
-	dgpool.Go(func() {
+	dgpool.FILOGo(func() {
 		//发送push类型的心跳，如果没有发送成功，则关闭会话
 		stat := sess.Push(heartbeatServiceMethod, nil, message.WithSetMeta(heartbeatMetaKey, that.getPingRateSecond()))
 		if stat != nil {

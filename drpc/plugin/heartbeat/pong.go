@@ -2,7 +2,6 @@ package heartbeat
 
 import (
 	"github.com/osgochina/donkeygo/drpc"
-	"github.com/osgochina/donkeygo/os/dgpool"
 	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"strconv"
@@ -53,7 +52,7 @@ func (that *heartPong) AfterNewEndpoint(endpoint drpc.EarlyEndpoint) error {
 
 	const initial = time.Second*minRateSecond - 1
 	interval := initial
-	dgpool.Go(func() {
+	go func() {
 		for {
 			time.Sleep(interval)
 			rangeSession(func(sess drpc.Session) bool {
@@ -73,7 +72,7 @@ func (that *heartPong) AfterNewEndpoint(endpoint drpc.EarlyEndpoint) error {
 				return true
 			})
 		}
-	})
+	}()
 	return nil
 }
 

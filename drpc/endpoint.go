@@ -344,7 +344,7 @@ func (that *endpoint) Dial(addr string, protoFunc ...proto.ProtoFunc) (Session, 
 			}
 			//修改会话状态为就绪，并且执行会话消息读取监听
 			sess.changeStatus(statusOk)
-			dgpool.Go(sess.startReadAndHandle)
+			dgpool.FILOAnywayGo(sess.startReadAndHandle)
 			if err != nil {
 				dlog.Errorf("redial fail (network:%s, addr:%s, id:%s): %s", that.network, addr, oldID, err.Error())
 				return false
@@ -358,10 +358,7 @@ func (that *endpoint) Dial(addr string, protoFunc ...proto.ProtoFunc) (Session, 
 	dlog.Infof("dial ok (network:%s, addr:%s, id:%s)", that.network, addr, sess.ID())
 	//修改会话状态，并且启动响应监听
 	sess.changeStatus(statusOk)
-	err = dgpool.Add(sess.startReadAndHandle)
-	if err != nil {
-		return nil, statDialFailed.Copy(err)
-	}
+	dgpool.FILOAnywayGo(sess.startReadAndHandle)
 	//把当前会话加入会话池
 	that.sessHub.set(sess)
 	return sess, nil
@@ -394,10 +391,7 @@ func (that *endpoint) ServeConn(conn net.Conn, protoFunc ...proto.ProtoFunc) (Se
 	}
 	dlog.Infof("serve ok (network:%s, addr:%s, id:%s)", network, sess.RemoteAddr().String(), sess.ID())
 	sess.changeStatus(statusOk)
-	err := dgpool.Add(sess.startReadAndHandle)
-	if err != nil {
-		return nil, statDialFailed.Copy(err)
-	}
+	dgpool.FILOAnywayGo(sess.startReadAndHandle)
 	//把当前会话加入会话池
 	that.sessHub.set(sess)
 	return sess, nil
@@ -457,7 +451,7 @@ func (that *endpoint) serveListener(lis net.Listener, protoFunc ...proto.ProtoFu
 		//重新开始计算 暂时网络错误的等待时间
 		tempDelay = 0
 
-		dgpool.Go(func() {
+		dgpool.FILOAnywayGo(func() {
 			//如果链接是tls加密链接，则设置超时时间，并进行握手
 			if c, ok := conn.(*tls.Conn); ok {
 				if that.defaultSessionAge > 0 {
@@ -519,7 +513,7 @@ func (that *endpoint) Close() (err error) {
 	)
 	that.sessHub.rangeCallback(func(s *session) bool {
 		count++
-		dgpool.Go(func() {
+		dgpool.FILOAnywayGo(func() {
 			errCh <- s.Close()
 		})
 		return true
