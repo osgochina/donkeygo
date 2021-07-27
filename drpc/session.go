@@ -886,7 +886,7 @@ func (that *session) readDisconnected(oldConn net.Conn, err error) {
 		if errStr := err.Error(); errStr != "EOF" {
 			reason = errStr
 			//记录会话关闭原因
-			dlog.Errorf("disconnect when reading: %T %s", err, errStr)
+			dlog.Warningf("disconnect when reading: %T %s", err, errStr)
 		}
 	}
 	//优化的等待所有处理程序结束

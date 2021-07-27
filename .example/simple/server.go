@@ -13,7 +13,8 @@ func main() {
 
 	svr := drpc.NewEndpoint(drpc.EndpointConfig{
 		CountTime:   true,
-		ListenPort:  9090,
+		LocalIP:     "127.0.0.1",
+		ListenPort:  9091,
 		PrintDetail: true,
 	})
 

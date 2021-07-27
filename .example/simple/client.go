@@ -14,7 +14,7 @@ func main() {
 
 	cli.RoutePush(new(Push))
 
-	sess, stat := cli.Dial(":9090")
+	sess, stat := cli.Dial("127.0.0.1:9091")
 	if !stat.OK() {
 		dlog.Fatalf("%v", stat)
 	}
