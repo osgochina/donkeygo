@@ -171,11 +171,10 @@ func (that *socket) Swap(newSwap ...*dmap.Map) *dmap.Map {
 
 // SwapLen 返回链接中自定义数据的长度
 func (that *socket) SwapLen() int {
-	swap := that.swap
-	if swap == nil {
+	if that.swap == nil {
 		return 0
 	}
-	return swap.Size()
+	return that.swap.Size()
 }
 
 func (that *socket) ID() string {
