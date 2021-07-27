@@ -69,21 +69,33 @@ type Socket interface {
 	Raw() net.Conn
 }
 
+// UnsafeSocket 比socket接口多了更多不安全的方法
+type UnsafeSocket interface {
+	Socket
+	// RawLocked returns the raw net.Conn,
+	// can be called in ProtoFunc.
+	// NOTE:
+	//  Make sure the external is locked before calling
+	RawLocked() net.Conn
+}
+
 //自定义链接
 type socket struct {
 	net.Conn
 	readerWithBuffer *bufio.Reader
 	protocol         proto.Proto
 	id               *dtype.String
+	idMutex          sync.RWMutex
 	swap             *dmap.Map
+	swapMutex        sync.RWMutex
 	mu               sync.RWMutex
 	curState         int32
 	fromPool         bool
 }
 
 var (
-	_ net.Conn = Socket(nil)
-	//_ UnsafeSocket = new(socket)
+	_ net.Conn     = Socket(nil)
+	_ UnsafeSocket = new(socket)
 )
 
 var readerSize = 1024
@@ -133,6 +145,11 @@ func (that *socket) ControlFD(f func(fd uintptr)) error {
 	return ctrl.Control(f)
 }
 
+// RawLocked 获取原始链接
+func (that *socket) RawLocked() net.Conn {
+	return that.Conn
+}
+
 //读取链接中指定字节的数据
 func (that *socket) Read(b []byte) (int, error) {
 	return that.readerWithBuffer.Read(b)
@@ -160,33 +177,41 @@ func (that *socket) WriteMessage(message Message) error {
 
 // Swap 链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
 func (that *socket) Swap(newSwap ...*dmap.Map) *dmap.Map {
+	that.swapMutex.Lock()
 	if len(newSwap) > 0 {
 		that.swap = newSwap[0]
 	} else if that.swap == nil {
 		that.swap = dmap.New(true)
 	}
 	swap := that.swap
+	that.swapMutex.Unlock()
 	return swap
 }
 
 // SwapLen 返回链接中自定义数据的长度
 func (that *socket) SwapLen() int {
+	that.swapMutex.Lock()
 	if that.swap == nil {
 		return 0
 	}
+	that.swapMutex.Unlock()
 	return that.swap.Size()
 }
 
 func (that *socket) ID() string {
+	that.idMutex.RLock()
 	id := that.id
 	if len(id.Val()) == 0 {
 		id.Set(that.RemoteAddr().String())
 	}
+	that.idMutex.RUnlock()
 	return id.Val()
 }
 
 func (that *socket) SetID(id string) {
+	that.idMutex.Lock()
 	that.id.Set(id)
+	that.idMutex.Unlock()
 }
 
 func (that *socket) Reset(netConn net.Conn, protoFunc ...ProtoFunc) {
@@ -197,7 +222,9 @@ func (that *socket) Reset(netConn net.Conn, protoFunc ...ProtoFunc) {
 	that.readerWithBuffer.Reset(netConn)
 	that.protocol = getProto(protoFunc, that)
 	that.SetID("")
+	that.swapMutex.Lock()
 	that.swap = nil
+	that.swapMutex.Unlock()
 	atomic.StoreInt32(&that.curState, normal)
 	that.initOptimize()
 	that.mu.Unlock()
@@ -220,7 +247,9 @@ func (that *socket) Close() error {
 	}
 	if that.fromPool {
 		that.Conn = nil
+		that.swapMutex.Lock()
 		that.swap = nil
+		that.swapMutex.Unlock()
 		that.protocol = nil
 		socketPool.Put(that)
 	}
