@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	cli := drpc.NewEndpoint(drpc.EndpointConfig{})
+	cli := drpc.NewEndpoint(drpc.EndpointConfig{PrintDetail: true})
 	defer cli.Close()
 
 	cli.RoutePush(new(Push))

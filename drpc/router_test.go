@@ -7,21 +7,26 @@ import (
 	"testing"
 )
 
-func TestHTTPServiceMethodMapper(t *testing.T) {
-	dtest.C(t, func(t *dtest.T) {
-		t.Assert(globalServiceMethodMapper("Abc", "Efg"), "/Abc/efg")
-		t.Assert(globalServiceMethodMapper("", ""), "/")
-	})
-}
+//func TestHTTPServiceMethodMapper(t *testing.T) {
+//	dtest.C(t, func(t *dtest.T) {
+//		t.Assert(globalServiceMethodMapper("Abc", "Efg"), "/Abc/efg")
+//		t.Assert(globalServiceMethodMapper("", ""), "/")
+//	})
+//}
 
 func TestRouteCall(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		root := newRouter(nil)
+		root := newRouter(newPluginContainer())
 		root.RouteCall(new(Math))
+		h, found := root.subRouter.getCall("/math/add")
+		if found {
+			h.handleFunc(newReadHandleCtx(), h.NewArgValue())
+		}
 	})
 }
 
 type Math struct {
+	name string
 	CallCtx
 }
 

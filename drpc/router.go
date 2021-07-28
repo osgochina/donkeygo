@@ -328,11 +328,11 @@ func makeCallHandlersFromStruct(prefix string, callCtrlStruct interface{}, plugi
 	var pool = &sync.Pool{
 		New: func() interface{} {
 			ctrl := reflect.New(cTypeElem)
-			callCtxPtr := ctrl.Pointer() + callCtxOffset
-			ctxPtr := (*CallCtx)(unsafe.Pointer(callCtxPtr))
 			return &CallCtrlValue{
-				ctrl:   ctrl,
-				ctxPtr: ctxPtr,
+				ctrl: ctrl,
+				//这种写法参考https://blog.csdn.net/u010853261/article/details/103826830中的模式三
+				//将非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针
+				ctxPtr: (*CallCtx)(unsafe.Pointer(uintptr(unsafe.Pointer(ctrl.Pointer())) + callCtxOffset)),
 			}
 		},
 	}
@@ -516,11 +516,11 @@ func makeCallHandlersFromFunc(prefix string, callHandleFunc interface{}, pluginC
 		var pool = &sync.Pool{
 			New: func() interface{} {
 				ctrl := reflect.New(ctxTypeElem)
-				callCtxPtr := ctrl.Pointer() + callCtxOffset
-				ctxPtr := (*CallCtx)(unsafe.Pointer(callCtxPtr))
 				return &CallCtrlValue{
-					ctrl:   ctrl,
-					ctxPtr: ctxPtr,
+					ctrl: ctrl,
+					//这种写法参考https://blog.csdn.net/u010853261/article/details/103826830中的模式三
+					//将非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针
+					ctxPtr: (*CallCtx)(unsafe.Pointer(uintptr(unsafe.Pointer(ctrl.Pointer())) + callCtxOffset)),
 				}
 			},
 		}
@@ -584,11 +584,11 @@ func makePushHandlersFromStruct(prefix string, pushCtrlStruct interface{}, plugi
 	var pool = &sync.Pool{
 		New: func() interface{} {
 			ctrl := reflect.New(cTypeElem)
-			pushCtxPtr := ctrl.Pointer() + pushCtxOffset
-			ctxPtr := (*PushCtx)(unsafe.Pointer(pushCtxPtr))
 			return &PushCtrlValue{
-				ctrl:   ctrl,
-				ctxPtr: ctxPtr,
+				ctrl: ctrl,
+				//这种写法参考https://blog.csdn.net/u010853261/article/details/103826830中的模式三
+				//将非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针
+				ctxPtr: (*PushCtx)(unsafe.Pointer(uintptr(unsafe.Pointer(ctrl.Pointer())) + pushCtxOffset)),
 			}
 		},
 	}
@@ -719,11 +719,11 @@ func makePushHandlersFromFunc(prefix string, pushHandleFunc interface{}, pluginC
 		var pool = &sync.Pool{
 			New: func() interface{} {
 				ctrl := reflect.New(ctxTypeElem)
-				pushCtxPtr := ctrl.Pointer() + pushCtxOffset
-				ctxPtr := (*PushCtx)(unsafe.Pointer(pushCtxPtr))
 				return &PushCtrlValue{
-					ctrl:   ctrl,
-					ctxPtr: ctxPtr,
+					ctrl: ctrl,
+					//这种写法参考https://blog.csdn.net/u010853261/article/details/103826830中的模式三
+					//将非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针
+					ctxPtr: (*PushCtx)(unsafe.Pointer(uintptr(unsafe.Pointer(ctrl.Pointer())) + pushCtxOffset)),
 				}
 			},
 		}

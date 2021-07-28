@@ -182,7 +182,6 @@ func (that *FILOPool) getCh() *goroutineChan {
 	createGoroutine := false
 
 	that.lock.Lock()
-
 	ready := that.ready
 	n := len(ready) - 1
 	// 如果可用的协程通道不存在
@@ -213,8 +212,8 @@ func (that *FILOPool) getCh() *goroutineChan {
 		}
 		ch = vch.(*goroutineChan)
 		go func() {
-			defer that.goroutineChanPool.Put(vch)
 			that.goroutineFunc(ch)
+			that.goroutineChanPool.Put(vch)
 		}()
 	}
 	return ch

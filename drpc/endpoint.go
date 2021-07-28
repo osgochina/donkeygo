@@ -497,7 +497,7 @@ func (that *endpoint) Close() (err error) {
 
 	defer func() {
 		if p := recover(); p != nil {
-			err = derror.NewSkipf(2, "panic:%v\n%s", p)
+			err = derror.NewSkipf(2, "panic:%v\n", p)
 		}
 	}()
 	close(that.closeCh)

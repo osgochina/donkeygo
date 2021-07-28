@@ -178,45 +178,46 @@ func (that *socket) WriteMessage(message Message) error {
 // Swap 链接的自定义数据，如果 newSwap不为空，则会替换内部数据，并返回
 func (that *socket) Swap(newSwap ...*dmap.Map) *dmap.Map {
 	that.swapMutex.Lock()
+	defer that.swapMutex.Unlock()
 	if len(newSwap) > 0 {
 		that.swap = newSwap[0]
 	} else if that.swap == nil {
 		that.swap = dmap.New(true)
 	}
 	swap := that.swap
-	that.swapMutex.Unlock()
 	return swap
 }
 
 // SwapLen 返回链接中自定义数据的长度
 func (that *socket) SwapLen() int {
-	that.swapMutex.Lock()
+	that.swapMutex.RLock()
+	defer that.swapMutex.RUnlock()
 	if that.swap == nil {
 		return 0
 	}
-	that.swapMutex.Unlock()
 	return that.swap.Size()
 }
 
 func (that *socket) ID() string {
 	that.idMutex.RLock()
+	defer that.idMutex.RUnlock()
 	id := that.id
 	if len(id.Val()) == 0 {
 		id.Set(that.RemoteAddr().String())
 	}
-	that.idMutex.RUnlock()
 	return id.Val()
 }
 
 func (that *socket) SetID(id string) {
 	that.idMutex.Lock()
+	defer that.idMutex.Unlock()
 	that.id.Set(id)
-	that.idMutex.Unlock()
 }
 
 func (that *socket) Reset(netConn net.Conn, protoFunc ...ProtoFunc) {
 	atomic.StoreInt32(&that.curState, activeClose)
 	that.mu.Lock()
+	defer that.mu.Unlock()
 	that.Conn = netConn
 	_, _ = that.readerWithBuffer.Discard(that.readerWithBuffer.Buffered())
 	that.readerWithBuffer.Reset(netConn)
@@ -227,7 +228,6 @@ func (that *socket) Reset(netConn net.Conn, protoFunc ...ProtoFunc) {
 	that.swapMutex.Unlock()
 	atomic.StoreInt32(&that.curState, normal)
 	that.initOptimize()
-	that.mu.Unlock()
 }
 
 func (that *socket) Close() error {
