@@ -39,7 +39,7 @@ func (that *session) printRunLog(realIP string, costTime time.Duration, input, o
 	addr += "(real:" + realIP + ")"
 	var (
 		costTimeStr string
-		printFunc   = dlog.Debug
+		printFunc   = dlog.Debugf
 	)
 	if that.endpoint.countTime {
 		if costTime >= that.endpoint.slowCometDuration {
