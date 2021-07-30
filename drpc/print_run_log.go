@@ -24,8 +24,7 @@ const (
 )
 
 func enablePrintRunLog() bool {
-	return dlog.GetLevel() >= dlog.LevelDebug
-	//return true
+	return dlog.GetLevel() == dlog.LevelDebug
 }
 
 //打印运行log
