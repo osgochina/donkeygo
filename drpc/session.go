@@ -439,13 +439,20 @@ func (that *session) send(
 //发送消息
 func (that *session) doSend(output message.Message) *status.Status {
 
+	var (
+		ctxTimout context.Context
+		cancel    context.CancelFunc
+	)
 	//如果设置了上下文生存时间，则应该对会话设置生存时间
 	if age := that.ContextAge(); age > 0 {
-		ctxTimout, _ := context.WithTimeout(output.Context(), age)
+		ctxTimout, cancel = context.WithTimeout(output.Context(), age)
 		message.WithContext(ctxTimout)(output)
 	}
 	that.writeLock.Lock()
-	defer that.writeLock.Unlock()
+	defer func() {
+		that.writeLock.Unlock()
+		cancel()
+	}()
 
 	ctx := output.Context()
 	select {
@@ -507,7 +514,8 @@ func (that *session) EarlyReceive(newArgs message.NewBodyFunc, ctx ...context.Co
 
 	//给消息处理上下文增加超时时间
 	if age := that.ContextAge(); age > 0 {
-		ctxTimeout, _ := context.WithTimeout(input.Context(), age)
+		ctxTimeout, cancel := context.WithTimeout(input.Context(), age)
+		defer cancel()
 		message.WithContext(ctxTimeout)(input)
 	}
 	//给链接增加超时时间
@@ -613,7 +621,8 @@ func (that *session) Push(serviceMethod string, args interface{}, setting ...mes
 	}
 	//设置上下文存活时间
 	if age := that.ContextAge(); age > 0 {
-		ctxTimout, _ := context.WithTimeout(output.Context(), age)
+		ctxTimout, cancel := context.WithTimeout(output.Context(), age)
+		defer cancel()
 		message.WithContext(ctxTimout)(output)
 	}
 	//在push write之前执行插件
@@ -662,7 +671,8 @@ func (that *session) AsyncCall(serviceMethod string, args interface{}, result in
 		output.SetBodyCodec(that.endpoint.defaultBodyCodec)
 	}
 	if age := that.ContextAge(); age > 0 {
-		ctxTimout, _ := context.WithTimeout(output.Context(), age)
+		ctxTimout, cancel := context.WithTimeout(output.Context(), age)
+		defer cancel()
 		message.WithContext(ctxTimout)(output)
 	}
 	cmd := &callCmd{
@@ -813,7 +823,8 @@ func (that *session) startReadAndHandle() {
 	//如果设置了会话的生命期，则针对该上下文设置生命周期
 	if readTimeout := that.SessionAge(); readTimeout > 0 {
 		_ = that.socket.SetReadDeadline(time.Now().Add(readTimeout))
-		ctxTimout, _ := context.WithTimeout(context.Background(), readTimeout)
+		ctxTimout, cancel := context.WithTimeout(context.Background(), readTimeout)
+		defer cancel()
 		withContext = message.WithContext(ctxTimout)
 	} else {
 		_ = that.socket.SetReadDeadline(time.Time{})

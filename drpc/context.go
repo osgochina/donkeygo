@@ -592,10 +592,10 @@ func (that *handlerCtx) handlePush() {
 	//判断push消息时候有处理时间限制
 	age := that.sess.ContextAge()
 	if age > 0 {
-		ctxTimout, _ := context.WithTimeout(context.Background(), age)
+		ctxTimout, cancel := context.WithTimeout(context.Background(), age)
+		defer cancel()
 		that.setContext(ctxTimout)
 	}
-
 	defer func() {
 		if p := recover(); p != nil {
 			dlog.Errorf("panic:%v\n%s", p, status.PanicStackTrace())
@@ -658,7 +658,8 @@ func (that *handlerCtx) handleCall() {
 
 	age := that.sess.ContextAge()
 	if age > 0 {
-		ctxTimout, _ := context.WithTimeout(that.input.Context(), age)
+		ctxTimout, cancel := context.WithTimeout(that.input.Context(), age)
+		defer cancel()
 		//为自己和响应消息设置生存周期
 		that.setContext(ctxTimout)
 		message.WithContext(ctxTimout)(that.output)
