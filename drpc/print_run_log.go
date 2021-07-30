@@ -24,7 +24,7 @@ const (
 )
 
 func enablePrintRunLog() bool {
-	return dlog.GetLevel() == dlog.LevelDebug
+	return dlog.GetLevel()&dlog.LevelDebug > 0
 }
 
 //打印运行log
@@ -39,22 +39,15 @@ func (that *session) printRunLog(realIP string, costTime time.Duration, input, o
 	addr += "(real:" + realIP + ")"
 	var (
 		costTimeStr string
-		printFunc   = dlog.Infof
+		printFunc   = dlog.Debug
 	)
 	if that.endpoint.countTime {
 		if costTime >= that.endpoint.slowCometDuration {
 			costTimeStr = costTime.String() + "(slow)"
-			printFunc = dlog.Warningf
 		} else {
-			if dlog.GetLevel() < dlog.LevelInfo {
-				return
-			}
 			costTimeStr = costTime.String() + "(fast)"
 		}
 	} else {
-		if dlog.GetLevel() < dlog.LevelInfo {
-			return
-		}
 		costTimeStr = "(-)"
 	}
 
