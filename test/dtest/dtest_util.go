@@ -2,6 +2,7 @@ package dtest
 
 import (
 	"fmt"
+	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/internal/empty"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"os"
@@ -10,15 +11,14 @@ import (
 )
 
 const (
-	dPathFilterKey = "/test/dtest/dtest"
+	pathFilterKey = "/test/dtest/dtest"
 )
 
 // C 创建一个测试单元用例
 func C(t *testing.T, f func(t *T)) {
 	defer func() {
 		if err := recover(); err != nil {
-			//fmt.Fprintf(os.Stderr,"%v\n%s",err,gdebug.StackWithFilter(gPATH_FILTER_KEY))
-			_, _ = fmt.Fprintf(os.Stderr, "%v", err)
+			_, _ = fmt.Fprintf(os.Stderr, "%v\n%s", err, ddebug.StackWithFilter(pathFilterKey))
 			t.Fail()
 		}
 	}()
@@ -30,8 +30,7 @@ func C(t *testing.T, f func(t *T)) {
 func Case(t *testing.T, f func()) {
 	defer func() {
 		if err := recover(); err != nil {
-			//fmt.Fprintf(os.Stderr, "%v\n%s", err, gdebug.StackWithFilter(gPATH_FILTER_KEY))
-			_, _ = fmt.Fprintf(os.Stderr, "%v", err)
+			_, _ = fmt.Fprintf(os.Stderr, "%v\n%s", err, ddebug.StackWithFilter(pathFilterKey))
 			t.Fail()
 		}
 	}()
@@ -41,7 +40,7 @@ func Case(t *testing.T, f func()) {
 // Assert 判断<value>和<expect>两个对象值是否相等
 func Assert(value, expect interface{}) {
 	rvExpect := reflect.ValueOf(expect)
-	if isNil(value) {
+	if empty.IsNil(value) {
 		value = nil
 	}
 
@@ -62,11 +61,22 @@ func Assert(value, expect interface{}) {
 
 // AssertEQ 判断<value>和<expect>两个对象是否相等,必须值与类型都相等
 func AssertEQ(value, expect interface{}) {
-	Assert(value, expect)
-	var (
-		strValue  = dconv.String(value)
-		strExpect = dconv.String(expect)
-	)
+	// Value assert.
+	rvExpect := reflect.ValueOf(expect)
+	if empty.IsNil(value) {
+		value = nil
+	}
+	if rvExpect.Kind() == reflect.Map {
+		if err := compareMap(value, expect); err != nil {
+			panic(err)
+		}
+		return
+	}
+	strValue := dconv.String(value)
+	strExpect := dconv.String(expect)
+	if strValue != strExpect {
+		panic(fmt.Sprintf(`[ASSERT] EXPECT %v == %v`, strValue, strExpect))
+	}
 	// Type assert.
 	t1 := reflect.TypeOf(value)
 	t2 := reflect.TypeOf(expect)
@@ -78,7 +88,7 @@ func AssertEQ(value, expect interface{}) {
 // AssertNE 判断<value>和<expect>的值是否相等，如果相等则报错
 func AssertNE(value, expect interface{}) {
 	rvExpect := reflect.ValueOf(expect)
-	if isNil(value) {
+	if empty.IsNil(value) {
 		value = nil
 	}
 	if rvExpect.Kind() == reflect.Map {
@@ -263,8 +273,7 @@ func Error(message ...interface{}) {
 
 // Fatal 输出错误，并退出
 func Fatal(message ...interface{}) {
-	//fmt.Fprintf(os.Stderr, "[FATAL] %s\n%s", fmt.Sprint(message...), gdebug.StackWithFilter(gPATH_FILTER_KEY))
-	_, _ = fmt.Fprintf(os.Stderr, "[FATAL] %s", fmt.Sprint(message...))
+	_, _ = fmt.Fprintf(os.Stderr, "[FATAL] %s\n%s", fmt.Sprint(message...), ddebug.StackWithFilter(pathFilterKey))
 	os.Exit(1)
 }
 
@@ -272,7 +281,7 @@ func Fatal(message ...interface{}) {
 func compareMap(value, expect interface{}) error {
 	rvValue := reflect.ValueOf(value)
 	rvExpect := reflect.ValueOf(expect)
-	if isNil(value) {
+	if empty.IsNil(value) {
 		value = nil
 	}
 	if rvExpect.Kind() == reflect.Map {
@@ -308,15 +317,15 @@ func compareMap(value, expect interface{}) error {
 }
 
 //判断对象是否为nil
-func isNil(value interface{}) bool {
-	rv := reflect.ValueOf(value)
-	switch rv.Kind() {
-	case reflect.Slice, reflect.Array, reflect.Map, reflect.Ptr, reflect.Func:
-		return rv.IsNil()
-	default:
-		return value == nil
-	}
-}
+//func isNil(value interface{}) bool {
+//	rv := reflect.ValueOf(value)
+//	switch rv.Kind() {
+//	case reflect.Slice, reflect.Array, reflect.Map, reflect.Ptr, reflect.Func:
+//		return rv.IsNil()
+//	default:
+//		return value == nil
+//	}
+//}
 
 // AssertNil asserts `value` is nil.
 func AssertNil(value interface{}) {

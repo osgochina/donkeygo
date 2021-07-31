@@ -39,7 +39,7 @@ func (that *Bool) Set(val bool) (old bool) {
 	if val {
 		old = atomic.SwapInt32(&that.value, 1) == 1
 	} else {
-		old = atomic.SwapInt32(&that.value, 0) == 0
+		old = atomic.SwapInt32(&that.value, 0) == 1
 	}
 	return
 }
@@ -69,16 +69,16 @@ var (
 	bytesFalse = []byte("false")
 )
 
-// MarshalJson json序列化
-func (that *Bool) MarshalJson() ([]byte, error) {
+// MarshalJSON json序列化
+func (that *Bool) MarshalJSON() ([]byte, error) {
 	if that.Val() {
 		return bytesTrue, nil
 	}
 	return bytesFalse, nil
 }
 
-// UnmarshalJson json反序列化
-func (that *Bool) UnmarshalJson(b []byte) error {
+// UnmarshalJSON json反序列化
+func (that *Bool) UnmarshalJSON(b []byte) error {
 	that.Set(dconv.Bool(bytes.Trim(b, `"`)))
 	return nil
 }
