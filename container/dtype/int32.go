@@ -12,10 +12,10 @@ type Int32 struct {
 }
 
 // NewInt32 创建Int32对象
-func NewInt32(val ...int) *Int32 {
+func NewInt32(val ...int32) *Int32 {
 	if len(val) > 0 {
 		return &Int32{
-			value: int32(val[0]),
+			value: val[0],
 		}
 	}
 	return &Int32{}
@@ -27,8 +27,8 @@ func (that *Int32) Clone() *Int32 {
 }
 
 // Val 并发安全获取int的值
-func (that *Int32) Val() int {
-	return int(atomic.LoadInt32(&that.value))
+func (that *Int32) Val() int32 {
+	return atomic.LoadInt32(&that.value)
 }
 
 // Set 并发安全设置int的值
@@ -48,7 +48,7 @@ func (that *Int32) Cas(old, new int32) (swapped bool) {
 
 //转换成字符串
 func (that *Int32) String() string {
-	return strconv.Itoa(that.Val())
+	return strconv.Itoa(int(that.Val()))
 }
 
 // MarshalJSON json序列化
