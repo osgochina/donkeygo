@@ -7,8 +7,8 @@
 package dconv_test
 
 import (
-	"github.com/gogf/gf/frame/g"
 	"github.com/osgochina/donkeygo/container/dvar"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -65,8 +65,8 @@ func Test_Time_Slice_Attribute(t *testing.T) {
 	}
 	dtest.C(t, func(t *dtest.T) {
 		var s *SelectReq
-		err := dconv.Struct(g.Map{
-			"arr": g.Slice{"2021-01-12 12:34:56", "2021-01-12 12:34:57"},
+		err := dconv.Struct(d.Map{
+			"arr": d.Slice{"2021-01-12 12:34:56", "2021-01-12 12:34:57"},
 			"one": "2021-01-12 12:34:58",
 		}, &s)
 		t.AssertNil(err)

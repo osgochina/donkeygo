@@ -7,7 +7,7 @@
 package dutil_test
 
 import (
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dutil"
 	"testing"
@@ -15,7 +15,7 @@ import (
 
 func Test_MapCopy(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m1 := g.Map{
+		m1 := d.Map{
 			"k1": "v1",
 		}
 		m2 := dutil.MapCopy(m1)
@@ -30,7 +30,7 @@ func Test_MapCopy(t *testing.T) {
 
 func Test_MapContains(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m1 := g.Map{
+		m1 := d.Map{
 			"k1": "v1",
 		}
 		t.Assert(dutil.MapContains(m1, "k1"), true)
@@ -41,13 +41,13 @@ func Test_MapContains(t *testing.T) {
 
 func Test_MapMerge(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m1 := g.Map{
+		m1 := d.Map{
 			"k1": "v1",
 		}
-		m2 := g.Map{
+		m2 := d.Map{
 			"k2": "v2",
 		}
-		m3 := g.Map{
+		m3 := d.Map{
 			"k3": "v3",
 		}
 		dutil.MapMerge(m1, m2, m3, nil)
@@ -61,13 +61,13 @@ func Test_MapMerge(t *testing.T) {
 
 func Test_MapMergeCopy(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m1 := g.Map{
+		m1 := d.Map{
 			"k1": "v1",
 		}
-		m2 := g.Map{
+		m2 := d.Map{
 			"k2": "v2",
 		}
-		m3 := g.Map{
+		m3 := d.Map{
 			"k3": "v3",
 		}
 		m := dutil.MapMergeCopy(m1, m2, m3, nil)
@@ -83,7 +83,7 @@ func Test_MapMergeCopy(t *testing.T) {
 
 func Test_MapPossibleItemByKey(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := g.Map{
+		m := d.Map{
 			"name":     "guo",
 			"NickName": "john",
 		}
@@ -103,7 +103,7 @@ func Test_MapPossibleItemByKey(t *testing.T) {
 
 func Test_MapContainsPossibleKey(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := g.Map{
+		m := d.Map{
 			"name":     "guo",
 			"NickName": "john",
 		}
@@ -120,7 +120,7 @@ func Test_MapContainsPossibleKey(t *testing.T) {
 
 func Test_MapOmitEmpty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := g.Map{
+		m := d.Map{
 			"k1": "john",
 			"e1": "",
 			"e2": 0,
@@ -136,31 +136,31 @@ func Test_MapOmitEmpty(t *testing.T) {
 
 func Test_MapToSlice(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := g.Map{
+		m := d.Map{
 			"k1": "v1",
 			"k2": "v2",
 		}
 		s := dutil.MapToSlice(m)
 		t.Assert(len(s), 4)
-		t.AssertIN(s[0], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[1], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[2], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[3], g.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[0], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[1], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[2], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[3], d.Slice{"k1", "k2", "v1", "v2"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		m := g.MapStrStr{
+		m := d.MapStrStr{
 			"k1": "v1",
 			"k2": "v2",
 		}
 		s := dutil.MapToSlice(m)
 		t.Assert(len(s), 4)
-		t.AssertIN(s[0], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[1], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[2], g.Slice{"k1", "k2", "v1", "v2"})
-		t.AssertIN(s[3], g.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[0], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[1], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[2], d.Slice{"k1", "k2", "v1", "v2"})
+		t.AssertIN(s[3], d.Slice{"k1", "k2", "v1", "v2"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		m := g.MapStrStr{}
+		m := d.MapStrStr{}
 		s := dutil.MapToSlice(m)
 		t.Assert(len(s), 0)
 	})

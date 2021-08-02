@@ -10,10 +10,10 @@ package drand_test
 
 import (
 	cryptoRand "crypto/rand"
+	"github.com/osgochina/donkeygo/util/drand"
 	mathRand "math/rand"
 
 	"encoding/binary"
-	"github.com/gogf/gf/util/grand"
 	"testing"
 )
 
@@ -42,63 +42,63 @@ func Benchmark_CryptoRand_Buffer1024(b *testing.B) {
 	}
 }
 
-func Benchmark_GRand_Intn(b *testing.B) {
+func Benchmark_drand_Intn(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.N(0, 99)
+		drand.N(0, 99)
 	}
 }
 
 func Benchmark_Perm10(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.Perm(10)
+		drand.Perm(10)
 	}
 }
 
 func Benchmark_Perm100(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.Perm(100)
+		drand.Perm(100)
 	}
 }
 
 func Benchmark_Rand_N1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.N(0, 99)
+		drand.N(0, 99)
 	}
 }
 
 func Benchmark_Rand_N2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.N(0, 999999999)
+		drand.N(0, 999999999)
 	}
 }
 
 func Benchmark_B(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.B(16)
+		drand.B(16)
 	}
 }
 
 func Benchmark_S(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.S(16)
+		drand.S(16)
 	}
 }
 
 func Benchmark_S_Symbols(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.S(16, true)
+		drand.S(16, true)
 	}
 }
 
 func Benchmark_Str(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.Str(strForStr, 16)
+		drand.Str(strForStr, 16)
 	}
 }
 
 func Benchmark_Symbols(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		grand.Symbols(16)
+		drand.Symbols(16)
 	}
 }
 

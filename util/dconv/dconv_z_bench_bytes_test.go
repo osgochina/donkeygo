@@ -9,10 +9,9 @@
 package dconv
 
 import (
+	"github.com/gogf/gf/encoding/gbinary"
 	"testing"
 	"unsafe"
-
-	"github.com/gogf/gf/encoding/gbinary"
 )
 
 var valueBytes = gbinary.Encode(123456789)
