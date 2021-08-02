@@ -39,10 +39,19 @@ func GTime(any interface{}, format ...string) *dtime.Time {
 	if any == nil {
 		return nil
 	}
+	if v, ok := any.(apiGTime); ok {
+		return v.GTime(format...)
+	}
 	// It's already this type.
 	if len(format) == 0 {
 		if v, ok := any.(*dtime.Time); ok {
 			return v
+		}
+		if t, ok := any.(time.Time); ok {
+			return dtime.New(t)
+		}
+		if t, ok := any.(*time.Time); ok {
+			return dtime.New(t)
 		}
 	}
 	s := String(any)

@@ -7,7 +7,6 @@
 package dvar
 
 import (
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/util/dconv"
 )
 
@@ -15,7 +14,7 @@ import (
 // The parameter <pointer> should be a pointer to a struct instance.
 // The parameter <mapping> is used to specify the key-to-attribute mapping rules.
 func (that *Var) Struct(pointer interface{}, mapping ...map[string]string) error {
-	return gconv.Struct(that.Val(), pointer, mapping...)
+	return dconv.Struct(that.Val(), pointer, mapping...)
 }
 
 // StructDeep maps value of <v> to <pointer> recursively.

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/gogf/gf/os/gfpool"
-	"github.com/gogf/gf/os/gmlock"
 	"github.com/osgochina/donkeygo/container/dtype"
 	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/internal/intlog"
 	"github.com/osgochina/donkeygo/os/dfile"
+	"github.com/osgochina/donkeygo/os/dfpool"
+	"github.com/osgochina/donkeygo/os/dmlock"
 	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"github.com/osgochina/donkeygo/text/dregex"
@@ -235,8 +235,8 @@ func (that *Logger) printToFile(now time.Time, buffer *bytes.Buffer) {
 		memoryLockKey = "dlog.printToFile:" + logFilePath
 	)
 	//内存锁
-	gmlock.Lock(memoryLockKey)
-	defer gmlock.Unlock(memoryLockKey)
+	dmlock.Lock(memoryLockKey)
+	defer dmlock.Unlock(memoryLockKey)
 
 	//如果日志文件的容量超出了设置的大小，则备份该日志文件，并重新生成新文件
 	if that.config.RotateSize > 0 {
@@ -258,8 +258,8 @@ func (that *Logger) printToFile(now time.Time, buffer *bytes.Buffer) {
 }
 
 // getFilePointer retrieves and returns a file pointer from file pool.
-func (that *Logger) getFilePointer(path string) *gfpool.File {
-	file, err := gfpool.Open(
+func (that *Logger) getFilePointer(path string) *dfpool.File {
+	file, err := dfpool.Open(
 		path,
 		defaultFileFlags,
 		defaultFilePerm,

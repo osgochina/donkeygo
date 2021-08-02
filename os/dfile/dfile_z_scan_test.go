@@ -7,15 +7,15 @@
 package dfile_test
 
 import (
-	"github.com/gogf/gf/container/garray"
-	"github.com/gogf/gf/debug/gdebug"
+	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 )
 
 func Test_ScanDir(t *testing.T) {
-	teatPath := gdebug.TestDataPath()
+	teatPath := ddebug.TestDataPath()
 	dtest.C(t, func(t *dtest.T) {
 		files, err := dfile.ScanDir(teatPath, "*", false)
 		t.Assert(err, nil)
@@ -34,7 +34,7 @@ func Test_ScanDir(t *testing.T) {
 }
 
 func Test_ScanDirFunc(t *testing.T) {
-	teatPath := gdebug.TestDataPath()
+	teatPath := ddebug.TestDataPath()
 	dtest.C(t, func(t *dtest.T) {
 		files, err := dfile.ScanDirFunc(teatPath, "*", true, func(path string) string {
 			if dfile.Name(path) != "file1" {
@@ -49,7 +49,7 @@ func Test_ScanDirFunc(t *testing.T) {
 }
 
 func Test_ScanDirFile(t *testing.T) {
-	teatPath := gdebug.TestDataPath()
+	teatPath := ddebug.TestDataPath()
 	dtest.C(t, func(t *dtest.T) {
 		files, err := dfile.ScanDirFile(teatPath, "*", false)
 		t.Assert(err, nil)
@@ -66,9 +66,9 @@ func Test_ScanDirFile(t *testing.T) {
 }
 
 func Test_ScanDirFileFunc(t *testing.T) {
-	teatPath := gdebug.TestDataPath()
+	teatPath := ddebug.TestDataPath()
 	dtest.C(t, func(t *dtest.T) {
-		array := garray.New()
+		array := darray.New()
 		files, err := dfile.ScanDirFileFunc(teatPath, "*", false, func(path string) string {
 			array.Append(1)
 			return path
@@ -78,7 +78,7 @@ func Test_ScanDirFileFunc(t *testing.T) {
 		t.Assert(array.Len(), 0)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := garray.New()
+		array := darray.New()
 		files, err := dfile.ScanDirFileFunc(teatPath, "*", true, func(path string) string {
 			array.Append(1)
 			if dfile.Basename(path) == "file1" {

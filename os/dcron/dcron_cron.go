@@ -3,7 +3,6 @@ package dcron
 import (
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/os/gtimer"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dmap"
 	"github.com/osgochina/donkeygo/container/dtype"
@@ -55,7 +54,7 @@ func (that *Cron) addEntry(pattern string, job func(), singleton bool, name ...s
 	}
 
 	// 定时任务每秒检查一次，看看是否要执行
-	entry.entry = dtimer.AddEntry(time.Second, entry.check, singleton, -1, gtimer.StatusStopped)
+	entry.entry = dtimer.AddEntry(time.Second, entry.check, singleton, -1, dtimer.StatusStopped)
 	that.entries.Set(entry.Name, entry)
 	entry.entry.Start()
 	return entry, nil

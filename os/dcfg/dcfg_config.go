@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/encoding/gjson"
-	"github.com/gogf/gf/os/gfsnotify"
 	"github.com/gogf/gf/os/gres"
 	"github.com/gogf/gf/os/gspath"
 	"github.com/gogf/gf/util/gmode"
@@ -15,6 +14,7 @@ import (
 	"github.com/osgochina/donkeygo/internal/intlog"
 	"github.com/osgochina/donkeygo/os/dcmd"
 	"github.com/osgochina/donkeygo/os/dfile"
+	"github.com/osgochina/donkeygo/os/dfsnotify"
 	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/text/dstr"
 )
@@ -366,7 +366,7 @@ func (that *Config) getJson(file ...string) *gjson.Json {
 		//文件不存在资源池，添加文件变更事件，实时更新配置文件
 		if filePath != "" && !gres.Contains(filePath) {
 			//文件有任何变更，则从内存中删除该文件
-			_, err = gfsnotify.Add(filePath, func(event *gfsnotify.Event) {
+			_, err = dfsnotify.Add(filePath, func(event *dfsnotify.Event) {
 				that.jsonMap.Remove(name)
 			})
 			if err != nil && errorPrint() {

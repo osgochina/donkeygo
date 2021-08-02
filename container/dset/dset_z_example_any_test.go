@@ -2,14 +2,14 @@ package dset_test
 
 import (
 	"fmt"
-	"github.com/gogf/gf/frame/g"
 	"github.com/osgochina/donkeygo/container/dset"
+	"github.com/osgochina/donkeygo/frame/d"
 )
 
 func ExampleSet_Intersect() {
-	s1 := dset.NewFrom(g.Slice{1, 2, 3})
-	s2 := dset.NewFrom(g.Slice{4, 5, 6})
-	s3 := dset.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7})
+	s1 := dset.NewFrom(d.Slice{1, 2, 3})
+	s2 := dset.NewFrom(d.Slice{4, 5, 6})
+	s3 := dset.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7})
 
 	fmt.Println(s3.Intersect(s1).Slice())
 	fmt.Println(s3.Diff(s1).Slice())
@@ -24,9 +24,9 @@ func ExampleSet_Intersect() {
 }
 
 func ExampleSet_Diff() {
-	s1 := dset.NewFrom(g.Slice{1, 2, 3})
-	s2 := dset.NewFrom(g.Slice{4, 5, 6})
-	s3 := dset.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7})
+	s1 := dset.NewFrom(d.Slice{1, 2, 3})
+	s2 := dset.NewFrom(d.Slice{4, 5, 6})
+	s3 := dset.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7})
 
 	fmt.Println(s3.Intersect(s1).Slice())
 	fmt.Println(s3.Diff(s1).Slice())
@@ -41,9 +41,9 @@ func ExampleSet_Diff() {
 }
 
 func ExampleSet_Union() {
-	s1 := dset.NewFrom(g.Slice{1, 2, 3})
-	s2 := dset.NewFrom(g.Slice{4, 5, 6})
-	s3 := dset.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7})
+	s1 := dset.NewFrom(d.Slice{1, 2, 3})
+	s2 := dset.NewFrom(d.Slice{4, 5, 6})
+	s3 := dset.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7})
 
 	fmt.Println(s3.Intersect(s1).Slice())
 	fmt.Println(s3.Diff(s1).Slice())
@@ -58,9 +58,9 @@ func ExampleSet_Union() {
 }
 
 func ExampleSet_Complement() {
-	s1 := dset.NewFrom(g.Slice{1, 2, 3})
-	s2 := dset.NewFrom(g.Slice{4, 5, 6})
-	s3 := dset.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7})
+	s1 := dset.NewFrom(d.Slice{1, 2, 3})
+	s2 := dset.NewFrom(d.Slice{4, 5, 6})
+	s3 := dset.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7})
 
 	fmt.Println(s3.Intersect(s1).Slice())
 	fmt.Println(s3.Diff(s1).Slice())
@@ -76,8 +76,8 @@ func ExampleSet_Complement() {
 
 func ExampleSet_IsSubsetOf() {
 	var s1, s2 dset.Set
-	s1.Add(g.Slice{1, 2, 3}...)
-	s2.Add(g.Slice{2, 3}...)
+	s1.Add(d.Slice{1, 2, 3}...)
+	s2.Add(d.Slice{2, 3}...)
 	fmt.Println(s1.IsSubsetOf(&s2))
 	fmt.Println(s2.IsSubsetOf(&s1))
 

@@ -2,11 +2,11 @@ package dlog
 
 import (
 	"fmt"
-	"github.com/gogf/gf/os/gmlock"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/encoding/dcompress"
 	"github.com/osgochina/donkeygo/internal/intlog"
 	"github.com/osgochina/donkeygo/os/dfile"
+	"github.com/osgochina/donkeygo/os/dmlock"
 	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"github.com/osgochina/donkeygo/text/dregex"
@@ -27,10 +27,10 @@ func (that *Logger) rotateFileBySize(now time.Time) {
 //备份日志文件
 func (that *Logger) doRotateFile(filePath string) error {
 	memoryLockKey := "dlog.doRotateFile:" + filePath
-	if !gmlock.TryLock(memoryLockKey) {
+	if !dmlock.TryLock(memoryLockKey) {
 		return nil
 	}
-	defer gmlock.Unlock(memoryLockKey)
+	defer dmlock.Unlock(memoryLockKey)
 
 	//最大备份数，如果为0，则表示不备份，把该文件删除
 	if that.config.RotateBackupLimit == 0 {
@@ -95,10 +95,10 @@ func (that *Logger) rotateChecksTimely() {
 	}
 	//加入内存锁
 	memoryLockKey := "dlog.rotateChecksTimely:" + that.config.Path
-	if !gmlock.TryLock(memoryLockKey) {
+	if !dmlock.TryLock(memoryLockKey) {
 		return
 	}
-	defer gmlock.Unlock(memoryLockKey)
+	defer dmlock.Unlock(memoryLockKey)
 
 	var (
 		now      = time.Now()

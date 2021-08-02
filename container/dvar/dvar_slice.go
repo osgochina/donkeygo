@@ -7,7 +7,6 @@
 package dvar
 
 import (
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/util/dconv"
 )
 
@@ -38,7 +37,7 @@ func (that *Var) Floats() []float64 {
 
 // Float32s converts and returns <v> as []float32.
 func (that *Var) Float32s() []float32 {
-	return gconv.Float32s(that.Val())
+	return dconv.Float32s(that.Val())
 }
 
 // Float64s converts and returns <v> as []float64.

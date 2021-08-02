@@ -1,7 +1,7 @@
 package dfile
 
 import (
-	"github.com/gogf/gf/container/garray"
+	"github.com/osgochina/donkeygo/container/darray"
 	"strings"
 )
 
@@ -24,7 +24,7 @@ func fileSortFunc(path1, path2 string) int {
 
 // SortFiles 对文件列表进行排序
 func SortFiles(files []string) []string {
-	array := garray.NewSortedStrArrayComparator(fileSortFunc)
+	array := darray.NewSortedStrArrayComparator(fileSortFunc)
 	array.Add(files...)
 	return array.Slice()
 }

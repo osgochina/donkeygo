@@ -9,10 +9,10 @@
 package darray_test
 
 import (
-	"github.com/gogf/gf/util/gutil"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dutil"
 	"strings"
 	"testing"
 )
@@ -38,7 +38,7 @@ func Test_Array_Var(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		var array darray.SortedArray
-		array.SetComparator(gutil.ComparatorInt)
+		array.SetComparator(dutil.ComparatorInt)
 		expect := []int{1, 2, 3}
 		array.Add(2, 3, 1)
 		t.Assert(array.Slice(), expect)

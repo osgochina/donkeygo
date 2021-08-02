@@ -1,6 +1,14 @@
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
 package utils
 
-import "strings"
+import (
+	"strings"
+)
 
 var (
 	// DefaultTrimChars are the characters which are stripped by Trim* functions in default.
@@ -17,7 +25,7 @@ var (
 	})
 )
 
-// IsLetterUpper 检查给定的字节b是否为大写。
+// IsLetterUpper checks whether the given byte b is in upper case.
 func IsLetterUpper(b byte) bool {
 	if b >= byte('A') && b <= byte('Z') {
 		return true
@@ -25,7 +33,7 @@ func IsLetterUpper(b byte) bool {
 	return false
 }
 
-// IsLetterLower 检查给定的字节b是否为小写
+// IsLetterLower checks whether the given byte b is in lower case.
 func IsLetterLower(b byte) bool {
 	if b >= byte('a') && b <= byte('z') {
 		return true
@@ -33,12 +41,13 @@ func IsLetterLower(b byte) bool {
 	return false
 }
 
-// IsLetter 检查给定的字节b是否为字母
+// IsLetter checks whether the given byte b is a letter.
 func IsLetter(b byte) bool {
 	return IsLetterUpper(b) || IsLetterLower(b)
 }
 
-// IsNumeric 判断字符串是否是数字
+// IsNumeric checks whether the given string s is numeric.
+// Note that float string like "123.456" is also numeric.
 func IsNumeric(s string) bool {
 	length := len(s)
 	if length == 0 {
@@ -62,7 +71,7 @@ func IsNumeric(s string) bool {
 	return true
 }
 
-// UcFirst 首字母大写
+// UcFirst returns a copy of the string s with the first letter mapped to its upper case.
 func UcFirst(s string) string {
 	if len(s) == 0 {
 		return s
@@ -73,7 +82,8 @@ func UcFirst(s string) string {
 	return s
 }
 
-// ReplaceByMap 使用字典替换字符串，使用map的key作为查找串，查找origin串，替换成value的值
+// ReplaceByMap returns a copy of `origin`,
+// which is replaced by a map in unordered way, case-sensitively.
 func ReplaceByMap(origin string, replaces map[string]string) string {
 	for k, v := range replaces {
 		origin = strings.Replace(origin, k, v, -1)
@@ -81,7 +91,7 @@ func ReplaceByMap(origin string, replaces map[string]string) string {
 	return origin
 }
 
-// RemoveSymbols 删除字符串中的所有符号，只留下字母和数字
+// RemoveSymbols removes all symbols from string and lefts only numbers and letters.
 func RemoveSymbols(s string) string {
 	var b []byte
 	for _, c := range s {
@@ -92,12 +102,15 @@ func RemoveSymbols(s string) string {
 	return string(b)
 }
 
-// EqualFoldWithoutChars 对比两个字符串是否相等，先分别删除两个字符串中的所有符合，只留下字母和数字，在对比两个字符串
+// EqualFoldWithoutChars checks string `s1` and `s2` equal case-insensitively,
+// with/without chars '-'/'_'/'.'/' '.
 func EqualFoldWithoutChars(s1, s2 string) bool {
 	return strings.EqualFold(RemoveSymbols(s1), RemoveSymbols(s2))
 }
 
-// SplitAndTrim 以delimiter 分割字符串str，并且对分割后的字串去除头尾的characterMask字符
+// SplitAndTrim splits string <str> by a string <delimiter> to an array,
+// and calls Trim to every element of this array. It ignores the elements
+// which are empty after Trim.
 func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
 	array := make([]string, 0)
 	for _, v := range strings.Split(str, delimiter) {

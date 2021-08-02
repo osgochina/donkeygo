@@ -231,7 +231,7 @@ func (that *Config) GetDuration(pattern string, def ...interface{}) time.Duratio
 	return 0
 }
 
-// GetGTime retrieves the value by specified `pattern` and converts it to *gtime.Time.
+// Getdtime retrieves the value by specified `pattern` and converts it to *dtime.Time.
 func (that *Config) GetGTime(pattern string, format ...string) *gtime.Time {
 	if j := that.getJson(); j != nil {
 		return j.GetGTime(pattern, format...)

@@ -8,10 +8,10 @@ package dlog_test
 
 import (
 	"fmt"
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/os/gtime"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/os/dlog"
+	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"testing"
@@ -21,8 +21,8 @@ import (
 func Test_Rotate_Size(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		l := dlog.New()
-		p := dfile.TempDir(gtime.TimestampNanoStr())
-		err := l.SetConfigWithMap(g.Map{
+		p := dfile.TempDir(dtime.TimestampNanoStr())
+		err := l.SetConfigWithMap(d.Map{
 			"Path":                 p,
 			"File":                 "access.log",
 			"StdoutPrint":          false,
@@ -60,8 +60,8 @@ func Test_Rotate_Size(t *testing.T) {
 func Test_Rotate_Expire(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		l := dlog.New()
-		p := dfile.TempDir(gtime.TimestampNanoStr())
-		err := l.SetConfigWithMap(g.Map{
+		p := dfile.TempDir(dtime.TimestampNanoStr())
+		err := l.SetConfigWithMap(d.Map{
 			"Path":                 p,
 			"File":                 "access.log",
 			"StdoutPrint":          false,

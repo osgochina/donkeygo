@@ -9,8 +9,8 @@ package dlog
 import (
 	"bytes"
 	"fmt"
-	"github.com/gogf/gf/os/gtime"
 	"github.com/osgochina/donkeygo/os/dfile"
+	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"testing"
@@ -29,8 +29,8 @@ func Test_To(t *testing.T) {
 
 func Test_Path(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -47,8 +47,8 @@ func Test_Path(t *testing.T) {
 func Test_Cat(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		cat := "category"
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -64,8 +64,8 @@ func Test_Cat(t *testing.T) {
 
 func Test_Level(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -81,8 +81,8 @@ func Test_Level(t *testing.T) {
 
 func Test_Skip(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -99,8 +99,8 @@ func Test_Skip(t *testing.T) {
 
 func Test_Stack(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -117,8 +117,8 @@ func Test_Stack(t *testing.T) {
 
 func Test_StackWithFilter(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -131,8 +131,8 @@ func Test_StackWithFilter(t *testing.T) {
 		t.Assert(dstr.Count(content, "Stack"), 1)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -148,8 +148,8 @@ func Test_StackWithFilter(t *testing.T) {
 
 func Test_Header(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -161,8 +161,8 @@ func Test_Header(t *testing.T) {
 		t.Assert(dstr.Count(content, "1 2 3"), 1)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -177,8 +177,8 @@ func Test_Header(t *testing.T) {
 
 func Test_Line(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -192,8 +192,8 @@ func Test_Line(t *testing.T) {
 		t.Assert(dstr.Contains(content, dfile.Separator), true)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -210,8 +210,8 @@ func Test_Line(t *testing.T) {
 
 func Test_Async(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)
@@ -228,8 +228,8 @@ func Test_Async(t *testing.T) {
 	})
 
 	dtest.C(t, func(t *dtest.T) {
-		path := dfile.TempDir(gtime.TimestampNanoStr())
-		file := fmt.Sprintf(`%d.log`, gtime.TimestampNano())
+		path := dfile.TempDir(dtime.TimestampNanoStr())
+		file := fmt.Sprintf(`%d.log`, dtime.TimestampNano())
 
 		err := dfile.Mkdir(path)
 		t.Assert(err, nil)

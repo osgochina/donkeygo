@@ -9,7 +9,7 @@
 package darray_test
 
 import (
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/util/dconv"
 
@@ -131,7 +131,7 @@ func TestStrArray_PushAndPop(t *testing.T) {
 
 func TestStrArray_PopLeft(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2", "3"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2", "3"})
 		v, ok := array.PopLeft()
 		t.Assert(v, 1)
 		t.Assert(ok, true)
@@ -149,7 +149,7 @@ func TestStrArray_PopLeft(t *testing.T) {
 
 func TestStrArray_PopRight(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2", "3"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2", "3"})
 
 		v, ok := array.PopRight()
 		t.Assert(v, 3)
@@ -170,20 +170,20 @@ func TestStrArray_PopRight(t *testing.T) {
 
 func TestStrArray_PopLefts(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2", "3"})
-		t.Assert(array.PopLefts(2), g.Slice{"1", "2"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2", "3"})
+		t.Assert(array.PopLefts(2), d.Slice{"1", "2"})
 		t.Assert(array.Len(), 1)
-		t.Assert(array.PopLefts(2), g.Slice{"3"})
+		t.Assert(array.PopLefts(2), d.Slice{"3"})
 		t.Assert(array.Len(), 0)
 	})
 }
 
 func TestStrArray_PopRights(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2", "3"})
-		t.Assert(array.PopRights(2), g.Slice{"2", "3"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2", "3"})
+		t.Assert(array.PopRights(2), d.Slice{"2", "3"})
 		t.Assert(array.Len(), 1)
-		t.Assert(array.PopLefts(2), g.Slice{"1"})
+		t.Assert(array.PopLefts(2), d.Slice{"1"})
 		t.Assert(array.Len(), 0)
 	})
 }
@@ -646,7 +646,7 @@ func TestStrArray_Json(t *testing.T) {
 			Name   string
 			Scores *darray.StrArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []string{"A+", "A", "A"},
 		}
@@ -665,7 +665,7 @@ func TestStrArray_Json(t *testing.T) {
 			Name   string
 			Scores darray.StrArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []string{"A+", "A", "A"},
 		}
@@ -681,7 +681,7 @@ func TestStrArray_Json(t *testing.T) {
 }
 
 func TestStrArray_Iterator(t *testing.T) {
-	slice := g.SliceStr{"a", "b", "d", "c"}
+	slice := d.SliceStr{"a", "b", "d", "c"}
 	array := darray.NewStrArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		array.Iterator(func(k int, v string) bool {
@@ -728,7 +728,7 @@ func TestStrArray_Iterator(t *testing.T) {
 }
 
 func TestStrArray_RemoveValue(t *testing.T) {
-	slice := g.SliceStr{"a", "b", "d", "c"}
+	slice := d.SliceStr{"a", "b", "d", "c"}
 	array := darray.NewStrArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		t.Assert(array.RemoveValue("e"), false)
@@ -747,43 +747,43 @@ func TestStrArray_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
 			"array": []byte(`["1","2","3"]`),
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.SliceStr{"1", "2", "3"})
+		t.Assert(v.Array.Slice(), d.SliceStr{"1", "2", "3"})
 	})
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
-			"array": g.SliceStr{"1", "2", "3"},
+			"array": d.SliceStr{"1", "2", "3"},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.SliceStr{"1", "2", "3"})
+		t.Assert(v.Array.Slice(), d.SliceStr{"1", "2", "3"})
 	})
 }
 
 func TestStrArray_FilterEmpty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"", "1", "2", "0"})
-		t.Assert(array.FilterEmpty(), g.SliceStr{"1", "2", "0"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"", "1", "2", "0"})
+		t.Assert(array.FilterEmpty(), d.SliceStr{"1", "2", "0"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2"})
-		t.Assert(array.FilterEmpty(), g.SliceStr{"1", "2"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2"})
+		t.Assert(array.FilterEmpty(), d.SliceStr{"1", "2"})
 	})
 }
 
 func TestStrArray_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewStrArrayFrom(g.SliceStr{"1", "2"})
+		array := darray.NewStrArrayFrom(d.SliceStr{"1", "2"})
 		t.Assert(array.Walk(func(value string) string {
 			return "key-" + value
-		}), g.Slice{"key-1", "key-2"})
+		}), d.Slice{"key-1", "key-2"})
 	})
 }

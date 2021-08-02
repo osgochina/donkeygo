@@ -1,9 +1,9 @@
 package dfpool
 
 import (
-	"github.com/gogf/gf/os/gfsnotify"
 	"github.com/osgochina/donkeygo/container/dpool"
 	"github.com/osgochina/donkeygo/container/dtype"
+	"github.com/osgochina/donkeygo/os/dfsnotify"
 	"os"
 	"time"
 )
@@ -93,7 +93,7 @@ func (that *Pool) File() (*File, error) {
 
 		//如果文件池没有初始化，则对文件加入事件监听
 		if !that.init.Val() && that.init.Cas(false, true) {
-			_, _ = gfsnotify.Add(f.path, func(event *gfsnotify.Event) {
+			_, _ = dfsnotify.Add(f.path, func(event *dfsnotify.Event) {
 				//如果要监听的文件被删除了或者改名了，则把该文件指针池清除了
 				if event.IsRemove() || event.IsRename() {
 					//删除老的池子

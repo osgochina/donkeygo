@@ -8,13 +8,13 @@ package darray_test
 
 import (
 	"fmt"
-	"github.com/gogf/gf/frame/g"
 	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/frame/d"
 )
 
 func ExampleStrArray_Walk() {
 	var array darray.StrArray
-	tables := g.SliceStr{"user", "user_detail"}
+	tables := d.SliceStr{"user", "user_detail"}
 	prefix := "gf_"
 	array.Append(tables...)
 	// Add prefix for given table names.

@@ -1,9 +1,9 @@
 package dfile
 
 import (
-	"github.com/gogf/gf/os/gfsnotify"
 	"github.com/osgochina/donkeygo/os/dcache"
 	"github.com/osgochina/donkeygo/os/dcmd"
+	"github.com/osgochina/donkeygo/os/dfsnotify"
 	"time"
 )
 
@@ -33,9 +33,9 @@ func GetBytesWithCache(path string, duration ...time.Duration) []byte {
 		b := GetBytes(path)
 		//如果文件存在，则监听文件变化，有任何变化则删除缓存
 		if b != nil {
-			_, _ = gfsnotify.Add(path, func(event *gfsnotify.Event) {
+			_, _ = dfsnotify.Add(path, func(event *dfsnotify.Event) {
 				_, _ = internalCache.Remove(key)
-				gfsnotify.Exit()
+				dfsnotify.Exit()
 			})
 		}
 		return b, nil

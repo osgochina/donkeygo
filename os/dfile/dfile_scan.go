@@ -1,8 +1,8 @@
 package dfile
 
 import (
-	"github.com/gogf/gf/text/gstr"
 	"github.com/osgochina/donkeygo/errors/derror"
+	"github.com/osgochina/donkeygo/text/dstr"
 	"os"
 	"path/filepath"
 	"sort"
@@ -96,7 +96,7 @@ func doScanDir(depth int, path string, pattern string, recursive bool, handler f
 	}
 	var (
 		filePath = ""
-		patterns = gstr.SplitAndTrim(pattern, ",")
+		patterns = dstr.SplitAndTrim(pattern, ",")
 	)
 	for _, name := range names {
 		filePath = path + Separator + name

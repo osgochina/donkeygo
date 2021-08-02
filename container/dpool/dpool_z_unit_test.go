@@ -9,11 +9,10 @@ package dpool_test
 import (
 	"errors"
 	"github.com/osgochina/donkeygo/container/dpool"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 	"time"
-
-	"github.com/gogf/gf/frame/g"
 )
 
 var nf dpool.NewFunc = func() (i interface{}, e error) {
@@ -49,7 +48,7 @@ func Test_Gpool(t *testing.T) {
 		//test won't be timeout
 		v1, err1 := p1.Get()
 		t.Assert(err1, nil)
-		t.AssertIN(v1, g.Slice{1, 2})
+		t.AssertIN(v1, d.Slice{1, 2})
 		//test clear
 		p1.Clear()
 		t.Assert(p1.Size(), 0)
@@ -62,7 +61,7 @@ func Test_Gpool(t *testing.T) {
 		p1.Put(4)
 		v1, err1 = p1.Get()
 		t.Assert(err1, nil)
-		t.AssertIN(v1, g.Slice{3, 4})
+		t.AssertIN(v1, d.Slice{3, 4})
 		//test close
 		p1.Close()
 		v1, err1 = p1.Get()
@@ -119,7 +118,7 @@ func Test_SyncPool(t *testing.T) {
 		time.Sleep(1 * time.Second)
 		//test won't be timeout
 		v1 := p1.Get()
-		t.AssertIN(v1, g.Slice{1, 2})
+		t.AssertIN(v1, d.Slice{1, 2})
 
 		//test newFunc
 		v1 = p1.Get()
@@ -129,7 +128,7 @@ func Test_SyncPool(t *testing.T) {
 		p1.Put(4)
 		v1 = p1.Get()
 		v1 = p1.Get()
-		t.AssertIN(v1, g.Slice{3, 4})
+		t.AssertIN(v1, d.Slice{3, 4})
 		v3 := p1.Get()
 		t.Assert(v3, "hello")
 	})

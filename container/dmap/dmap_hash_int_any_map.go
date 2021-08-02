@@ -2,7 +2,7 @@ package dmap
 
 import (
 	"encoding/json"
-	"github.com/gogf/gf/container/gvar"
+	"github.com/osgochina/donkeygo/container/dvar"
 	"github.com/osgochina/donkeygo/internal/empty"
 	"github.com/osgochina/donkeygo/internal/rwmutex"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -245,26 +245,26 @@ func (that *IntAnyMap) GetOrSetFuncLock(key int, f func() interface{}) interface
 
 // GetVar returns a Var with the value by given <key>.
 // The returned Var is un-concurrent safe.
-func (that *IntAnyMap) GetVar(key int) *gvar.Var {
-	return gvar.New(that.Get(key))
+func (that *IntAnyMap) GetVar(key int) *dvar.Var {
+	return dvar.New(that.Get(key))
 }
 
 // GetVarOrSet returns a Var with result from GetVarOrSet.
 // The returned Var is un-concurrent safe.
-func (that *IntAnyMap) GetVarOrSet(key int, value interface{}) *gvar.Var {
-	return gvar.New(that.GetOrSet(key, value))
+func (that *IntAnyMap) GetVarOrSet(key int, value interface{}) *dvar.Var {
+	return dvar.New(that.GetOrSet(key, value))
 }
 
 // GetVarOrSetFunc returns a Var with result from GetOrSetFunc.
 // The returned Var is un-concurrent safe.
-func (that *IntAnyMap) GetVarOrSetFunc(key int, f func() interface{}) *gvar.Var {
-	return gvar.New(that.GetOrSetFunc(key, f))
+func (that *IntAnyMap) GetVarOrSetFunc(key int, f func() interface{}) *dvar.Var {
+	return dvar.New(that.GetOrSetFunc(key, f))
 }
 
 // GetVarOrSetFuncLock returns a Var with result from GetOrSetFuncLock.
 // The returned Var is un-concurrent safe.
-func (that *IntAnyMap) GetVarOrSetFuncLock(key int, f func() interface{}) *gvar.Var {
-	return gvar.New(that.GetOrSetFuncLock(key, f))
+func (that *IntAnyMap) GetVarOrSetFuncLock(key int, f func() interface{}) *dvar.Var {
+	return dvar.New(that.GetOrSetFuncLock(key, f))
 }
 
 // SetIfNotExist sets <value> to the map if the <key> does not exist, and then returns true.

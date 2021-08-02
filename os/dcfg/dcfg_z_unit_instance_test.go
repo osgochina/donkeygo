@@ -1,8 +1,8 @@
 package dcfg
 
 import (
-	"github.com/gogf/gf/debug/gdebug"
 	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/os/denv"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/test/dtest"
@@ -81,7 +81,7 @@ func Test_Instance_AutoLocateConfigFile(t *testing.T) {
 	// Automatically locate the configuration file with supported file extensions.
 	dtest.C(t, func(t *dtest.T) {
 		pwd := dfile.Pwd()
-		t.Assert(dfile.Chdir(gdebug.TestDataPath()), nil)
+		t.Assert(dfile.Chdir(ddebug.TestDataPath()), nil)
 		defer dfile.Chdir(pwd)
 		t.Assert(Instance("c1") != nil, true)
 		t.Assert(Instance("c1").Get("my-config"), "1")
@@ -90,7 +90,7 @@ func Test_Instance_AutoLocateConfigFile(t *testing.T) {
 	// Automatically locate the configuration file with supported file extensions.
 	dtest.C(t, func(t *dtest.T) {
 		pwd := dfile.Pwd()
-		t.Assert(dfile.Chdir(gdebug.TestDataPath("folder1")), nil)
+		t.Assert(dfile.Chdir(ddebug.TestDataPath("folder1")), nil)
 		defer dfile.Chdir(pwd)
 		t.Assert(Instance("c2").Get("my-config"), 2)
 	})
@@ -98,7 +98,7 @@ func Test_Instance_AutoLocateConfigFile(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		instances.Clear()
 		pwd := dfile.Pwd()
-		t.Assert(dfile.Chdir(gdebug.TestDataPath("default")), nil)
+		t.Assert(dfile.Chdir(ddebug.TestDataPath("default")), nil)
 		defer dfile.Chdir(pwd)
 		t.Assert(Instance().Get("my-config"), 1)
 
@@ -111,7 +111,7 @@ func Test_Instance_AutoLocateConfigFile(t *testing.T) {
 
 func Test_Instance_EnvPath(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		denv.Set("DK_DCFG_PATH", gdebug.TestDataPath("envpath"))
+		denv.Set("DK_DCFG_PATH", ddebug.TestDataPath("envpath"))
 		defer denv.Set("DK_DCFG_PATH", "")
 		t.Assert(Instance("c3") != nil, true)
 		t.Assert(Instance("c3").Get("my-config"), "3")
@@ -122,7 +122,7 @@ func Test_Instance_EnvPath(t *testing.T) {
 
 func Test_Instance_EnvFile(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		file := gdebug.TestDataPath("envfile")
+		file := ddebug.TestDataPath("envfile")
 		denv.Set("DK_DCFG_PATH", file)
 		defer denv.Set("DK_DCFG_PATH", "")
 		denv.Set("DK_DCFG_FILE", "c6.json")

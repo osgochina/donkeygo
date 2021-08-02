@@ -7,7 +7,7 @@
 package dfile_test
 
 import (
-	"github.com/gogf/gf/debug/gdebug"
+	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/test/dtest"
@@ -16,7 +16,7 @@ import (
 
 func Test_NotFound(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		teatFile := dfile.Dir(gdebug.CallerFilePath()) + dfile.Separator + "testdata/readline/error.log"
+		teatFile := dfile.Dir(ddebug.CallerFilePath()) + dfile.Separator + "testdata/readline/error.log"
 		callback := func(line string) error {
 			return nil
 		}
@@ -34,7 +34,7 @@ func Test_ReadLines(t *testing.T) {
 				getList = append(getList, line)
 				return nil
 			}
-			teatFile = dfile.Dir(gdebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
+			teatFile = dfile.Dir(ddebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
 		)
 		err := dfile.ReadLines(teatFile, callback)
 		t.AssertEQ(getList, expectList)
@@ -48,7 +48,7 @@ func Test_ReadLines_Error(t *testing.T) {
 			callback = func(line string) error {
 				return derror.New("custom error")
 			}
-			teatFile = dfile.Dir(gdebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
+			teatFile = dfile.Dir(ddebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
 		)
 		err := dfile.ReadLines(teatFile, callback)
 		t.AssertEQ(err.Error(), "custom error")
@@ -64,7 +64,7 @@ func Test_ReadLinesBytes(t *testing.T) {
 				getList = append(getList, line)
 				return nil
 			}
-			teatFile = dfile.Dir(gdebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
+			teatFile = dfile.Dir(ddebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
 		)
 		err := dfile.ReadLinesBytes(teatFile, callback)
 		t.AssertEQ(getList, expectList)
@@ -78,7 +78,7 @@ func Test_ReadLinesBytes_Error(t *testing.T) {
 			callback = func(line []byte) error {
 				return derror.New("custom error")
 			}
-			teatFile = dfile.Dir(gdebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
+			teatFile = dfile.Dir(ddebug.CallerFilePath()) + dfile.Separator + "testdata/readline/file.log"
 		)
 		err := dfile.ReadLinesBytes(teatFile, callback)
 		t.AssertEQ(err.Error(), "custom error")

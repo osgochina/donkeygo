@@ -7,7 +7,7 @@
 package dtime_test
 
 import (
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
@@ -86,7 +86,7 @@ func Test_RFC822(t *testing.T) {
 
 func Test_StrToTime(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		// Correct datetime string.
+		// Correct datetime strind.
 		var testDateTimes = []string{
 			"2006-01-02 15:04:05",
 			"2006/01/02 15:04:05",
@@ -121,8 +121,8 @@ func Test_StrToTime(t *testing.T) {
 			t.Assert(timeTemp.Time.Format("2006-01-02 15:04:05"), "2006-01-02 00:00:00")
 		}
 
-		// Correct time string.
-		var testTimes = g.MapStrStr{
+		// Correct time strind.
+		var testTimes = d.MapStrStr{
 			"16:12:01":     "15:04:05",
 			"16:12:01.789": "15:04:05.000",
 		}

@@ -1,16 +1,16 @@
 package dcron
 
 import (
-	"github.com/gogf/gf/os/gtimer"
+	"github.com/osgochina/donkeygo/os/dtimer"
 	"math"
 	"time"
 )
 
 const (
-	StatusReady   = gtimer.StatusReady   //已就绪
-	StatusRunning = gtimer.StatusRunning // 运行中
-	StatusStopped = gtimer.StatusStopped //已停止
-	StatusClosed  = gtimer.StatusClosed  // 已关闭
+	StatusReady   = dtimer.StatusReady   //已就绪
+	StatusRunning = dtimer.StatusRunning // 运行中
+	StatusStopped = dtimer.StatusStopped //已停止
+	StatusClosed  = dtimer.StatusClosed  // 已关闭
 	defaultTimes  = math.MaxInt32        // 默认运行次数
 )
 

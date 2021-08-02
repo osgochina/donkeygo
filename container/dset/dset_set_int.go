@@ -2,9 +2,9 @@ package dset
 
 import (
 	"bytes"
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/internal/rwmutex"
+	"github.com/osgochina/donkeygo/util/dconv"
 )
 
 type IntSet struct {
@@ -175,7 +175,7 @@ func (set *IntSet) Join(glue string) string {
 		buffer = bytes.NewBuffer(nil)
 	)
 	for k, _ := range set.data {
-		buffer.WriteString(gconv.String(k))
+		buffer.WriteString(dconv.String(k))
 		if i != l-1 {
 			buffer.WriteString(glue)
 		}
@@ -445,9 +445,9 @@ func (set *IntSet) UnmarshalValue(value interface{}) (err error) {
 	var array []int
 	switch value.(type) {
 	case string, []byte:
-		err = json.UnmarshalUseNumber(gconv.Bytes(value), &array)
+		err = json.UnmarshalUseNumber(dconv.Bytes(value), &array)
 	default:
-		array = gconv.SliceInt(value)
+		array = dconv.SliceInt(value)
 	}
 	for _, v := range array {
 		set.data[v] = struct{}{}

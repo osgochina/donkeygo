@@ -1,6 +1,7 @@
 package dcfg_test
 
 import (
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dcfg"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/os/dtime"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/gogf/gf/encoding/gjson"
-	"github.com/gogf/gf/frame/g"
 )
 
 func init() {
@@ -168,7 +168,7 @@ func Test_SetFileName(t *testing.T) {
 }
 `
 	dtest.C(t, func(t *dtest.T) {
-		path := "config.json"
+		path := "confid.json"
 		err := dfile.PutContents(path, config)
 		t.Assert(err, nil)
 		defer func() {
@@ -223,29 +223,29 @@ func Test_SetFileName(t *testing.T) {
 func TestCfg_New(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		os.Setenv("DK_DCFG_PATH", "config")
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		t.Assert(c.Get("name"), nil)
-		t.Assert(c.GetFileName(), "config.yml")
+		t.Assert(c.GetFileName(), "confid.yml")
 
 		configPath := dfile.Pwd() + dfile.Separator + "config"
 		_ = dfile.Mkdir(configPath)
 		defer dfile.Remove(configPath)
 
-		c = dcfg.New("config.yml")
+		c = dcfg.New("confid.yml")
 		t.Assert(c.Get("name"), nil)
 
 		_ = os.Unsetenv("DK_DCFG_PATH")
-		c = dcfg.New("config.yml")
+		c = dcfg.New("confid.yml")
 		t.Assert(c.Get("name"), nil)
 	})
 }
 
 func TestCfg_SetPath(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		err := c.SetPath("tmp")
 		t.AssertNE(err, nil)
-		err = c.SetPath("gcfg.go")
+		err = c.SetPath("gcfd.go")
 		t.AssertNE(err, nil)
 		t.Assert(c.Get("name"), nil)
 	})
@@ -253,7 +253,7 @@ func TestCfg_SetPath(t *testing.T) {
 
 func TestCfg_SetViolenceCheck(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		c.SetViolenceCheck(true)
 		t.Assert(c.Get("name"), nil)
 	})
@@ -261,10 +261,10 @@ func TestCfg_SetViolenceCheck(t *testing.T) {
 
 func TestCfg_AddPath(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		err := c.AddPath("tmp")
 		t.AssertNE(err, nil)
-		err = c.AddPath("gcfg.go")
+		err = c.AddPath("gcfd.go")
 		t.AssertNE(err, nil)
 		t.Assert(c.Get("name"), nil)
 	})
@@ -272,7 +272,7 @@ func TestCfg_AddPath(t *testing.T) {
 
 func TestCfg_FilePath(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		path, _ := c.GetFilePath("tmp")
 		t.Assert(path, "")
 		path, _ = c.GetFilePath("tmp")
@@ -310,11 +310,11 @@ func TestCfg_Get(t *testing.T) {
 		t.Assert(err, nil)
 
 		err = dfile.PutContents(
-			dfile.Join(configPath, "config.yml"),
+			dfile.Join(configPath, "confid.yml"),
 			"wrong config",
 		)
 		t.Assert(err, nil)
-		c := dcfg.New("config.yml")
+		c := dcfg.New("confid.yml")
 		t.Assert(c.Get("name"), nil)
 		t.Assert(c.GetVar("name").Val(), nil)
 		t.Assert(c.Contains("name"), false)
@@ -349,15 +349,15 @@ func TestCfg_Get(t *testing.T) {
 		c.Clear()
 
 		arr, _ := gjson.Encode(
-			g.Map{
+			d.Map{
 				"name":   "gf",
 				"time":   "2019-06-12",
-				"person": g.Map{"name": "gf"},
-				"floats": g.Slice{1, 2, 3},
+				"person": d.Map{"name": "gf"},
+				"floats": d.Slice{1, 2, 3},
 			},
 		)
 		err = dfile.PutBytes(
-			dfile.Join(configPath, "config.yml"),
+			dfile.Join(configPath, "confid.yml"),
 			arr,
 		)
 		t.Assert(err, nil)
@@ -374,11 +374,11 @@ func TestCfg_Get(t *testing.T) {
 
 func TestCfg_Config(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		dcfg.SetContent("gf", "config.yml")
-		t.Assert(dcfg.GetContent("config.yml"), "gf")
-		dcfg.SetContent("gf1", "config.yml")
-		t.Assert(dcfg.GetContent("config.yml"), "gf1")
-		dcfg.RemoveContent("config.yml")
+		dcfg.SetContent("gf", "confid.yml")
+		t.Assert(dcfg.GetContent("confid.yml"), "gf")
+		dcfg.SetContent("gf1", "confid.yml")
+		t.Assert(dcfg.GetContent("confid.yml"), "gf1")
+		dcfg.RemoveContent("confid.yml")
 		dcfg.ClearContent()
 		t.Assert(dcfg.GetContent("name"), "")
 	})

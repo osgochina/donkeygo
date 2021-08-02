@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/util/grand"
 	"github.com/osgochina/donkeygo/internal/rwmutex"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -261,7 +260,7 @@ func (a *StrArray) PopRight() (value string, found bool) {
 func (a *StrArray) PopRand() (value string, found bool) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.doRemoveWithoutLock(grand.Intn(len(a.array)))
+	return a.doRemoveWithoutLock(drand.Intn(len(a.array)))
 }
 
 // PopRands randomly pops and returns <size> items out of array.
@@ -278,7 +277,7 @@ func (a *StrArray) PopRands(size int) []string {
 	}
 	array := make([]string, size)
 	for i := 0; i < size; i++ {
-		array[i], _ = a.doRemoveWithoutLock(grand.Intn(len(a.array)))
+		array[i], _ = a.doRemoveWithoutLock(drand.Intn(len(a.array)))
 	}
 	return array
 }

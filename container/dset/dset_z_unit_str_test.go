@@ -3,12 +3,12 @@
 package dset_test
 
 import (
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dset"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strings"
 	"sync"
 	"testing"
@@ -347,10 +347,10 @@ func TestStrSet_AddIfNotExistFunc(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		s := dset.NewStrSet(true)
-		wg := sync.WaitGroup{}
-		wg.Add(1)
+		wd := sync.WaitGroup{}
+		wd.Add(1)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFunc("1", func() bool {
 				time.Sleep(100 * time.Millisecond)
 				return true
@@ -358,17 +358,17 @@ func TestStrSet_AddIfNotExistFunc(t *testing.T) {
 			t.Assert(r, false)
 		}()
 		s.Add("1")
-		wg.Wait()
+		wd.Wait()
 	})
 }
 
 func TestStrSet_AddIfNotExistFuncLock(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		s := dset.NewStrSet(true)
-		wg := sync.WaitGroup{}
-		wg.Add(2)
+		wd := sync.WaitGroup{}
+		wd.Add(2)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFuncLock("1", func() bool {
 				time.Sleep(500 * time.Millisecond)
 				return true
@@ -377,13 +377,13 @@ func TestStrSet_AddIfNotExistFuncLock(t *testing.T) {
 		}()
 		time.Sleep(100 * time.Millisecond)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFuncLock("1", func() bool {
 				return true
 			})
 			t.Assert(r, false)
 		}()
-		wg.Wait()
+		wd.Wait()
 	})
 }
 
@@ -420,7 +420,7 @@ func TestStrSet_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		var (
 			set    dset.StrSet
-			names  = g.SliceStr{"user", "user_detail"}
+			names  = d.SliceStr{"user", "user_detail"}
 			prefix = "gf_"
 		)
 		set.Add(names...)
@@ -442,7 +442,7 @@ func TestStrSet_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name": "john",
 			"set":  []byte(`["1","2","3"]`),
 		}, &v)
@@ -457,9 +457,9 @@ func TestStrSet_UnmarshalValue(t *testing.T) {
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name": "john",
-			"set":  g.SliceStr{"1", "2", "3"},
+			"set":  d.SliceStr{"1", "2", "3"},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")

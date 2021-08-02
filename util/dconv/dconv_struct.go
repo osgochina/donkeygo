@@ -3,7 +3,6 @@ package dconv
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gogf/gf/errors/gerror"
 	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/internal/empty"
 	"github.com/osgochina/donkeygo/internal/structs"
@@ -138,7 +137,7 @@ func doStruct(params interface{}, pointer interface{}, mapping map[string]string
 	// DO NOT use MapDeep here.
 	paramsMap := Map(params)
 	if paramsMap == nil {
-		return gerror.Newf("convert params to map failed: %v", params)
+		return derror.Newf("convert params to map failed: %v", params)
 	}
 
 	// It only performs one converting to the same attribute.

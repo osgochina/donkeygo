@@ -7,7 +7,7 @@
 package dutil
 
 import (
-	"github.com/gogf/gf/util/gconv"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"reflect"
 )
 
@@ -25,9 +25,9 @@ func StructToSlice(data interface{}) []interface{} {
 	switch reflectKind {
 	case reflect.Struct:
 		array := make([]interface{}, 0)
-		// Note that, it uses the gconv tag name instead of the attribute name if
-		// the gconv tag is fined in the struct attributes.
-		for k, v := range gconv.Map(reflectValue) {
+		// Note that, it uses the dconv tag name instead of the attribute name if
+		// the dconv tag is fined in the struct attributes.
+		for k, v := range dconv.Map(reflectValue) {
 			array = append(array, k)
 			array = append(array, v)
 		}

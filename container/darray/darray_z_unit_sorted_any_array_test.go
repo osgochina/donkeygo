@@ -9,12 +9,12 @@
 package darray_test
 
 import (
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/util/gutil"
 	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
+	"github.com/osgochina/donkeygo/util/dutil"
 	"strings"
 	"testing"
 	"time"
@@ -149,7 +149,7 @@ func TestSortedArray_PopLeft(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		array1 := darray.NewSortedArrayFrom(
 			[]interface{}{"a", "d", "c", "b"},
-			gutil.ComparatorString,
+			dutil.ComparatorString,
 		)
 		i1, ok := array1.PopLeft()
 		t.Assert(ok, true)
@@ -158,7 +158,7 @@ func TestSortedArray_PopLeft(t *testing.T) {
 		t.Assert(array1, []interface{}{"b", "c", "d"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFrom(g.Slice{1, 2, 3}, gutil.ComparatorInt)
+		array := darray.NewSortedArrayFrom(d.Slice{1, 2, 3}, dutil.ComparatorInt)
 		v, ok := array.PopLeft()
 		t.Assert(v, 1)
 		t.Assert(ok, true)
@@ -178,7 +178,7 @@ func TestSortedArray_PopRight(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		array1 := darray.NewSortedArrayFrom(
 			[]interface{}{"a", "d", "c", "b"},
-			gutil.ComparatorString,
+			dutil.ComparatorString,
 		)
 		i1, ok := array1.PopRight()
 		t.Assert(ok, true)
@@ -187,7 +187,7 @@ func TestSortedArray_PopRight(t *testing.T) {
 		t.Assert(array1, []interface{}{"a", "b", "c"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFrom(g.Slice{1, 2, 3}, gutil.ComparatorInt)
+		array := darray.NewSortedArrayFrom(d.Slice{1, 2, 3}, dutil.ComparatorInt)
 		v, ok := array.PopRight()
 		t.Assert(v, 3)
 		t.Assert(ok, true)
@@ -242,7 +242,7 @@ func TestSortedArray_PopRands(t *testing.T) {
 
 func TestSortedArray_Empty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArray(gutil.ComparatorInt)
+		array := darray.NewSortedArray(dutil.ComparatorInt)
 		v, ok := array.PopLeft()
 		t.Assert(v, nil)
 		t.Assert(ok, false)
@@ -390,7 +390,7 @@ func TestSortedArray_Chunk(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{1, 2, 3, 4, 5}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorInt)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorInt)
 		chunks := array1.Chunk(3)
 		t.Assert(len(chunks), 2)
 		t.Assert(chunks[0], []interface{}{1, 2, 3})
@@ -399,7 +399,7 @@ func TestSortedArray_Chunk(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{1, 2, 3, 4, 5, 6}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorInt)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorInt)
 		chunks := array1.Chunk(2)
 		t.Assert(len(chunks), 3)
 		t.Assert(chunks[0], []interface{}{1, 2})
@@ -409,7 +409,7 @@ func TestSortedArray_Chunk(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{1, 2, 3, 4, 5, 6}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorInt)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorInt)
 		chunks := array1.Chunk(3)
 		t.Assert(len(chunks), 2)
 		t.Assert(chunks[0], []interface{}{1, 2, 3})
@@ -494,7 +494,7 @@ func TestSortedArray_Join(t *testing.T) {
 
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{0, 1, `"a"`, `\a`}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorString)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorString)
 		t.Assert(array1.Join("."), `"a".0.1.\a`)
 	})
 }
@@ -502,7 +502,7 @@ func TestSortedArray_Join(t *testing.T) {
 func TestSortedArray_String(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{0, 1, "a", "b"}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorString)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorString)
 		t.Assert(array1.String(), `[0,1,"a","b"]`)
 	})
 }
@@ -526,7 +526,7 @@ func TestSortedArray_CountValues(t *testing.T) {
 func TestSortedArray_SetUnique(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{1, 2, 3, 4, 5, 3, 2, 2, 3, 5, 5}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorInt)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorInt)
 		array1.SetUnique(true)
 		t.Assert(array1.Len(), 5)
 		t.Assert(array1, []interface{}{1, 2, 3, 4, 5})
@@ -536,7 +536,7 @@ func TestSortedArray_SetUnique(t *testing.T) {
 func TestSortedArray_Unique(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		a1 := []interface{}{1, 2, 3, 4, 5, 3, 2, 2, 3, 5, 5}
-		array1 := darray.NewSortedArrayFrom(a1, gutil.ComparatorInt)
+		array1 := darray.NewSortedArrayFrom(a1, dutil.ComparatorInt)
 		array1.Unique()
 		t.Assert(array1.Len(), 5)
 		t.Assert(array1, []interface{}{1, 2, 3, 4, 5})
@@ -648,13 +648,13 @@ func TestSortedArray_Json(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		s1 := []interface{}{"a", "b", "d", "c"}
 		s2 := []interface{}{"a", "b", "c", "d"}
-		a1 := darray.NewSortedArrayFrom(s1, gutil.ComparatorString)
+		a1 := darray.NewSortedArrayFrom(s1, dutil.ComparatorString)
 		b1, err1 := json.Marshal(a1)
 		b2, err2 := json.Marshal(s1)
 		t.Assert(b1, b2)
 		t.Assert(err1, err2)
 
-		a2 := darray.NewSortedArray(gutil.ComparatorString)
+		a2 := darray.NewSortedArray(dutil.ComparatorString)
 		err1 = json.UnmarshalUseNumber(b2, &a2)
 		t.Assert(a2.Slice(), s2)
 
@@ -668,13 +668,13 @@ func TestSortedArray_Json(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		s1 := []interface{}{"a", "b", "d", "c"}
 		s2 := []interface{}{"a", "b", "c", "d"}
-		a1 := *darray.NewSortedArrayFrom(s1, gutil.ComparatorString)
+		a1 := *darray.NewSortedArrayFrom(s1, dutil.ComparatorString)
 		b1, err1 := json.Marshal(a1)
 		b2, err2 := json.Marshal(s1)
 		t.Assert(b1, b2)
 		t.Assert(err1, err2)
 
-		a2 := darray.NewSortedArray(gutil.ComparatorString)
+		a2 := darray.NewSortedArray(dutil.ComparatorString)
 		err1 = json.UnmarshalUseNumber(b2, &a2)
 		t.Assert(a2.Slice(), s2)
 
@@ -690,7 +690,7 @@ func TestSortedArray_Json(t *testing.T) {
 			Name   string
 			Scores *darray.SortedArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []int{99, 100, 98},
 		}
@@ -726,7 +726,7 @@ func TestSortedArray_Json(t *testing.T) {
 			Name   string
 			Scores darray.SortedArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []int{99, 100, 98},
 		}
@@ -759,8 +759,8 @@ func TestSortedArray_Json(t *testing.T) {
 }
 
 func TestSortedArray_Iterator(t *testing.T) {
-	slice := g.Slice{"a", "b", "d", "c"}
-	array := darray.NewSortedArrayFrom(slice, gutil.ComparatorString)
+	slice := d.Slice{"a", "b", "d", "c"}
+	array := darray.NewSortedArrayFrom(slice, dutil.ComparatorString)
 	dtest.C(t, func(t *dtest.T) {
 		array.Iterator(func(k int, v interface{}) bool {
 			t.Assert(v, slice[k])
@@ -806,8 +806,8 @@ func TestSortedArray_Iterator(t *testing.T) {
 }
 
 func TestSortedArray_RemoveValue(t *testing.T) {
-	slice := g.Slice{"a", "b", "d", "c"}
-	array := darray.NewSortedArrayFrom(slice, gutil.ComparatorString)
+	slice := d.Slice{"a", "b", "d", "c"}
+	array := darray.NewSortedArrayFrom(slice, dutil.ComparatorString)
 	dtest.C(t, func(t *dtest.T) {
 		t.Assert(array.RemoveValue("e"), false)
 		t.Assert(array.RemoveValue("b"), true)
@@ -825,55 +825,55 @@ func TestSortedArray_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
 			"array": []byte(`[2,3,1]`),
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.Slice{1, 2, 3})
+		t.Assert(v.Array.Slice(), d.Slice{1, 2, 3})
 	})
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
-			"array": g.Slice{2, 3, 1},
+			"array": d.Slice{2, 3, 1},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.Slice{1, 2, 3})
+		t.Assert(v.Array.Slice(), d.Slice{1, 2, 3})
 	})
 }
 
 func TestSortedArray_FilterNil(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		values := g.Slice{0, 1, 2, 3, 4, "", g.Slice{}}
-		array := darray.NewSortedArrayFromCopy(values, gutil.ComparatorInt)
-		t.Assert(array.FilterNil().Slice(), g.Slice{0, "", g.Slice{}, 1, 2, 3, 4})
+		values := d.Slice{0, 1, 2, 3, 4, "", d.Slice{}}
+		array := darray.NewSortedArrayFromCopy(values, dutil.ComparatorInt)
+		t.Assert(array.FilterNil().Slice(), d.Slice{0, "", d.Slice{}, 1, 2, 3, 4})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFromCopy(g.Slice{nil, 1, 2, 3, 4, nil}, gutil.ComparatorInt)
-		t.Assert(array.FilterNil(), g.Slice{1, 2, 3, 4})
+		array := darray.NewSortedArrayFromCopy(d.Slice{nil, 1, 2, 3, 4, nil}, dutil.ComparatorInt)
+		t.Assert(array.FilterNil(), d.Slice{1, 2, 3, 4})
 	})
 }
 
 func TestSortedArray_FilterEmpty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFrom(g.Slice{0, 1, 2, 3, 4, "", g.Slice{}}, gutil.ComparatorInt)
-		t.Assert(array.FilterEmpty(), g.Slice{1, 2, 3, 4})
+		array := darray.NewSortedArrayFrom(d.Slice{0, 1, 2, 3, 4, "", d.Slice{}}, dutil.ComparatorInt)
+		t.Assert(array.FilterEmpty(), d.Slice{1, 2, 3, 4})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFrom(g.Slice{1, 2, 3, 4}, gutil.ComparatorInt)
-		t.Assert(array.FilterEmpty(), g.Slice{1, 2, 3, 4})
+		array := darray.NewSortedArrayFrom(d.Slice{1, 2, 3, 4}, dutil.ComparatorInt)
+		t.Assert(array.FilterEmpty(), d.Slice{1, 2, 3, 4})
 	})
 }
 
 func TestSortedArray_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedArrayFrom(g.Slice{"1", "2"}, gutil.ComparatorString)
+		array := darray.NewSortedArrayFrom(d.Slice{"1", "2"}, dutil.ComparatorString)
 		t.Assert(array.Walk(func(value interface{}) interface{} {
 			return "key-" + dconv.String(value)
-		}), g.Slice{"key-1", "key-2"})
+		}), d.Slice{"key-1", "key-2"})
 	})
 }

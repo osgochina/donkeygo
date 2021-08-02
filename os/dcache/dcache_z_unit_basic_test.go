@@ -10,22 +10,21 @@ package dcache_test
 
 import (
 	"context"
+	"github.com/gogf/gf/os/grpool"
 	"github.com/gogf/gf/util/guid"
+	"github.com/osgochina/donkeygo/container/dset"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dcache"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"math"
 	"testing"
 	"time"
-
-	"github.com/gogf/gf/container/gset"
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/os/grpool"
 )
 
 func TestCache_GCache_Set(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		dcache.Set(1, 11, 0)
-		defer dcache.Removes(g.Slice{1, 2, 3})
+		defer dcache.Removes(d.Slice{1, 2, 3})
 		v, _ := dcache.Get(1)
 		t.Assert(v, 11)
 		b, _ := dcache.Contains(1)
@@ -208,7 +207,7 @@ func TestCache_SetIfNotExist(t *testing.T) {
 		v, _ = cache.Get(2)
 		t.Assert(v, 22)
 
-		dcache.Removes(g.Slice{1, 2, 3})
+		dcache.Removes(d.Slice{1, 2, 3})
 		dcache.SetIfNotExist(1, 11, 0)
 		v, _ = dcache.Get(1)
 		t.Assert(v, 11)
@@ -221,12 +220,12 @@ func TestCache_SetIfNotExist(t *testing.T) {
 func TestCache_Sets(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		cache := dcache.New()
-		cache.Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+		cache.Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 		v, _ := cache.Get(1)
 		t.Assert(v, 11)
 
-		dcache.Removes(g.Slice{1, 2, 3})
-		dcache.Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+		dcache.Removes(d.Slice{1, 2, 3})
+		dcache.Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 		v, _ = cache.Get(1)
 		t.Assert(v, 11)
 	})
@@ -242,7 +241,7 @@ func TestCache_GetOrSet(t *testing.T) {
 
 		v, _ = cache.Get(1)
 		t.Assert(v, 11)
-		dcache.Removes(g.Slice{1, 2, 3})
+		dcache.Removes(d.Slice{1, 2, 3})
 		dcache.GetOrSet(1, 11, 0)
 
 		v, _ = cache.Get(1)
@@ -269,7 +268,7 @@ func TestCache_GetOrSetFunc(t *testing.T) {
 		v, _ = cache.Get(1)
 		t.Assert(v, 11)
 
-		dcache.Removes(g.Slice{1, 2, 3})
+		dcache.Removes(d.Slice{1, 2, 3})
 
 		dcache.GetOrSetFunc(1, func() (interface{}, error) {
 			return 11, nil
@@ -300,7 +299,7 @@ func TestCache_GetOrSetFuncLock(t *testing.T) {
 		v, _ = cache.Get(1)
 		t.Assert(v, 11)
 
-		dcache.Removes(g.Slice{1, 2, 3})
+		dcache.Removes(d.Slice{1, 2, 3})
 		dcache.GetOrSetFuncLock(1, func() (interface{}, error) {
 			return 11, nil
 		}, 0)
@@ -318,7 +317,7 @@ func TestCache_GetOrSetFuncLock(t *testing.T) {
 func TestCache_Clear(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		cache := dcache.New()
-		cache.Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+		cache.Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 		cache.Clear()
 		n, _ := cache.Size()
 		t.Assert(n, 0)
@@ -359,7 +358,7 @@ func TestCache_Basic(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		{
 			cache := dcache.New()
-			cache.Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+			cache.Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 			b, _ := cache.Contains(1)
 			t.Assert(b, true)
 			v, _ := cache.Get(1)
@@ -371,23 +370,23 @@ func TestCache_Basic(t *testing.T) {
 			n, _ := cache.Size()
 			t.Assert(n, 2)
 			keys, _ := cache.Keys()
-			t.Assert(gset.NewFrom(g.Slice{1, 2}).Equal(gset.NewFrom(keys)), true)
+			t.Assert(dset.NewFrom(d.Slice{1, 2}).Equal(dset.NewFrom(keys)), true)
 			keyStrs, _ := cache.KeyStrings()
-			t.Assert(gset.NewFrom(g.Slice{"1", "2"}).Equal(gset.NewFrom(keyStrs)), true)
+			t.Assert(dset.NewFrom(d.Slice{"1", "2"}).Equal(dset.NewFrom(keyStrs)), true)
 			values, _ := cache.Values()
-			t.Assert(gset.NewFrom(g.Slice{11, 22}).Equal(gset.NewFrom(values)), true)
+			t.Assert(dset.NewFrom(d.Slice{11, 22}).Equal(dset.NewFrom(values)), true)
 			removeData1, _ := cache.Remove(1)
 			t.Assert(removeData1, 11)
 			n, _ = cache.Size()
 			t.Assert(n, 1)
-			cache.Removes(g.Slice{2})
+			cache.Removes(d.Slice{2})
 			n, _ = cache.Size()
 			t.Assert(n, 0)
 		}
 
-		dcache.Remove(g.Slice{1, 2, 3}...)
+		dcache.Remove(d.Slice{1, 2, 3}...)
 		{
-			dcache.Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+			dcache.Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 			b, _ := dcache.Contains(1)
 			t.Assert(b, true)
 			v, _ := dcache.Get(1)
@@ -399,16 +398,16 @@ func TestCache_Basic(t *testing.T) {
 			n, _ := dcache.Size()
 			t.Assert(n, 2)
 			keys, _ := dcache.Keys()
-			t.Assert(gset.NewFrom(g.Slice{1, 2}).Equal(gset.NewFrom(keys)), true)
+			t.Assert(dset.NewFrom(d.Slice{1, 2}).Equal(dset.NewFrom(keys)), true)
 			keyStrs, _ := dcache.KeyStrings()
-			t.Assert(gset.NewFrom(g.Slice{"1", "2"}).Equal(gset.NewFrom(keyStrs)), true)
+			t.Assert(dset.NewFrom(d.Slice{"1", "2"}).Equal(dset.NewFrom(keyStrs)), true)
 			values, _ := dcache.Values()
-			t.Assert(gset.NewFrom(g.Slice{11, 22}).Equal(gset.NewFrom(values)), true)
+			t.Assert(dset.NewFrom(d.Slice{11, 22}).Equal(dset.NewFrom(values)), true)
 			removeData1, _ := dcache.Remove(1)
 			t.Assert(removeData1, 11)
 			n, _ = dcache.Size()
 			t.Assert(n, 1)
-			dcache.Removes(g.Slice{2})
+			dcache.Removes(d.Slice{2})
 			n, _ = dcache.Size()
 			t.Assert(n, 0)
 		}
@@ -418,7 +417,7 @@ func TestCache_Basic(t *testing.T) {
 func TestCache_Ctx(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		cache := dcache.New()
-		cache.Ctx(context.Background()).Sets(g.MapAnyAny{1: 11, 2: 22}, 0)
+		cache.Ctx(context.Background()).Sets(d.MapAnyAny{1: 11, 2: 22}, 0)
 		b, _ := cache.Contains(1)
 		t.Assert(b, true)
 		v, _ := cache.Get(1)

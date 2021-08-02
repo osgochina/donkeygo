@@ -9,7 +9,7 @@ package dlog_test
 import (
 	"bytes"
 	"context"
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/text/dstr"
@@ -38,7 +38,7 @@ func Test_Ctx_Config(t *testing.T) {
 		w := bytes.NewBuffer(nil)
 		l := dlog.NewWithWriter(w)
 		m := map[string]interface{}{
-			"CtxKeys": g.SliceStr{"Trace-Id", "Span-Id", "Test"},
+			"CtxKeys": d.SliceStr{"Trace-Id", "Span-Id", "Test"},
 		}
 		err := l.SetConfigWithMap(m)
 		t.Assert(err, nil)

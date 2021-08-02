@@ -9,7 +9,7 @@
 package darray_test
 
 import (
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 
 	"github.com/osgochina/donkeygo/container/darray"
@@ -138,7 +138,7 @@ func TestSortedStrArray_PopLeft(t *testing.T) {
 		t.Assert(array1.Contains("a"), false)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedStrArrayFrom(g.SliceStr{"1", "2", "3"})
+		array := darray.NewSortedStrArrayFrom(d.SliceStr{"1", "2", "3"})
 		v, ok := array.PopLeft()
 		t.Assert(v, 1)
 		t.Assert(ok, true)
@@ -165,7 +165,7 @@ func TestSortedStrArray_PopRight(t *testing.T) {
 		t.Assert(array1.Contains("e"), false)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedStrArrayFrom(g.SliceStr{"1", "2", "3"})
+		array := darray.NewSortedStrArrayFrom(d.SliceStr{"1", "2", "3"})
 		v, ok := array.PopRight()
 		t.Assert(v, 3)
 		t.Assert(ok, true)
@@ -614,7 +614,7 @@ func TestSortedStrArray_Json(t *testing.T) {
 			Name   string
 			Scores *darray.SortedStrArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []string{"A+", "A", "A"},
 		}
@@ -633,7 +633,7 @@ func TestSortedStrArray_Json(t *testing.T) {
 			Name   string
 			Scores darray.SortedStrArray
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []string{"A+", "A", "A"},
 		}
@@ -649,7 +649,7 @@ func TestSortedStrArray_Json(t *testing.T) {
 }
 
 func TestSortedStrArray_Iterator(t *testing.T) {
-	slice := g.SliceStr{"a", "b", "d", "c"}
+	slice := d.SliceStr{"a", "b", "d", "c"}
 	array := darray.NewSortedStrArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		array.Iterator(func(k int, v string) bool {
@@ -696,7 +696,7 @@ func TestSortedStrArray_Iterator(t *testing.T) {
 }
 
 func TestSortedStrArray_RemoveValue(t *testing.T) {
-	slice := g.SliceStr{"a", "b", "d", "c"}
+	slice := d.SliceStr{"a", "b", "d", "c"}
 	array := darray.NewSortedStrArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		t.Assert(array.RemoveValue("e"), false)
@@ -715,43 +715,43 @@ func TestSortedStrArray_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
 			"array": []byte(`["1","3","2"]`),
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.SliceStr{"1", "2", "3"})
+		t.Assert(v.Array.Slice(), d.SliceStr{"1", "2", "3"})
 	})
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := dconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
-			"array": g.SliceStr{"1", "3", "2"},
+			"array": d.SliceStr{"1", "3", "2"},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.SliceStr{"1", "2", "3"})
+		t.Assert(v.Array.Slice(), d.SliceStr{"1", "2", "3"})
 	})
 }
 
 func TestSortedStrArray_FilterEmpty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedStrArrayFrom(g.SliceStr{"", "1", "2", "0"})
-		t.Assert(array.FilterEmpty(), g.SliceStr{"0", "1", "2"})
+		array := darray.NewSortedStrArrayFrom(d.SliceStr{"", "1", "2", "0"})
+		t.Assert(array.FilterEmpty(), d.SliceStr{"0", "1", "2"})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedStrArrayFrom(g.SliceStr{"1", "2"})
-		t.Assert(array.FilterEmpty(), g.SliceStr{"1", "2"})
+		array := darray.NewSortedStrArrayFrom(d.SliceStr{"1", "2"})
+		t.Assert(array.FilterEmpty(), d.SliceStr{"1", "2"})
 	})
 }
 
 func TestSortedStrArray_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewSortedStrArrayFrom(g.SliceStr{"1", "2"})
+		array := darray.NewSortedStrArrayFrom(d.SliceStr{"1", "2"})
 		t.Assert(array.Walk(func(value string) string {
 			return "key-" + value
-		}), g.Slice{"key-1", "key-2"})
+		}), d.Slice{"key-1", "key-2"})
 	})
 }

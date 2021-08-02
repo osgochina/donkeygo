@@ -3,8 +3,7 @@ package dlog
 import (
 	"errors"
 	"fmt"
-	"github.com/gogf/gf/errors/gerror"
-	"github.com/gogf/gf/util/gconv"
+	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/internal/intlog"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -91,7 +90,7 @@ func (that *Logger) SetConfigWithMap(m map[string]interface{}) error {
 	// 文件大小限制，超过该大小则重新建一个文件写
 	rotateSizeKey, rotateSizeValue := dutil.MapPossibleItemByKey(m, "RotateSize")
 	if rotateSizeValue != nil {
-		m[rotateSizeKey] = dfile.StrToSize(gconv.String(rotateSizeValue))
+		m[rotateSizeKey] = dfile.StrToSize(dconv.String(rotateSizeValue))
 		if m[rotateSizeKey] == -1 {
 			return errors.New(fmt.Sprintf(`invalid rotate size: %v`, rotateSizeValue))
 		}
@@ -180,7 +179,7 @@ func (that *Logger) SetPath(path string) error {
 	}
 	if !dfile.Exists(path) {
 		if err := dfile.Mkdir(path); err != nil {
-			return gerror.Wrapf(err, `Mkdir "%s" failed in PWD "%s"`, path, dfile.Pwd())
+			return derror.Wrapf(err, `Mkdir "%s" failed in PWD "%s"`, path, dfile.Pwd())
 		}
 	}
 	that.config.Path = strings.TrimRight(path, dfile.Separator)

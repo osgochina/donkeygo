@@ -9,11 +9,11 @@
 package darray_test
 
 import (
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/util/gconv"
 	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
 	"time"
 )
@@ -138,7 +138,7 @@ func TestArray_PopRands(t *testing.T) {
 
 func TestArray_PopLeft(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewFrom(g.Slice{1, 2, 3})
+		array := darray.NewFrom(d.Slice{1, 2, 3})
 		v, ok := array.PopLeft()
 		t.Assert(v, 1)
 		t.Assert(ok, true)
@@ -156,7 +156,7 @@ func TestArray_PopLeft(t *testing.T) {
 
 func TestArray_PopRight(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewFrom(g.Slice{1, 2, 3})
+		array := darray.NewFrom(d.Slice{1, 2, 3})
 
 		v, ok := array.PopRight()
 		t.Assert(v, 3)
@@ -177,20 +177,20 @@ func TestArray_PopRight(t *testing.T) {
 
 func TestArray_PopLefts(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewFrom(g.Slice{1, 2, 3})
-		t.Assert(array.PopLefts(2), g.Slice{1, 2})
+		array := darray.NewFrom(d.Slice{1, 2, 3})
+		t.Assert(array.PopLefts(2), d.Slice{1, 2})
 		t.Assert(array.Len(), 1)
-		t.Assert(array.PopLefts(2), g.Slice{3})
+		t.Assert(array.PopLefts(2), d.Slice{3})
 		t.Assert(array.Len(), 0)
 	})
 }
 
 func TestArray_PopRights(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewFrom(g.Slice{1, 2, 3})
-		t.Assert(array.PopRights(2), g.Slice{2, 3})
+		array := darray.NewFrom(d.Slice{1, 2, 3})
+		t.Assert(array.PopRights(2), d.Slice{2, 3})
 		t.Assert(array.Len(), 1)
-		t.Assert(array.PopLefts(2), g.Slice{1})
+		t.Assert(array.PopLefts(2), d.Slice{1})
 		t.Assert(array.Len(), 0)
 	})
 }
@@ -247,7 +247,7 @@ func TestArray_Range(t *testing.T) {
 func TestArray_Merge(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		func1 := func(v1, v2 interface{}) int {
-			if gconv.Int(v1) < gconv.Int(v2) {
+			if dconv.Int(v1) < dconv.Int(v2) {
 				return 0
 			}
 			return 1
@@ -505,15 +505,15 @@ func TestArray_LockFunc(t *testing.T) {
 		go a1.LockFunc(func(n1 []interface{}) { //读写锁
 			time.Sleep(2 * time.Second) //暂停2秒
 			n1[2] = "g"
-			ch2 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch2 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 		})
 
 		//go2
 		go func() {
 			time.Sleep(100 * time.Millisecond) //故意暂停0.01秒,等go1执行锁后，再开始执行.
-			ch1 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch1 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 			a1.Len()
-			ch1 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch1 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 		}()
 
 		t1 := <-ch1
@@ -537,15 +537,15 @@ func TestArray_RLockFunc(t *testing.T) {
 		go a1.RLockFunc(func(n1 []interface{}) { //读锁
 			time.Sleep(2 * time.Second) //暂停1秒
 			n1[2] = "g"
-			ch2 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch2 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 		})
 
 		//go2
 		go func() {
 			time.Sleep(100 * time.Millisecond) //故意暂停0.01秒,等go1执行锁后，再开始执行.
-			ch1 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch1 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 			a1.Len()
-			ch1 <- gconv.Int64(time.Now().UnixNano() / 1000 / 1000)
+			ch1 <- dconv.Int64(time.Now().UnixNano() / 1000 / 1000)
 		}()
 
 		t1 := <-ch1
@@ -603,7 +603,7 @@ func TestArray_Json(t *testing.T) {
 			Name   string
 			Scores *darray.Array
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []int{99, 100, 98},
 		}
@@ -622,7 +622,7 @@ func TestArray_Json(t *testing.T) {
 			Name   string
 			Scores darray.Array
 		}
-		data := g.Map{
+		data := d.Map{
 			"Name":   "john",
 			"Scores": []int{99, 100, 98},
 		}
@@ -638,7 +638,7 @@ func TestArray_Json(t *testing.T) {
 }
 
 func TestArray_Iterator(t *testing.T) {
-	slice := g.Slice{"a", "b", "d", "c"}
+	slice := d.Slice{"a", "b", "d", "c"}
 	array := darray.NewArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		array.Iterator(func(k int, v interface{}) bool {
@@ -685,7 +685,7 @@ func TestArray_Iterator(t *testing.T) {
 }
 
 func TestArray_RemoveValue(t *testing.T) {
-	slice := g.Slice{"a", "b", "d", "c"}
+	slice := d.Slice{"a", "b", "d", "c"}
 	array := darray.NewArrayFrom(slice)
 	dtest.C(t, func(t *dtest.T) {
 		t.Assert(array.RemoveValue("e"), false)
@@ -704,55 +704,55 @@ func TestArray_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
 			"array": []byte(`[1,2,3]`),
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.Slice{1, 2, 3})
+		t.Assert(v.Array.Slice(), d.Slice{1, 2, 3})
 	})
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name":  "john",
-			"array": g.Slice{1, 2, 3},
+			"array": d.Slice{1, 2, 3},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")
-		t.Assert(v.Array.Slice(), g.Slice{1, 2, 3})
+		t.Assert(v.Array.Slice(), d.Slice{1, 2, 3})
 	})
 }
 
 func TestArray_FilterNil(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		values := g.Slice{0, 1, 2, 3, 4, "", g.Slice{}}
+		values := d.Slice{0, 1, 2, 3, 4, "", d.Slice{}}
 		array := darray.NewArrayFromCopy(values)
 		t.Assert(array.FilterNil().Slice(), values)
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewArrayFromCopy(g.Slice{nil, 1, 2, 3, 4, nil})
-		t.Assert(array.FilterNil(), g.Slice{1, 2, 3, 4})
+		array := darray.NewArrayFromCopy(d.Slice{nil, 1, 2, 3, 4, nil})
+		t.Assert(array.FilterNil(), d.Slice{1, 2, 3, 4})
 	})
 }
 
 func TestArray_FilterEmpty(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewArrayFrom(g.Slice{0, 1, 2, 3, 4, "", g.Slice{}})
-		t.Assert(array.FilterEmpty(), g.Slice{1, 2, 3, 4})
+		array := darray.NewArrayFrom(d.Slice{0, 1, 2, 3, 4, "", d.Slice{}})
+		t.Assert(array.FilterEmpty(), d.Slice{1, 2, 3, 4})
 	})
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewArrayFrom(g.Slice{1, 2, 3, 4})
-		t.Assert(array.FilterEmpty(), g.Slice{1, 2, 3, 4})
+		array := darray.NewArrayFrom(d.Slice{1, 2, 3, 4})
+		t.Assert(array.FilterEmpty(), d.Slice{1, 2, 3, 4})
 	})
 }
 
 func TestArray_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		array := darray.NewArrayFrom(g.Slice{"1", "2"})
+		array := darray.NewArrayFrom(d.Slice{"1", "2"})
 		t.Assert(array.Walk(func(value interface{}) interface{} {
-			return "key-" + gconv.String(value)
-		}), g.Slice{"key-1", "key-2"})
+			return "key-" + dconv.String(value)
+		}), d.Slice{"key-1", "key-2"})
 	})
 }

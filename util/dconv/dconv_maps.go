@@ -1,6 +1,12 @@
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
 package dconv
 
-import "encoding/json"
+import "github.com/osgochina/donkeygo/internal/json"
 
 // SliceMap is alias of Maps.
 func SliceMap(any interface{}) []map[string]interface{} {
@@ -17,7 +23,7 @@ func SliceStruct(params interface{}, pointer interface{}, mapping ...map[string]
 	return Structs(params, pointer, mapping...)
 }
 
-// Maps converts `i` to []map[string]interface{}.
+// Maps converts `value` to []map[string]interface{}.
 // Note that it automatically checks and converts json string to []map if `value` is string/[]byte.
 func Maps(value interface{}, tags ...string) []map[string]interface{} {
 	if value == nil {
@@ -27,7 +33,7 @@ func Maps(value interface{}, tags ...string) []map[string]interface{} {
 	case string:
 		list := make([]map[string]interface{}, 0)
 		if len(r) > 0 && r[0] == '[' && r[len(r)-1] == ']' {
-			if err := json.Unmarshal([]byte(r), &list); err != nil {
+			if err := json.UnmarshalUseNumber([]byte(r), &list); err != nil {
 				return nil
 			}
 			return list
@@ -38,7 +44,7 @@ func Maps(value interface{}, tags ...string) []map[string]interface{} {
 	case []byte:
 		list := make([]map[string]interface{}, 0)
 		if len(r) > 0 && r[0] == '[' && r[len(r)-1] == ']' {
-			if err := json.Unmarshal(r, &list); err != nil {
+			if err := json.UnmarshalUseNumber(r, &list); err != nil {
 				return nil
 			}
 			return list
@@ -62,7 +68,7 @@ func Maps(value interface{}, tags ...string) []map[string]interface{} {
 	}
 }
 
-// MapsDeep converts `i` to []map[string]interface{} recursively.
+// MapsDeep converts `value` to []map[string]interface{} recursively.
 //
 // TODO completely implement the recursive converting for all types.
 func MapsDeep(value interface{}, tags ...string) []map[string]interface{} {
@@ -73,7 +79,7 @@ func MapsDeep(value interface{}, tags ...string) []map[string]interface{} {
 	case string:
 		list := make([]map[string]interface{}, 0)
 		if len(r) > 0 && r[0] == '[' && r[len(r)-1] == ']' {
-			if err := json.Unmarshal([]byte(r), &list); err != nil {
+			if err := json.UnmarshalUseNumber([]byte(r), &list); err != nil {
 				return nil
 			}
 			return list
@@ -84,7 +90,7 @@ func MapsDeep(value interface{}, tags ...string) []map[string]interface{} {
 	case []byte:
 		list := make([]map[string]interface{}, 0)
 		if len(r) > 0 && r[0] == '[' && r[len(r)-1] == ']' {
-			if err := json.Unmarshal(r, &list); err != nil {
+			if err := json.UnmarshalUseNumber(r, &list); err != nil {
 				return nil
 			}
 			return list

@@ -7,9 +7,9 @@
 package dlog_test
 
 import (
-	"github.com/gogf/gf/os/gtime"
 	"github.com/osgochina/donkeygo/os/dfile"
 	"github.com/osgochina/donkeygo/os/dlog"
+	"github.com/osgochina/donkeygo/os/dtime"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/text/dstr"
 	"sync"
@@ -22,7 +22,7 @@ func Test_Concurrent(t *testing.T) {
 		l := dlog.New()
 		s := "@1234567890#"
 		f := "test.log"
-		p := dfile.TempDir(gtime.TimestampNanoStr())
+		p := dfile.TempDir(dtime.TimestampNanoStr())
 		t.Assert(l.SetPath(p), nil)
 		defer dfile.Remove(p)
 		wg := sync.WaitGroup{}

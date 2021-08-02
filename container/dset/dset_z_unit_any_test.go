@@ -3,18 +3,16 @@
 package dset_test
 
 import (
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/util/gconv"
+	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dset"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/test/dtest"
+	"github.com/osgochina/donkeygo/util/dconv"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/gogf/gf/container/garray"
-
 	"testing"
+	"time"
 )
 
 func TestSet_Var(t *testing.T) {
@@ -83,8 +81,8 @@ func TestSet_Iterator(t *testing.T) {
 		s.Add(1, 2, 3)
 		t.Assert(s.Size(), 3)
 
-		a1 := garray.New(true)
-		a2 := garray.New(true)
+		a1 := darray.New(true)
+		a2 := darray.New(true)
 		s.Iterator(func(v interface{}) bool {
 			a1.Append(1)
 			return false
@@ -368,10 +366,10 @@ func TestSet_AddIfNotExistFunc(t *testing.T) {
 	})
 	dtest.C(t, func(t *dtest.T) {
 		s := dset.New(true)
-		wg := sync.WaitGroup{}
-		wg.Add(1)
+		wd := sync.WaitGroup{}
+		wd.Add(1)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFunc(1, func() bool {
 				time.Sleep(100 * time.Millisecond)
 				return true
@@ -379,16 +377,16 @@ func TestSet_AddIfNotExistFunc(t *testing.T) {
 			t.Assert(r, false)
 		}()
 		s.Add(1)
-		wg.Wait()
+		wd.Wait()
 	})
 }
 
 func TestSet_Walk(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		var set dset.Set
-		set.Add(g.Slice{1, 2}...)
+		set.Add(d.Slice{1, 2}...)
 		set.Walk(func(item interface{}) interface{} {
-			return gconv.Int(item) + 10
+			return dconv.Int(item) + 10
 		})
 		t.Assert(set.Size(), 2)
 		t.Assert(set.Contains(11), true)
@@ -399,10 +397,10 @@ func TestSet_Walk(t *testing.T) {
 func TestSet_AddIfNotExistFuncLock(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		s := dset.New(true)
-		wg := sync.WaitGroup{}
-		wg.Add(2)
+		wd := sync.WaitGroup{}
+		wd.Add(2)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFuncLock(1, func() bool {
 				time.Sleep(500 * time.Millisecond)
 				return true
@@ -411,13 +409,13 @@ func TestSet_AddIfNotExistFuncLock(t *testing.T) {
 		}()
 		time.Sleep(100 * time.Millisecond)
 		go func() {
-			defer wg.Done()
+			defer wd.Done()
 			r := s.AddIfNotExistFuncLock(1, func() bool {
 				return true
 			})
 			t.Assert(r, false)
 		}()
-		wg.Wait()
+		wd.Wait()
 	})
 }
 
@@ -429,7 +427,7 @@ func TestSet_UnmarshalValue(t *testing.T) {
 	// JSON
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name": "john",
 			"set":  []byte(`["k1","k2","k3"]`),
 		}, &v)
@@ -444,9 +442,9 @@ func TestSet_UnmarshalValue(t *testing.T) {
 	// Map
 	dtest.C(t, func(t *dtest.T) {
 		var v *V
-		err := gconv.Struct(g.Map{
+		err := dconv.Struct(d.Map{
 			"name": "john",
-			"set":  g.Slice{"k1", "k2", "k3"},
+			"set":  d.Slice{"k1", "k2", "k3"},
 		}, &v)
 		t.Assert(err, nil)
 		t.Assert(v.Name, "john")

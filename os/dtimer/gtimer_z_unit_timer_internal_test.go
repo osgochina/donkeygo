@@ -7,15 +7,15 @@
 package dtimer
 
 import (
-	"github.com/gogf/gf/container/garray"
-	"github.com/gogf/gf/test/gtest"
+	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
 	"time"
 )
 
 func TestTimer_Proceed(t *testing.T) {
-	gtest.C(t, func(t *gtest.T) {
-		array := garray.New(true)
+	dtest.C(t, func(t *dtest.T) {
+		array := darray.New(true)
 		timer := New(TimerOptions{
 			Interval: time.Hour,
 		})
@@ -29,8 +29,8 @@ func TestTimer_Proceed(t *testing.T) {
 		time.Sleep(10 * time.Millisecond)
 		t.Assert(array.Len(), 2)
 	})
-	gtest.C(t, func(t *gtest.T) {
-		array := garray.New(true)
+	dtest.C(t, func(t *dtest.T) {
+		array := darray.New(true)
 		timer := New(TimerOptions{
 			Interval: time.Millisecond * 100,
 		})

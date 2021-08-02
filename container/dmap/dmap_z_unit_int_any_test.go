@@ -8,9 +8,9 @@ package dmap_test
 
 import (
 	"encoding/json"
-	"github.com/gogf/gf/container/garray"
-	"github.com/gogf/gf/frame/g"
+	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dmap"
+	"github.com/osgochina/donkeygo/frame/d"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"github.com/osgochina/donkeygo/util/dconv"
 	"testing"
@@ -224,7 +224,7 @@ func Test_IntAnyMap_FilterEmpty(t *testing.T) {
 func Test_IntAnyMap_Json(t *testing.T) {
 	// Marshal
 	dtest.C(t, func(t *dtest.T) {
-		data := g.MapIntAny{
+		data := d.MapIntAny{
 			1: "v1",
 			2: "v2",
 		}
@@ -236,7 +236,7 @@ func Test_IntAnyMap_Json(t *testing.T) {
 	})
 	// Unmarshal
 	dtest.C(t, func(t *dtest.T) {
-		data := g.MapIntAny{
+		data := d.MapIntAny{
 			1: "v1",
 			2: "v2",
 		}
@@ -253,19 +253,19 @@ func Test_IntAnyMap_Json(t *testing.T) {
 
 func Test_IntAnyMap_Pop(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := dmap.NewIntAnyMapFrom(g.MapIntAny{
+		m := dmap.NewIntAnyMapFrom(d.MapIntAny{
 			1: "v1",
 			2: "v2",
 		})
 		t.Assert(m.Size(), 2)
 
 		k1, v1 := m.Pop()
-		t.AssertIN(k1, g.Slice{1, 2})
-		t.AssertIN(v1, g.Slice{"v1", "v2"})
+		t.AssertIN(k1, d.Slice{1, 2})
+		t.AssertIN(v1, d.Slice{"v1", "v2"})
 		t.Assert(m.Size(), 1)
 		k2, v2 := m.Pop()
-		t.AssertIN(k2, g.Slice{1, 2})
-		t.AssertIN(v2, g.Slice{"v1", "v2"})
+		t.AssertIN(k2, d.Slice{1, 2})
+		t.AssertIN(v2, d.Slice{"v1", "v2"})
 		t.Assert(m.Size(), 0)
 
 		t.AssertNE(k1, k2)
@@ -275,25 +275,25 @@ func Test_IntAnyMap_Pop(t *testing.T) {
 
 func Test_IntAnyMap_Pops(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		m := dmap.NewIntAnyMapFrom(g.MapIntAny{
+		m := dmap.NewIntAnyMapFrom(d.MapIntAny{
 			1: "v1",
 			2: "v2",
 			3: "v3",
 		})
 		t.Assert(m.Size(), 3)
 
-		kArray := garray.New()
-		vArray := garray.New()
+		kArray := darray.New()
+		vArray := darray.New()
 		for k, v := range m.Pops(1) {
-			t.AssertIN(k, g.Slice{1, 2, 3})
-			t.AssertIN(v, g.Slice{"v1", "v2", "v3"})
+			t.AssertIN(k, d.Slice{1, 2, 3})
+			t.AssertIN(v, d.Slice{"v1", "v2", "v3"})
 			kArray.Append(k)
 			vArray.Append(v)
 		}
 		t.Assert(m.Size(), 2)
 		for k, v := range m.Pops(2) {
-			t.AssertIN(k, g.Slice{1, 2, 3})
-			t.AssertIN(v, g.Slice{"v1", "v2", "v3"})
+			t.AssertIN(k, d.Slice{1, 2, 3})
+			t.AssertIN(v, d.Slice{"v1", "v2", "v3"})
 			kArray.Append(k)
 			vArray.Append(v)
 		}
@@ -327,7 +327,7 @@ func TestIntAnyMap_UnmarshalValue(t *testing.T) {
 		var v *V
 		err := dconv.Struct(map[string]interface{}{
 			"name": "john",
-			"map": g.MapIntAny{
+			"map": d.MapIntAny{
 				1: "v1",
 				2: "v2",
 			},

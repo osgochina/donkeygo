@@ -8,8 +8,8 @@ package darray_test
 
 import (
 	"fmt"
-	"github.com/gogf/gf/frame/g"
 	"github.com/osgochina/donkeygo/container/darray"
+	"github.com/osgochina/donkeygo/frame/d"
 )
 
 func ExampleNew() {
@@ -72,7 +72,7 @@ func ExampleNew() {
 }
 
 func ExampleArray_Iterator() {
-	array := darray.NewArrayFrom(g.Slice{"a", "b", "c"})
+	array := darray.NewArrayFrom(d.Slice{"a", "b", "c"})
 	// Iterator is alias of IteratorAsc, which iterates the array readonly in ascending order
 	//  with given callback function <f>.
 	// If <f> returns true, then it continues iterating; or false to stop.
@@ -97,7 +97,7 @@ func ExampleArray_Iterator() {
 }
 
 func ExampleArray_Reverse() {
-	array := darray.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	array := darray.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 	// Reverse makes array with elements in reverse order.
 	fmt.Println(array.Reverse().Slice())
@@ -107,14 +107,14 @@ func ExampleArray_Reverse() {
 }
 
 func ExampleArray_Shuffle() {
-	array := darray.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	array := darray.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 	// Shuffle randomly shuffles the array.
 	fmt.Println(array.Shuffle().Slice())
 }
 
 func ExampleArray_Rands() {
-	array := darray.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	array := darray.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 	// Randomly retrieve and return 2 items from the array.
 	// It does not delete the items from array.
@@ -126,7 +126,7 @@ func ExampleArray_Rands() {
 }
 
 func ExampleArray_PopRand() {
-	array := darray.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	array := darray.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 	// Randomly retrieve and return 2 items from the array.
 	// It does not delete the items from array.
@@ -138,7 +138,7 @@ func ExampleArray_PopRand() {
 }
 
 func ExampleArray_Join() {
-	array := darray.NewFrom(g.Slice{"a", "b", "c", "d"})
+	array := darray.NewFrom(d.Slice{"a", "b", "c", "d"})
 	fmt.Println(array.Join(","))
 
 	// Output:
@@ -146,7 +146,7 @@ func ExampleArray_Join() {
 }
 
 func ExampleArray_Chunk() {
-	array := darray.NewFrom(g.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
+	array := darray.NewFrom(d.Slice{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 	// Chunk splits an array into multiple arrays,
 	// the size of each array is determined by <size>.
@@ -239,9 +239,9 @@ func ExampleArray_Contains() {
 }
 
 func ExampleArray_Merge() {
-	array1 := darray.NewFrom(g.Slice{1, 2})
-	array2 := darray.NewFrom(g.Slice{3, 4})
-	slice1 := g.Slice{5, 6}
+	array1 := darray.NewFrom(d.Slice{1, 2})
+	array2 := darray.NewFrom(d.Slice{3, 4})
+	slice1 := d.Slice{5, 6}
 	slice2 := []int{7, 8}
 	slice3 := []string{"9", "0"}
 	fmt.Println(array1.Slice())
@@ -258,8 +258,8 @@ func ExampleArray_Merge() {
 }
 
 func ExampleArray_FilterEmpty() {
-	array1 := darray.NewFrom(g.Slice{0, 1, 2, nil, "", g.Slice{}, "john"})
-	array2 := darray.NewFrom(g.Slice{0, 1, 2, nil, "", g.Slice{}, "john"})
+	array1 := darray.NewFrom(d.Slice{0, 1, 2, nil, "", d.Slice{}, "john"})
+	array2 := darray.NewFrom(d.Slice{0, 1, 2, nil, "", d.Slice{}, "john"})
 	fmt.Printf("%#v\n", array1.FilterNil().Slice())
 	fmt.Printf("%#v\n", array2.FilterEmpty().Slice())
 
@@ -269,8 +269,8 @@ func ExampleArray_FilterEmpty() {
 }
 
 func ExampleArray_FilterNil() {
-	array1 := darray.NewFrom(g.Slice{0, 1, 2, nil, "", g.Slice{}, "john"})
-	array2 := darray.NewFrom(g.Slice{0, 1, 2, nil, "", g.Slice{}, "john"})
+	array1 := darray.NewFrom(d.Slice{0, 1, 2, nil, "", d.Slice{}, "john"})
+	array2 := darray.NewFrom(d.Slice{0, 1, 2, nil, "", d.Slice{}, "john"})
 	fmt.Printf("%#v\n", array1.FilterNil().Slice())
 	fmt.Printf("%#v\n", array2.FilterEmpty().Slice())
 

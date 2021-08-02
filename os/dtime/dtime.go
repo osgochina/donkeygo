@@ -2,7 +2,6 @@ package dtime
 
 import (
 	"fmt"
-	"github.com/gogf/gf/text/gregex"
 	"github.com/osgochina/donkeygo/errors/derror"
 	"github.com/osgochina/donkeygo/internal/utils"
 	"github.com/osgochina/donkeygo/text/dregex"
@@ -370,7 +369,7 @@ func StrToTimeLayout(str string, layout string) (*Time, error) {
 // It only retrieves and parses the time information with given <format> if it's passed.
 func ParseTimeFromContent(content string, format ...string) *Time {
 	if len(format) > 0 {
-		if match, err := gregex.MatchString(formatToRegexPattern(format[0]), content); err == nil && len(match) > 0 {
+		if match, err := dregex.MatchString(formatToRegexPattern(format[0]), content); err == nil && len(match) > 0 {
 			return NewFromStrFormat(match[0], format[0])
 		}
 	} else {

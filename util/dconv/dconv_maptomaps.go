@@ -73,7 +73,7 @@ func doMapToMaps(params interface{}, pointer interface{}, mapping ...map[string]
 		paramsKind = paramsRv.Kind()
 	}
 	if paramsKind != reflect.Array && paramsKind != reflect.Slice {
-		return derror.New("params should be type of slice, eg: []map/[]*map/[]struct/[]*struct")
+		return derror.NewCode(derror.CodeInvalidParameter, "params should be type of slice, eg: []map/[]*map/[]struct/[]*struct")
 	}
 	var (
 		paramsElem     = paramsRv.Type().Elem()
@@ -84,7 +84,7 @@ func doMapToMaps(params interface{}, pointer interface{}, mapping ...map[string]
 		paramsElemKind = paramsElem.Kind()
 	}
 	if paramsElemKind != reflect.Map && paramsElemKind != reflect.Struct && paramsElemKind != reflect.Interface {
-		return derror.Newf("params element should be type of map/*map/struct/*struct, but got: %s", paramsElemKind)
+		return derror.NewCodef(derror.CodeInvalidParameter, "params element should be type of map/*map/struct/*struct, but got: %s", paramsElemKind)
 	}
 	// Empty slice, no need continue.
 	if paramsRv.Len() == 0 {
@@ -100,7 +100,7 @@ func doMapToMaps(params interface{}, pointer interface{}, mapping ...map[string]
 		pointerKind = pointerRv.Kind()
 	}
 	if pointerKind != reflect.Array && pointerKind != reflect.Slice {
-		return derror.New("pointer should be type of *[]map/*[]*map")
+		return derror.NewCode(derror.CodeInvalidParameter, "pointer should be type of *[]map/*[]*map")
 	}
 	var (
 		pointerElemType = pointerRv.Type().Elem()
@@ -110,7 +110,7 @@ func doMapToMaps(params interface{}, pointer interface{}, mapping ...map[string]
 		pointerElemKind = pointerElemType.Elem().Kind()
 	}
 	if pointerElemKind != reflect.Map {
-		return derror.New("pointer element should be type of map/*map")
+		return derror.NewCode(derror.CodeInvalidParameter, "pointer element should be type of map/*map")
 	}
 	defer func() {
 		// Catch the panic, especially the reflect operation panics.
@@ -118,7 +118,7 @@ func doMapToMaps(params interface{}, pointer interface{}, mapping ...map[string]
 			if e, ok := exception.(errorStack); ok {
 				err = e
 			} else {
-				err = derror.NewSkipf(1, "%v", exception)
+				err = derror.NewCodeSkipf(derror.CodeInternalError, 1, "%v", exception)
 			}
 		}
 	}()

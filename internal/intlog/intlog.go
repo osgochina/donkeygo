@@ -2,7 +2,7 @@ package intlog
 
 import (
 	"fmt"
-	"github.com/gogf/gf/debug/gdebug"
+	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/internal/utils"
 	"path/filepath"
 	"time"
@@ -46,7 +46,7 @@ func Error(v ...interface{}) {
 		return
 	}
 	array := append([]interface{}{now(), "[INTE]", file()}, v...)
-	array = append(array, "\n"+gdebug.StackWithFilter(stackFilterKey))
+	array = append(array, "\n"+ddebug.StackWithFilter(stackFilterKey))
 	fmt.Println(array...)
 }
 
@@ -56,7 +56,7 @@ func Errorf(format string, v ...interface{}) {
 	}
 	fmt.Printf(
 		now()+" [INTE] "+file()+" "+format+"\n%s\n",
-		append(v, gdebug.StackWithFilter(stackFilterKey))...,
+		append(v, ddebug.StackWithFilter(stackFilterKey))...,
 	)
 }
 
@@ -67,6 +67,6 @@ func now() string {
 
 // 返回调用者的文件名和行号
 func file() string {
-	_, p, l := gdebug.CallerWithFilter(stackFilterKey)
+	_, p, l := ddebug.CallerWithFilter(stackFilterKey)
 	return fmt.Sprintf(`%s:%d`, filepath.Base(p), l)
 }

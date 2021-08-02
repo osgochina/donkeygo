@@ -68,12 +68,28 @@ func ComparatorUint64(a, b interface{}) int {
 
 // ComparatorFloat32 provides a basic comparison on float32.
 func ComparatorFloat32(a, b interface{}) int {
-	return int(dconv.Float32(a) - dconv.Float32(b))
+	aFloat := dconv.Float32(a)
+	bFloat := dconv.Float32(b)
+	if aFloat == bFloat {
+		return 0
+	}
+	if aFloat > bFloat {
+		return 1
+	}
+	return -1
 }
 
 // ComparatorFloat64 provides a basic comparison on float64.
 func ComparatorFloat64(a, b interface{}) int {
-	return int(dconv.Float64(a) - dconv.Float64(b))
+	aFloat := dconv.Float64(a)
+	bFloat := dconv.Float64(b)
+	if aFloat == bFloat {
+		return 0
+	}
+	if aFloat > bFloat {
+		return 1
+	}
+	return -1
 }
 
 // ComparatorByte provides a basic comparison on byte.

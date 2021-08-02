@@ -2,8 +2,8 @@ package dset_test
 
 import (
 	"fmt"
-	"github.com/gogf/gf/frame/g"
 	"github.com/osgochina/donkeygo/container/dset"
+	"github.com/osgochina/donkeygo/frame/d"
 )
 
 func ExampleStrSet_Contains() {
@@ -22,7 +22,7 @@ func ExampleStrSet_Contains() {
 func ExampleStrSet_Walk() {
 	var (
 		set    dset.StrSet
-		names  = g.SliceStr{"user", "user_detail"}
+		names  = d.SliceStr{"user", "user_detail"}
 		prefix = "gf_"
 	)
 	set.Add(names...)
