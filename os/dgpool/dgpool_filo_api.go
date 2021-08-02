@@ -23,7 +23,7 @@ func SetFILOPool(maxGoroutinesAmount int, maxGoroutineIdleDuration time.Duration
 // FILOGo 使用栈的形式组织协程执行方法，
 func FILOGo(fn func()) bool {
 	if err := _filoPool.Go(fn); err != nil {
-		intlog.Printf("%s", err.Error())
+		intlog.Printf(context.TODO(), "%s", err.Error())
 		return false
 	}
 	return true

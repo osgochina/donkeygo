@@ -2,6 +2,7 @@ package dcfg
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/encoding/gjson"
@@ -49,20 +50,20 @@ func New(file ...string) *Config {
 	} else {
 		//把当前working目录加入搜索范围
 		if err := c.AddPath(dfile.Pwd()); err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 
 		// 把当前代码的main包所在的目录加入到搜索范围
 		if mainPath := dfile.MainPkgPath(); mainPath != "" && dfile.Exists(mainPath) {
 			if err := c.AddPath(mainPath); err != nil {
-				intlog.Error(err)
+				intlog.Error(context.TODO(), err)
 			}
 		}
 
 		// 把当前程序所在的目录放入搜索范围
 		if selfPath := dfile.SelfDir(); selfPath != "" && dfile.Exists(selfPath) {
 			if err := c.AddPath(selfPath); err != nil {
-				intlog.Error(err)
+				intlog.Error(context.TODO(), err)
 			}
 		}
 
@@ -108,7 +109,7 @@ func (that *Config) SetPath(path string) error {
 	that.jsonMap.Clear()
 	that.searchPaths.Clear()
 	that.searchPaths.Append(realPath)
-	intlog.Print("SetPath:", realPath)
+	intlog.Print(context.TODO(), "SetPath:", realPath)
 	return nil
 }
 
@@ -132,7 +133,7 @@ func (that *Config) AddPath(path string) error {
 		return nil
 	}
 	that.searchPaths.Append(realPath)
-	intlog.Print("AddPath:", realPath)
+	intlog.Print(context.TODO(), "AddPath:", realPath)
 	return nil
 }
 

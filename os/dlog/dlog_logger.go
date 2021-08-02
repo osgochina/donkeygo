@@ -93,7 +93,7 @@ func (that *Logger) print(std io.Writer, lead string, values ...interface{}) {
 		//判断是否需要旋转日志
 		if p.config.RotateSize > 0 || p.config.RotateExpire > 0 {
 			dtimer.AddOnce(p.config.RotateCheckInterval, p.rotateChecksTimely)
-			intlog.Printf("logger rotation initialized: every %s", p.config.RotateCheckInterval.String())
+			intlog.Printf(context.TODO(), "logger rotation initialized: every %s", p.config.RotateCheckInterval.String())
 		}
 	}
 	var (
@@ -198,7 +198,7 @@ func (that *Logger) print(std io.Writer, lead string, values ...interface{}) {
 			that.printToWriter(now, std, buffer)
 		})
 		if err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 	} else {
 		that.printToWriter(now, std, buffer)
@@ -216,14 +216,14 @@ func (that *Logger) printToWriter(now time.Time, std io.Writer, buffer *bytes.Bu
 		//写入标准输出
 		if that.config.StdoutPrint {
 			if _, err := std.Write(buffer.Bytes()); err != nil {
-				intlog.Error(err)
+				intlog.Error(context.TODO(), err)
 			}
 		}
 	} else {
 		//写入自定义设备
 		if _, err := that.config.Writer.Write(buffer.Bytes()); err != nil {
 			// panic(err)
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 	}
 }
@@ -246,13 +246,13 @@ func (that *Logger) printToFile(now time.Time, buffer *bytes.Buffer) {
 	}
 	//获取文件的指针
 	if file := that.getFilePointer(logFilePath); file == nil {
-		intlog.Errorf(`got nil file pointer for: %s`, logFilePath)
+		intlog.Errorf(context.TODO(), `got nil file pointer for: %s`, logFilePath)
 	} else {
 		if _, err := file.Write(buffer.Bytes()); err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 		if err := file.Close(); err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 	}
 }
@@ -267,7 +267,7 @@ func (that *Logger) getFilePointer(path string) *dfpool.File {
 	)
 	if err != nil {
 		// panic(err)
-		intlog.Error(err)
+		intlog.Error(context.TODO(), err)
 	}
 	return file
 }

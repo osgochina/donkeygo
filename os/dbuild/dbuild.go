@@ -1,9 +1,10 @@
 package dbuild
 
 import (
-	"github.com/gogf/gf/encoding/gbase64"
+	"context"
 	"github.com/osgochina/donkeygo"
 	"github.com/osgochina/donkeygo/container/dvar"
+	"github.com/osgochina/donkeygo/encoding/dbase64"
 	"github.com/osgochina/donkeygo/internal/intlog"
 	"github.com/osgochina/donkeygo/internal/json"
 	"github.com/osgochina/donkeygo/util/dconv"
@@ -17,15 +18,15 @@ var (
 
 func init() {
 	if builtInVarStr != "" {
-		err := json.UnmarshalUseNumber(gbase64.MustDecodeString(builtInVarStr), &builtInVarMap)
+		err := json.UnmarshalUseNumber(dbase64.MustDecodeString(builtInVarStr), &builtInVarMap)
 		if err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 		builtInVarMap["dkVersion"] = donkeygo.VERSION
 		builtInVarMap["goVersion"] = runtime.Version()
-		intlog.Printf("build variables: %+v", builtInVarMap)
+		intlog.Printf(context.TODO(), "build variables: %+v", builtInVarMap)
 	} else {
-		intlog.Print("no build variables")
+		intlog.Print(context.TODO(), "no build variables")
 	}
 }
 

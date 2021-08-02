@@ -1,6 +1,7 @@
 package dcfg
 
 import (
+	"context"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/container/dmap"
 	"github.com/osgochina/donkeygo/internal/intlog"
@@ -76,7 +77,7 @@ func RemoveContent(file ...string) {
 		customConfigContentMap.Remove(name)
 	})
 
-	intlog.Printf(`RemoveContent: %s`, name)
+	intlog.Printf(context.TODO(), `RemoveContent: %s`, name)
 }
 
 // ClearContent 清空所有的配置文件内容
@@ -89,7 +90,7 @@ func ClearContent() {
 		}
 	})
 
-	intlog.Print(`RemoveConfig`)
+	intlog.Print(context.TODO(), `RemoveConfig`)
 }
 
 // 是否需要打印错误信息

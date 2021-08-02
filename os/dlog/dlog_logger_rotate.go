@@ -1,6 +1,7 @@
 package dlog
 
 import (
+	"context"
 	"fmt"
 	"github.com/osgochina/donkeygo/container/darray"
 	"github.com/osgochina/donkeygo/encoding/dcompress"
@@ -20,7 +21,7 @@ func (that *Logger) rotateFileBySize(now time.Time) {
 	}
 	if err := that.doRotateFile(that.getFilePath(now)); err != nil {
 		// panic(err)
-		intlog.Error(err)
+		intlog.Error(context.TODO(), err)
 	}
 }
 
@@ -37,7 +38,7 @@ func (that *Logger) doRotateFile(filePath string) error {
 		if err := dfile.Remove(filePath); err != nil {
 			return err
 		}
-		intlog.Printf(`%d size exceeds, no backups set, remove original logging file: %s`, that.config.RotateSize, filePath)
+		intlog.Printf(context.TODO(), `%d size exceeds, no backups set, remove original logging file: %s`, that.config.RotateSize, filePath)
 		return nil
 	}
 	// 为备份做准备，留下原始原件的信息
@@ -70,7 +71,7 @@ func (that *Logger) doRotateFile(filePath string) error {
 		if !dfile.Exists(newFilePath) {
 			break
 		} else {
-			intlog.Printf(`rotation file exists, continue: %s`, newFilePath)
+			intlog.Printf(context.TODO(), `rotation file exists, continue: %s`, newFilePath)
 		}
 	}
 	//把老的文件改名
@@ -87,7 +88,7 @@ func (that *Logger) rotateChecksTimely() {
 
 	//旋转文件备份未启动
 	if that.config.RotateSize <= 0 && that.config.RotateExpire == 0 {
-		intlog.Printf(
+		intlog.Printf(context.TODO(),
 			"logging rotation ignore checks: RotateSize: %d, RotateExpire: %s",
 			that.config.RotateSize, that.config.RotateExpire.String(),
 		)
@@ -105,7 +106,7 @@ func (that *Logger) rotateChecksTimely() {
 		pattern  = "*.log, *.gz"
 		files, _ = dfile.ScanDirFile(that.config.Path, pattern, true)
 	)
-	intlog.Printf("logging rotation start checks: %+v", files)
+	intlog.Printf(context.TODO(), "logging rotation start checks: %+v", files)
 
 	// =============================================================
 	// 检查旋转文件是否过期
@@ -125,12 +126,12 @@ func (that *Logger) rotateChecksTimely() {
 			subDuration = now.Sub(mtime)
 			if subDuration > that.config.RotateExpire {
 				expireRotated = true
-				intlog.Printf(
+				intlog.Printf(context.TODO(),
 					`%v - %v = %v > %v, rotation expire logging file: %s`,
 					now, mtime, subDuration, that.config.RotateExpire, file,
 				)
 				if err := that.doRotateFile(file); err != nil {
-					intlog.Error(err)
+					intlog.Error(context.TODO(), err)
 				}
 			}
 		}
@@ -161,12 +162,12 @@ func (that *Logger) rotateChecksTimely() {
 			needCompressFileArray.Iterator(func(_ int, path string) bool {
 				err := dcompress.GzipFile(path, path+".gz")
 				if err == nil {
-					intlog.Printf(`compressed done, remove original logging file: %s`, path)
+					intlog.Printf(context.TODO(), `compressed done, remove original logging file: %s`, path)
 					if err = dfile.Remove(path); err != nil {
-						intlog.Print(err)
+						intlog.Print(context.TODO(), err)
 					}
 				} else {
-					intlog.Print(err)
+					intlog.Print(context.TODO(), err)
 				}
 				return true
 			})
@@ -203,14 +204,14 @@ func (that *Logger) rotateChecksTimely() {
 				backupFilesMap[originalLoggingFilePath].Add(file)
 			}
 		}
-		intlog.Printf(`calculated backup files map: %+v`, backupFilesMap)
+		intlog.Printf(context.TODO(), `calculated backup files map: %+v`, backupFilesMap)
 		for _, array := range backupFilesMap {
 			diff := array.Len() - that.config.RotateBackupLimit
 			for i := 0; i < diff; i++ {
 				path, _ := array.PopLeft()
-				intlog.Printf(`remove exceeded backup limit file: %s`, path)
+				intlog.Printf(context.TODO(), `remove exceeded backup limit file: %s`, path)
 				if err := dfile.Remove(path.(string)); err != nil {
-					intlog.Print(err)
+					intlog.Print(context.TODO(), err)
 				}
 			}
 		}
@@ -226,12 +227,12 @@ func (that *Logger) rotateChecksTimely() {
 					mtime = dfile.MTime(path)
 					subDuration = now.Sub(mtime)
 					if subDuration > that.config.RotateBackupExpire {
-						intlog.Printf(
+						intlog.Printf(context.TODO(),
 							`%v - %v = %v > %v, remove expired backup file: %s`,
 							now, mtime, subDuration, that.config.RotateBackupExpire, path,
 						)
 						if err := dfile.Remove(path); err != nil {
-							intlog.Print(err)
+							intlog.Print(context.TODO(), err)
 						}
 						return true
 					} else {

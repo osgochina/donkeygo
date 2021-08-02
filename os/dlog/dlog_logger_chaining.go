@@ -48,7 +48,7 @@ func (that *Logger) Path(path string) *Logger {
 	if path != "" {
 		if err := logger.SetPath(path); err != nil {
 			// panic(err)
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 	}
 	return logger
@@ -65,7 +65,7 @@ func (that *Logger) Cat(category string) *Logger {
 	if logger.config.Path != "" {
 		if err := logger.SetPath(dfile.Join(logger.config.Path, category)); err != nil {
 			// panic(err)
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 		}
 	}
 	return logger
@@ -105,7 +105,7 @@ func (that *Logger) LevelStr(levelStr string) *Logger {
 	}
 	if err := logger.SetLevelStr(levelStr); err != nil {
 		// panic(err)
-		intlog.Error(err)
+		intlog.Error(context.TODO(), err)
 	}
 	return logger
 }

@@ -1,6 +1,7 @@
 package dlog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/osgochina/donkeygo/errors/derror"
@@ -62,11 +63,11 @@ func (that *Logger) SetConfig(config Config) error {
 	that.config = config
 	if that.config.Path != "" {
 		if err := that.SetPath(config.Path); err != nil {
-			intlog.Error(err)
+			intlog.Error(context.TODO(), err)
 			return err
 		}
 	}
-	intlog.Printf("SetConfig: %+v", that.config)
+	intlog.Printf(context.TODO(), "SetConfig: %+v", that.config)
 	return nil
 }
 

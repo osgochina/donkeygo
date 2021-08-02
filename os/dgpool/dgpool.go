@@ -1,6 +1,7 @@
 package dgpool
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/osgochina/donkeygo/container/dlist"
@@ -36,7 +37,7 @@ func New(limit ...int) *Pool {
 // Go 执行协程
 func Go(fn func()) bool {
 	if err := pool.Add(fn); err != nil {
-		intlog.Errorf("%s", err.Error())
+		intlog.Errorf(context.TODO(), "%s", err.Error())
 		return false
 	}
 	return true
