@@ -1,13 +1,18 @@
-package dtimer_test
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
+package dtimer
 
 import (
-	"github.com/osgochina/donkeygo/os/dtimer"
 	"testing"
 	"time"
 )
 
 var (
-	timer = dtimer.NewTimer(5, 30*time.Millisecond)
+	timer = New()
 )
 
 func Benchmark_Add(b *testing.B) {
@@ -15,6 +20,12 @@ func Benchmark_Add(b *testing.B) {
 		timer.Add(time.Hour, func() {
 
 		})
+	}
+}
+
+func Benchmark_PriorityQueue_Pop(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		timer.queue.Pop()
 	}
 }
 

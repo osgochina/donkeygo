@@ -1,135 +1,131 @@
 package dtimer
 
-import "github.com/osgochina/donkeygo/container/dtype"
+import (
+	"github.com/osgochina/donkeygo/container/dtype"
+	"math"
+)
 
-// Entry 定时器中的每个刻度中需要执行的任务
+// Entry 定时器要执行的任务
 type Entry struct {
-	wheel             *wheel      // 当前条目所属的时间轮盘
-	job               JobFunc     // 将要执行的业务方法
-	singleton         *dtype.Bool // 是否是单例模式
-	status            *dtype.Int  // 当前业务方法执行的状态
-	times             *dtype.Int  // 该条目能运行的最大次数，超过这个次数就会被销毁
-	createMs          int64       //任务创建时候的毫秒时间戳
-	createTicks       int64       // 任务创建时候所在轮盘的当前滴答声
-	intervalMs        int64       // 任务的运行间隔毫秒数
-	intervalTicks     int64       //任务运行时候间隔的滴答声
-	installIntervalMs int64       //任务创建时候间隔的毫秒数
-
+	job       JobFunc      // 要执行的func
+	timer     *Timer       // 定时器对象
+	ticks     int64        // 任务执行间隔，当前执行ticks+ticks等于下一次需要执行的ticks
+	times     *dtype.Int   // job func要执行的次数
+	status    *dtype.Int   // 任务状态
+	singleton *dtype.Bool  // 是否是一次性任务
+	nextTicks *dtype.Int64 // 该任务下一次执行的时间
 }
 
-// 检查当前条目处理逻辑
-// nowTicks: 传入当前时间轮盘的滴答声
-// nowMs: 表示当前毫秒时间戳
-// runnable: 是否需要运行这个条目
-// addable: 是否需要把该条目重新添加到轮盘中，等带下一个到期时间
-func (that *Entry) check(nowTicks int64, nowMs int64) (runnable, addable bool) {
+type JobFunc = func()
 
-	switch that.status.Val() {
-	//如果当前条目是停止状态，说明该条目现在不需要现在执行，重新添加到轮盘中，等带下一个到期时间
-	case StatusStopped:
-		return false, true
-	// 如果当前条目状态是关闭，则说明都不做
-	case StatusClosed:
-		return false, false
-	//如果当前条目是重置，说明该条目不需要现在执行，重新添加到轮盘中，等带下一个到期时间
-	case StatusReset:
-		return false, true
-	}
-
-	//滴答声已经走动起来了，并且当前走到的位置已经命中了刻度
-	diff := nowTicks - that.createTicks
-	if diff > 0 && diff%that.intervalTicks == 0 {
-
-		//如果当前任务所在的时间轮盘不是最小的那个，则需要把自己放到下一个轮盘中继续等待命中
-		if that.wheel.level > 0 {
-
-			diffMs := nowMs - that.createMs
-			//如果间隔时间不足，则把它放到下一个刻度中执行
-			if diffMs < that.wheel.timer.intervalMs {
-				that.wheel.slots[(nowTicks+that.intervalTicks)%that.wheel.number].PushBack(that)
-				return false, false
-				// 正常
-			} else if diffMs >= that.wheel.timer.intervalMs {
-				//如果滴答一次的毫秒数 - 已等待的毫秒数，还要大于定时器最小滴答毫秒数，说明这个任务还要好久才能到期，把它重新放到轮盘中，等待下一次执行
-				if leftMs := that.intervalMs - diffMs; leftMs > that.wheel.timer.intervalMs {
-					that.wheel.timer.doAddEntryByParent(false, nowMs, leftMs, that)
-					return false, false
-				}
-			}
-		}
-		//如果当前任务是单例任务，并且正在运行中,那么此次任务略过，把任务丢到处理器中，等待下次执行
-		if that.IsSingleton() {
-			if that.status.Set(StatusRunning) == StatusRunning {
-				return false, true
-			}
-		}
-
-		//如果任务的执行次数到了设置值，此次不需要执行，也不需要再次添加到任务处理器中
-		times := that.times.Add(-1)
-		if times <= 0 {
-			if that.status.Set(StatusClosed) == StatusClosed || times < 0 {
-				return false, false
-			}
-		}
-
-		// 这里是一个快速判断逻辑，如果任务的最大执行次数小于20E，则让任务的执行次数变为最大
-		// 针对不限制执行次数的任务使用
-		if times < 2000000000 && times > 1000000000 {
-			that.times.Set(defaultTimes)
-		}
-		return true, true
-	}
-
-	//默认情况下，如果未到执行时间，都把该条目放到轮盘中，等待到期执行
-	return false, true
-}
-
-// Status 当前运行的状态
+// Status 获取当前任务的状态
 func (that *Entry) Status() int {
 	return that.status.Val()
 }
 
-// SetStatus 设置条目状态
+// Run 运行任务
+func (that *Entry) Run() {
+	// 执行次数-1
+	leftRunningTimes := that.times.Add(-1)
+	// 检查执行次数，如果到了设置的值，则关闭该任务
+	if leftRunningTimes < 0 {
+		that.status.Set(StatusClosed)
+		return
+	}
+	// 不限制执行次数
+	if leftRunningTimes == math.MaxInt32-1 {
+		that.times.Set(math.MaxInt32)
+	}
+	// 开启一个协程执行任务
+	go func() {
+		defer func() {
+			// 如果任务执行报错，则截取该错误，看该任务是否是主动关闭，如果是主动关闭，则退出该任务的执行，
+			// 以后也不会再次执行了，如果是运行报错，则继续网上panic，下次到了时间还会执行
+			if err := recover(); err != nil {
+				if err != panicExit {
+					panic(err)
+				} else {
+					that.Close()
+					return
+				}
+			}
+			//把任务正在执行状态变更为准备执行
+			if that.Status() == StatusRunning {
+				that.SetStatus(StatusReady)
+			}
+		}()
+		that.job()
+	}()
+}
+
+// 检查任务是否可以执行
+func (that *Entry) doCheckAndRunByTicks(currentTimerTicks int64) {
+	// 当前ticks是否到了任务下一次需要执行的ticks
+	if currentTimerTicks < that.nextTicks.Val() {
+		return
+	}
+	// 设置下一次需要执行的ticks
+	that.nextTicks.Set(currentTimerTicks + that.ticks)
+	// 执行任务状态检查
+	switch that.status.Val() {
+	case StatusRunning:
+		if that.IsSingleton() {
+			return
+		}
+	case StatusReady:
+		if !that.status.Cas(StatusReady, StatusRunning) {
+			return
+		}
+	case StatusStopped:
+		return
+	case StatusClosed:
+		return
+	}
+	// 执行任务
+	that.Run()
+}
+
+// SetStatus 修改任务状态
 func (that *Entry) SetStatus(status int) int {
 	return that.status.Set(status)
 }
 
-// Start 开始运行
+// Start 启动任务，把任务状态修改为准备执行
 func (that *Entry) Start() {
 	that.status.Set(StatusReady)
 }
 
-// Stop 停止运行
+// Stop 停止任务，把任务修正为停止状态，不同于close任务，停止状态可以从新开始
 func (that *Entry) Stop() {
 	that.status.Set(StatusStopped)
 }
 
-// Reset 重置
-func (that *Entry) Reset() {
-	that.status.Set(StatusReset)
-}
-
-// Close 关闭
+// Close 关闭该任务
 func (that *Entry) Close() {
 	that.status.Set(StatusClosed)
 }
 
-// IsSingleton 判断该条目是否是单例模式
+// Reset 重置任务运行节拍器
+func (that *Entry) Reset() {
+	that.nextTicks.Set(that.timer.ticks.Val() + that.ticks)
+}
+
+// IsSingleton 判断任务是否是并发限制任务
 func (that *Entry) IsSingleton() bool {
 	return that.singleton.Val()
 }
 
-// SetSingleton 设置该条目为单例模式
+// SetSingleton 设置任务为并发限制任务
 func (that *Entry) SetSingleton(enabled bool) {
 	that.singleton.Set(enabled)
 }
 
-// SetTimes 设置当前条目运行时间
-func (that *Entry) SetTimes(times int) {
-	that.times.Set(times)
+// Job 当前定时任务需要执行的方法
+func (that *Entry) Job() JobFunc {
+	return that.job
 }
 
-// Run 开始运行该条目
-func (that *Entry) Run() {
-	that.job()
+// SetTimes 设置任务执行次数
+func (that *Entry) SetTimes(times int) {
+	that.times.Set(times)
 }

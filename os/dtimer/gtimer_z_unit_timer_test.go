@@ -10,7 +10,6 @@ package dtimer_test
 
 import (
 	"github.com/osgochina/donkeygo/container/darray"
-	"github.com/osgochina/donkeygo/os/dlog"
 	"github.com/osgochina/donkeygo/os/dtimer"
 	"github.com/osgochina/donkeygo/test/dtest"
 	"testing"
@@ -18,7 +17,7 @@ import (
 )
 
 func New() *dtimer.Timer {
-	return dtimer.NewTimer(10, 10*time.Millisecond)
+	return dtimer.New()
 }
 
 func TestTimer_Add_Close(t *testing.T) {
@@ -27,15 +26,15 @@ func TestTimer_Add_Close(t *testing.T) {
 		array := darray.New(true)
 		//fmt.Println("start", time.Now())
 		timer.Add(200*time.Millisecond, func() {
-			//fmt.Println("entry1", time.Now())
+			//fmt.Println("job1", time.Now())
 			array.Append(1)
 		})
 		timer.Add(200*time.Millisecond, func() {
-			//fmt.Println("entry2", time.Now())
+			//fmt.Println("job2", time.Now())
 			array.Append(1)
 		})
 		timer.Add(400*time.Millisecond, func() {
-			//fmt.Println("entry3", time.Now())
+			//fmt.Println("job3", time.Now())
 			array.Append(1)
 		})
 		time.Sleep(250 * time.Millisecond)
@@ -54,40 +53,39 @@ func TestTimer_Start_Stop_Close(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
-		timer.Add(200*time.Millisecond, func() {
-			//dlog.Println("add...")
+		timer.Add(1000*time.Millisecond, func() {
 			array.Append(1)
 		})
 		t.Assert(array.Len(), 0)
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(1200 * time.Millisecond)
 		t.Assert(array.Len(), 1)
 		timer.Stop()
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(1200 * time.Millisecond)
 		t.Assert(array.Len(), 1)
 		timer.Start()
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(1200 * time.Millisecond)
 		t.Assert(array.Len(), 2)
 		timer.Close()
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(1200 * time.Millisecond)
 		t.Assert(array.Len(), 2)
 	})
 }
 
-func TestTimer_Reset(t *testing.T) {
+func TestJob_Reset(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
-		dlog.Printf("start time:%d", time.Now().Unix())
-		singleton := timer.AddSingleton(2*time.Second, func() {
-			timestamp := time.Now().Unix()
-			dlog.Println(timestamp)
-			array.Append(timestamp)
+		job := timer.AddSingleton(500*time.Millisecond, func() {
+			array.Append(1)
 		})
-		time.Sleep(5 * time.Second)
-		dlog.Printf("reset time:%d", time.Now().Unix())
-		singleton.Reset()
-		time.Sleep(10 * time.Second)
-		t.Assert(array.Len(), 6)
+		time.Sleep(300 * time.Millisecond)
+		job.Reset()
+		time.Sleep(300 * time.Millisecond)
+		job.Reset()
+		time.Sleep(300 * time.Millisecond)
+		job.Reset()
+		time.Sleep(600 * time.Millisecond)
+		t.Assert(array.Len(), 1)
 	})
 }
 
@@ -155,7 +153,7 @@ func TestTimer_DelayAdd(t *testing.T) {
 	})
 }
 
-func TestTimer_DelayAddEntry(t *testing.T) {
+func TestTimer_DelayAddJob(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
@@ -226,7 +224,9 @@ func TestTimer_DelayAddTimes(t *testing.T) {
 
 func TestTimer_AddLessThanInterval(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
-		timer := dtimer.NewTimer(10, 100*time.Millisecond)
+		timer := dtimer.New(dtimer.TimerOptions{
+			Interval: 100 * time.Millisecond,
+		})
 		array := darray.New(true)
 		timer.Add(20*time.Millisecond, func() {
 			array.Append(1)
@@ -242,19 +242,19 @@ func TestTimer_AddLessThanInterval(t *testing.T) {
 	})
 }
 
-func TestTimer_AddLeveledEntry1(t *testing.T) {
+func TestTimer_AddLeveledJob1(t *testing.T) {
 	dtest.C(t, func(t *dtest.T) {
 		timer := New()
 		array := darray.New(true)
-		//dlog.Println("start")
+		//glog.Println("start")
 		timer.DelayAdd(1000*time.Millisecond, 1000*time.Millisecond, func() {
-			//dlog.Println("add")
+			//glog.Println("add")
 			array.Append(1)
 		})
 		time.Sleep(1500 * time.Millisecond)
 		t.Assert(array.Len(), 0)
 		time.Sleep(1300 * time.Millisecond)
-		//dlog.Println("check")
+		//glog.Println("check")
 		t.Assert(array.Len(), 1)
 	})
 }
