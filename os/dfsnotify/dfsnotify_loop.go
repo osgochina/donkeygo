@@ -1,6 +1,7 @@
 package dfsnotify
 
 import (
+	"context"
 	"github.com/osgochina/donkeygo/container/dlist"
 	"github.com/osgochina/donkeygo/internal/intlog"
 )
@@ -25,7 +26,7 @@ func (that *Watcher) watchLoop() {
 					return struct{}{}, nil
 				}, repeatEventFilterDuration)
 			case err := <-that.watcher.Errors:
-				intlog.Error(err)
+				intlog.Error(context.TODO(), err)
 			}
 		}
 	}()
@@ -48,9 +49,9 @@ func (that *Watcher) eventLoop() {
 					if fileExists(event.Path) {
 						// 如果该名字的文件还存在，重新把改名字的文件添加到监听中
 						if err := that.watcher.Add(event.Path); err != nil {
-							intlog.Error(err)
+							intlog.Error(context.TODO(), err)
 						} else {
-							intlog.Printf("fake remove event, watcher re-adds monitor for: %s", event.Path)
+							intlog.Printf(context.TODO(), "fake remove event, watcher re-adds monitor for: %s", event.Path)
 						}
 						// 如果该名字的文件还存在，就不能认为它是删除，把事件变成改名
 						event.Op = RENAME
@@ -59,9 +60,9 @@ func (that *Watcher) eventLoop() {
 					if fileExists(event.Path) {
 						//如果该名字的文件还存在,则再次加入监听
 						if err := that.watcher.Add(event.Path); err != nil {
-							intlog.Error(err)
+							intlog.Error(context.TODO(), err)
 						} else {
-							intlog.Printf("fake rename event, watcher re-adds monitor for: %s", event.Path)
+							intlog.Printf(context.TODO(), "fake rename event, watcher re-adds monitor for: %s", event.Path)
 						}
 						// 如果该名字的文件还存在，就不能认为它是改名了，把事件更改为修改权限
 						event.Op = CHMOD
@@ -72,18 +73,18 @@ func (that *Watcher) eventLoop() {
 						for _, subPath := range fileAllDirs(event.Path) {
 							if fileIsDir(subPath) {
 								if err := that.watcher.Add(subPath); err != nil {
-									intlog.Error(err)
+									intlog.Error(context.TODO(), err)
 								} else {
-									intlog.Printf("folder creation event, watcher adds monitor for: %s", subPath)
+									intlog.Printf(context.TODO(), "folder creation event, watcher adds monitor for: %s", subPath)
 								}
 							}
 						}
 					} else {
 						// 如果它是一个文件，则把该文件路径添加到监听列表中
 						if err := that.watcher.Add(event.Path); err != nil {
-							intlog.Error(err)
+							intlog.Error(context.TODO(), err)
 						} else {
-							intlog.Printf("file creation event, watcher adds monitor for: %s", event.Path)
+							intlog.Printf(context.TODO(), "file creation event, watcher adds monitor for: %s", event.Path)
 						}
 					}
 				}

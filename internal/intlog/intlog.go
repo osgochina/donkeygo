@@ -1,9 +1,19 @@
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
+// Package intlog provides internal logging for GoFrame development usage only.
 package intlog
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"github.com/osgochina/donkeygo/debug/ddebug"
 	"github.com/osgochina/donkeygo/internal/utils"
+	"go.opentelemetry.io/otel/trace"
 	"path/filepath"
 	"time"
 )
@@ -12,60 +22,111 @@ const (
 	stackFilterKey = "/internal/intlog"
 )
 
-var isDKDebug = false
+var (
+	// isGFDebug marks whether printing GoFrame debug information.
+	isGFDebug = false
+)
 
 func init() {
-	isDKDebug = utils.IsDebugEnabled()
+	isGFDebug = utils.IsDebugEnabled()
 }
 
-// SetEnabled 开启关闭内部日志，非并发安全
+// SetEnabled enables/disables the internal logging manually.
+// Note that this function is not concurrent safe, be aware of the DATA RACE.
 func SetEnabled(enabled bool) {
-	if isDKDebug != enabled {
-		isDKDebug = enabled
+	// If they're the same, it does not write the `isGFDebug` but only reading operation.
+	if isGFDebug != enabled {
+		isGFDebug = enabled
 	}
 }
 
-// Print 打印日志
-func Print(v ...interface{}) {
-	if !isDKDebug {
+// Print prints `v` with newline using fmt.Println.
+// The parameter `v` can be multiple variables.
+func Print(ctx context.Context, v ...interface{}) {
+	doPrint(ctx, fmt.Sprint(v...), false)
+}
+
+// Printf prints `v` with format `format` using fmt.Printf.
+// The parameter `v` can be multiple variables.
+func Printf(ctx context.Context, format string, v ...interface{}) {
+	doPrint(ctx, fmt.Sprintf(format, v...), false)
+}
+
+// Error prints `v` with newline using fmt.Println.
+// The parameter `v` can be multiple variables.
+func Error(ctx context.Context, v ...interface{}) {
+	doPrint(ctx, fmt.Sprint(v...), true)
+}
+
+// Errorf prints `v` with format `format` using fmt.Printf.
+func Errorf(ctx context.Context, format string, v ...interface{}) {
+	doPrint(ctx, fmt.Sprintf(format, v...), true)
+}
+
+// PrintFunc prints the output from function `f`.
+// It only calls function `f` if debug mode is enabled.
+func PrintFunc(ctx context.Context, f func() string) {
+	if !isGFDebug {
 		return
 	}
-	fmt.Println(append([]interface{}{now(), "[INTE]", file()}, v...)...)
-}
-
-// Printf 打印日志
-func Printf(format string, v ...interface{}) {
-	if !isDKDebug {
+	s := f()
+	if s == "" {
 		return
 	}
-	fmt.Printf(now()+" [INTE] "+file()+" "+format+"\n", v...)
+	doPrint(ctx, s, false)
 }
 
-func Error(v ...interface{}) {
-	if !isDKDebug {
+// ErrorFunc prints the output from function `f`.
+// It only calls function `f` if debug mode is enabled.
+func ErrorFunc(ctx context.Context, f func() string) {
+	if !isGFDebug {
 		return
 	}
-	array := append([]interface{}{now(), "[INTE]", file()}, v...)
-	array = append(array, "\n"+ddebug.StackWithFilter(stackFilterKey))
-	fmt.Println(array...)
-}
-
-func Errorf(format string, v ...interface{}) {
-	if !isDKDebug {
+	s := f()
+	if s == "" {
 		return
 	}
-	fmt.Printf(
-		now()+" [INTE] "+file()+" "+format+"\n%s\n",
-		append(v, ddebug.StackWithFilter(stackFilterKey))...,
-	)
+	doPrint(ctx, s, true)
 }
 
-// 当前时间
+func doPrint(ctx context.Context, content string, stack bool) {
+	if !isGFDebug {
+		return
+	}
+	buffer := bytes.NewBuffer(nil)
+	buffer.WriteString(now())
+	buffer.WriteString(" [INTE] ")
+	buffer.WriteString(file())
+	buffer.WriteString(" ")
+	if s := traceIdStr(ctx); s != "" {
+		buffer.WriteString(s + " ")
+	}
+	buffer.WriteString(content)
+	buffer.WriteString("\n")
+	if stack {
+		buffer.WriteString(ddebug.StackWithFilter(stackFilterKey))
+	}
+	fmt.Print(buffer.String())
+}
+
+// traceIdStr retrieves and returns the trace id string for logging output.
+func traceIdStr(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	spanCtx := trace.SpanContextFromContext(ctx)
+	if traceId := spanCtx.TraceID(); traceId.IsValid() {
+		return "{" + traceId.String() + "}"
+	}
+	return ""
+}
+
+// now returns current time string.
 func now() string {
 	return time.Now().Format("2006-01-02 15:04:05.000")
 }
 
-// 返回调用者的文件名和行号
+// file returns caller file name along with its line number.
 func file() string {
 	_, p, l := ddebug.CallerWithFilter(stackFilterKey)
 	return fmt.Sprintf(`%s:%d`, filepath.Base(p), l)

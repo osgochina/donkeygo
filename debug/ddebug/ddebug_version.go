@@ -7,8 +7,8 @@
 package ddebug
 
 import (
-	"github.com/gogf/gf/crypto/gmd5"
-	"github.com/gogf/gf/encoding/ghash"
+	"github.com/osgochina/donkeygo/crypto/dmd5"
+	"github.com/osgochina/donkeygo/encoding/dhash"
 	"io/ioutil"
 	"strconv"
 )
@@ -19,7 +19,7 @@ func BinVersion() string {
 	if binaryVersion == "" {
 		binaryContent, _ := ioutil.ReadFile(selfPath)
 		binaryVersion = strconv.FormatInt(
-			int64(ghash.BKDRHash(binaryContent)),
+			int64(dhash.BKDRHash(binaryContent)),
 			36,
 		)
 	}
@@ -30,7 +30,7 @@ func BinVersion() string {
 // It uses MD5 algorithm to calculate the unique version of the binary.
 func BinVersionMd5() string {
 	if binaryVersionMd5 == "" {
-		binaryVersionMd5, _ = gmd5.EncryptFile(selfPath)
+		binaryVersionMd5, _ = dmd5.EncryptFile(selfPath)
 	}
 	return binaryVersionMd5
 }

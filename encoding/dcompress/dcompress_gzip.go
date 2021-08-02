@@ -1,3 +1,9 @@
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
 package dcompress
 
 import (
@@ -7,7 +13,11 @@ import (
 	"io"
 )
 
-// Gzip 使用gzip压缩
+// Gzip compresses <data> using gzip algorithm.
+// The optional parameter <level> specifies the compression level from
+// 1 to 9 which means from none to the best compression.
+//
+// Note that it returns error if given <level> is invalid.
 func Gzip(data []byte, level ...int) ([]byte, error) {
 	var (
 		writer *gzip.Writer
@@ -31,23 +41,7 @@ func Gzip(data []byte, level ...int) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// UnGzip 解压缩gzip
-func UnGzip(data []byte) ([]byte, error) {
-	var buf bytes.Buffer
-	reader, err := gzip.NewReader(bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-	if _, err = io.Copy(&buf, reader); err != nil {
-		return nil, err
-	}
-	if err = reader.Close(); err != nil {
-		return buf.Bytes(), err
-	}
-	return buf.Bytes(), nil
-}
-
-// GzipFile 压缩文件
+// GzipFile compresses the file <src> to <dst> using gzip algorithm.
 func GzipFile(src, dst string, level ...int) error {
 	var (
 		writer *gzip.Writer
@@ -81,7 +75,23 @@ func GzipFile(src, dst string, level ...int) error {
 	return nil
 }
 
-// UnGzipFile 解压缩文件
+// UnGzip decompresses <data> with gzip algorithm.
+func UnGzip(data []byte) ([]byte, error) {
+	var buf bytes.Buffer
+	reader, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	if _, err = io.Copy(&buf, reader); err != nil {
+		return nil, err
+	}
+	if err = reader.Close(); err != nil {
+		return buf.Bytes(), err
+	}
+	return buf.Bytes(), nil
+}
+
+// UnGzip decompresses file <src> to <dst> using gzip algorithm.
 func UnGzipFile(src, dst string) error {
 	srcFile, err := dfile.Open(src)
 	if err != nil {

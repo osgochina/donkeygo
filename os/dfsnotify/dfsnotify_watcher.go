@@ -1,6 +1,7 @@
 package dfsnotify
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/osgochina/donkeygo/container/dlist"
@@ -28,9 +29,9 @@ func (that *Watcher) AddOnce(name, path string, callbackFunc func(event *Event),
 			for _, subPath := range fileAllDirs(path) {
 				if fileIsDir(subPath) {
 					if err := that.watcher.Add(subPath); err != nil {
-						intlog.Error(err)
+						intlog.Error(context.TODO(), err)
 					} else {
-						intlog.Printf("watcher adds monitor for: %s", subPath)
+						intlog.Printf(context.TODO(), "watcher adds monitor for: %s", subPath)
 					}
 				}
 			}
@@ -77,9 +78,9 @@ func (that *Watcher) addWithCallbackFunc(name, path string, callbackFunc func(ev
 	})
 	// 添加path的监听
 	if err = that.watcher.Add(path); err != nil {
-		intlog.Error(err)
+		intlog.Error(context.TODO(), err)
 	} else {
-		intlog.Printf("watcher adds monitor for: %s", path)
+		intlog.Printf(context.TODO(), "watcher adds monitor for: %s", path)
 	}
 	// 把callback加入到map中
 	callbackIdMap.Set(callback.Id, callback)
@@ -91,7 +92,7 @@ func (that *Watcher) addWithCallbackFunc(name, path string, callbackFunc func(ev
 func (that *Watcher) Close() {
 	that.events.Close()
 	if err := that.watcher.Close(); err != nil {
-		intlog.Error(err)
+		intlog.Error(context.TODO(), err)
 	}
 	close(that.closeChan)
 }
@@ -131,7 +132,7 @@ func (that *Watcher) Remove(path string) error {
 		for _, subPath := range subPaths {
 			if that.checkPathCanBeRemoved(subPath) {
 				if err := that.watcher.Remove(subPath); err != nil {
-					intlog.Error(err)
+					intlog.Error(context.TODO(), err)
 				}
 			}
 		}

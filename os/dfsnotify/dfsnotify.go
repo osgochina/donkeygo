@@ -1,6 +1,7 @@
 package dfsnotify
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
@@ -77,7 +78,7 @@ func New() (*Watcher, error) {
 	if watcher, err := fsnotify.NewWatcher(); err == nil {
 		w.watcher = watcher
 	} else {
-		intlog.Printf("New watcher failed: %v", err)
+		intlog.Printf(context.TODO(), "New watcher failed: %v", err)
 		return nil, err
 	}
 	w.watchLoop()
