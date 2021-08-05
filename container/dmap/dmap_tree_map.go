@@ -7,17 +7,17 @@
 package dmap
 
 import (
-	"github.com/gogf/gf/container/gtree"
+	"github.com/osgochina/donkeygo/container/dtree"
 )
 
 // Map based on red-black tree, alias of RedBlackTree.
-type TreeMap = gtree.RedBlackTree
+type TreeMap = dtree.RedBlackTree
 
 // NewTreeMap instantiates a tree map with the custom comparator.
 // The parameter <safe> is used to specify whether using tree in concurrent-safety,
 // which is false in default.
 func NewTreeMap(comparator func(v1, v2 interface{}) int, safe ...bool) *TreeMap {
-	return gtree.NewRedBlackTree(comparator, safe...)
+	return dtree.NewRedBlackTree(comparator, safe...)
 }
 
 // NewTreeMapFrom instantiates a tree map with the custom comparator and <data> map.
@@ -26,5 +26,5 @@ func NewTreeMap(comparator func(v1, v2 interface{}) int, safe ...bool) *TreeMap 
 // The parameter <safe> is used to specify whether using tree in concurrent-safety,
 // which is false in default.
 func NewTreeMapFrom(comparator func(v1, v2 interface{}) int, data map[interface{}]interface{}, safe ...bool) *TreeMap {
-	return gtree.NewRedBlackTreeFrom(comparator, data, safe...)
+	return dtree.NewRedBlackTreeFrom(comparator, data, safe...)
 }
