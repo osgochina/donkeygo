@@ -201,7 +201,7 @@ func (that *endpoint) GetSession(sessionID string) (Session, bool) {
 
 // RangeSession 遍历session
 func (that *endpoint) RangeSession(fn func(sess Session) bool) {
-	that.sessHub.sessions.Iterator(func(key, value interface{}) bool {
+	that.sessHub.sessions.Range(func(key, value interface{}) bool {
 		return fn(value.(*session))
 	})
 }
